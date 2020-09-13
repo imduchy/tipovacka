@@ -1,5 +1,17 @@
-interface Game {
+import mongoose, { Schema, Document } from 'mongoose'
+import { GameStatus, Season } from './Enums'
+
+interface ITeam {
+  id: number
+  name: String
+  logo: String
+}
+
+export interface IGame extends Document {
+  version?: number
   date: Date
+  homeTeam: ITeam
+  awayTeam: ITeam
   homeTeamScore: number
   awayTeamScore: number
   status: GameStatus
@@ -8,32 +20,31 @@ interface Game {
   venue: String
 }
 
-enum Season {
-  S2020 = '2020',
-  S2021 = '2021',
-}
+const GameSchema = new Schema({
+  version: { type: Number, default: 1, required: true },
+  date: { type: Date, required: true },
+  homeTeam: {
+    type: {
+      id: { type: Number, required: true },
+      name: { type: String, required: true },
+      logo: { type: String, required: true },
+    },
+    required: true,
+  },
+  awayTeam: {
+    type: {
+      id: { type: Number, required: true },
+      name: { type: String, required: true },
+      logo: { type: String, required: true },
+    },
+    required: true,
+  },
+  homeTeamScore: { type: Number, required: true },
+  awayTeamScore: { type: Number, required: true },
+  status: { type: GameStatus, required: true },
+  competition: { type: String, required: true },
+  season: { type: Season, required: true },
+  venue: { type: String, required: true },
+})
 
-/**
- * List of available fixture statuses from the api-footbal API.
- * https://www.api-football.com/documentation-beta#operation/get-fixtures
- */
-enum GameStatus {
-  TBD = 'Time To Be Defined',
-  NS = 'Not Started',
-  FirstHalf = 'First Half, Kick Off',
-  HT = 'Halftime',
-  SecondHalf = 'Second Half, 2nd Half Started',
-  ET = 'Extra Time',
-  P = 'Penalty In Progress',
-  FT = 'Match Finished',
-  AET = 'Match Finished After Extra Time',
-  PEN = 'Match Finished After Penalty',
-  BT = 'Break Time (in Extra Time)',
-  SUSP = 'Match Suspended',
-  INT = 'Match Interrupted',
-  PST = 'Match Postponed',
-  CANC = 'Match Cancelled',
-  ABD = 'Match Abandoned',
-  AWD = 'Technical Loss',
-  WO = 'WalkOver',
-}
+export default mongoose.model<IGame>('game', GameSchema)
