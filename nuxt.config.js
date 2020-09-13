@@ -2,11 +2,6 @@ import colors from 'vuetify/es5/util/colors'
 
 export default {
   /*
-   ** Nuxt rendering mode
-   ** See https://nuxtjs.org/api/configuration-mode
-   */
-  mode: 'universal',
-  /*
    ** Nuxt target
    ** See https://nuxtjs.org/api/configuration-target
    */
@@ -29,6 +24,7 @@ export default {
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
+  serverMiddleware: ['~/api/v1/index'],
   /*
    ** Global CSS
    */
