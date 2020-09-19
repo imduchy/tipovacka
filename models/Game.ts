@@ -1,50 +1,52 @@
 import mongoose, { Schema, Document } from 'mongoose'
-import { GameStatus, Season } from './Enums'
+import { GameStatus } from './Enums'
 
-interface ITeam {
-  id: number
+export interface ITeam {
+  teamId: number
   name: String
   logo: String
 }
 
-export interface IGame extends Document {
+export interface IGame {
   version?: number
+  gameId: number
   date: Date
   homeTeam: ITeam
   awayTeam: ITeam
-  homeTeamScore: number
-  awayTeamScore: number
+  homeTeamScore?: number
+  awayTeamScore?: number
   status: GameStatus
-  competition: String
-  season: Season
+  competition: number
+  season: number
   venue: String
 }
+
+export type IGameDocument = IGame & Document
+
+const TeamSchema = new Schema({
+  version: { type: Number, default: 1, required: true },
+  teamId: { type: Number, required: true },
+  name: { type: String, required: true },
+  logo: { type: String, required: true },
+})
 
 const GameSchema = new Schema({
   version: { type: Number, default: 1, required: true },
   date: { type: Date, required: true },
   homeTeam: {
-    type: {
-      id: { type: Number, required: true },
-      name: { type: String, required: true },
-      logo: { type: String, required: true },
-    },
+    type: TeamSchema,
     required: true,
   },
   awayTeam: {
-    type: {
-      id: { type: Number, required: true },
-      name: { type: String, required: true },
-      logo: { type: String, required: true },
-    },
+    type: TeamSchema,
     required: true,
   },
-  homeTeamScore: { type: Number, required: true },
-  awayTeamScore: { type: Number, required: true },
+  homeTeamScore: { type: Number, required: true, default: 0 },
+  awayTeamScore: { type: Number, required: true, default: 0 },
   status: { type: GameStatus, required: true },
-  competition: { type: String, required: true },
-  season: { type: Season, required: true },
+  competition: { type: Number, required: true },
+  season: { type: Number, required: true },
   venue: { type: String, required: true },
 })
 
-export default mongoose.model<IGame>('game', GameSchema)
+export default mongoose.model<IGameDocument>('game', GameSchema)

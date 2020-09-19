@@ -1,5 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose'
-import User, { IUser } from './User'
+import mongoose, { Document, Schema, Types } from 'mongoose'
+import User, { IUserDocument } from './User'
 
 interface IGroup extends Document {
   version?: number
@@ -8,7 +8,7 @@ interface IGroup extends Document {
   website: String
   teamId: number
   competitionsIds: number[]
-  users: IUser[]
+  users: Types.Array<IUserDocument>
 }
 
 const GroupSchema = new Schema({
@@ -17,8 +17,8 @@ const GroupSchema = new Schema({
   email: { type: String, required: true, unique: true },
   website: { type: String, required: false },
   teamId: { type: Number, required: true },
-  competitionsIds: { type: [Number], required: true },
-  users: { type: [User], required: true },
+  competitionsIds: [{ type: Number, required: true }],
+  users: [{ type: User.schema }],
 })
 
 export default mongoose.model<IGroup>('group', GroupSchema)

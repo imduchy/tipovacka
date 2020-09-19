@@ -1,8 +1,3 @@
-export enum Season {
-  S2020 = '2020',
-  S2021 = '2021',
-}
-
 /**
  * List of available fixture statuses from the api-footbal API.
  * https://www.api-football.com/documentation-beta#operation/get-fixtures

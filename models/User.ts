@@ -1,37 +1,43 @@
-import mongoose, { Schema, Document } from 'mongoose'
+import mongoose, { Schema, Document, Types } from 'mongoose'
 import { IBet } from './Bet'
-import { Season } from './Enums'
 
-export interface IUser extends Document {
-  version?: number
+export interface IUser {
+  _version?: number
   username: String
   email: String
   passwordHash: String
-  totalScore: TotalScore[]
-  bet: IBet | mongoose.Types.ObjectId
+  totalScore: ITotalScore[]
+  bets?: IBet[] | Types.ObjectId[]
 }
 
-interface TotalScore {
+export interface IUserDocument extends IUser, Document {}
+
+interface ITotalScore {
+  _version?: number
   competitionId: number
-  season: Season
+  season: number
   score: number
 }
 
+const TotalScoreSchema = new Schema({
+  _version: { type: Number, default: 1, required: true },
+  competitionId: { type: Number, required: true },
+  season: { type: Number, required: true },
+  score: { type: Number, required: true, default: 0 },
+})
+
 const UserSchema = new Schema({
-  version: { type: Number, required: true, default: 1 },
+  _version: { type: Number, required: true, default: 1 },
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
-  totalScore: {
-    type: {
-      competitionId: { type: Number, required: true },
-      season: { type: Season, required: true },
-      score: { type: Number, required: true },
+  totalScore: [
+    {
+      type: TotalScoreSchema,
+      required: true,
     },
-    required: true,
-    unique: true,
-  },
-  bets: { type: [mongoose.Types.ObjectId], ref: 'bet' },
+  ],
+  bets: [{ type: Schema.Types.ObjectId, ref: 'bet', default: [] }],
 })
 
-export default mongoose.model<IUser>('user', UserSchema)
+export default mongoose.model<IUserDocument>('user', UserSchema)
