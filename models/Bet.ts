@@ -2,13 +2,15 @@ import mongoose, { Schema, Document } from 'mongoose'
 import { IGame } from './Game'
 import { IUserDocument } from './User'
 
-export interface IBet extends Document {
+export interface IBet {
   version?: number
   homeTeamScore: number
   awayTeamScore: number
   game: IGame | mongoose.Types.ObjectId
   user: IUserDocument | mongoose.Types.ObjectId
 }
+
+export type IBetDocument = IBet & Document
 
 const BetSchema = new Schema({
   version: { type: Number, required: true, default: 1 },
@@ -18,4 +20,4 @@ const BetSchema = new Schema({
   user: { types: Schema.Types.ObjectId },
 })
 
-export default mongoose.model<IBet>('bet', BetSchema)
+export default mongoose.model<IBetDocument>('bet', BetSchema)

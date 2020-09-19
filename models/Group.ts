@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, Types } from 'mongoose'
 import User, { IUserDocument } from './User'
 
-interface IGroup extends Document {
+export interface IGroup {
   version?: number
   name: String
   email: String
@@ -10,6 +10,8 @@ interface IGroup extends Document {
   competitionsIds: number[]
   users: Types.Array<IUserDocument>
 }
+
+export type IGroupDocument = IGroup & Document
 
 const GroupSchema = new Schema({
   version: { type: Number, required: true, default: 1 },
@@ -21,4 +23,4 @@ const GroupSchema = new Schema({
   users: [{ type: User.schema }],
 })
 
-export default mongoose.model<IGroup>('group', GroupSchema)
+export default mongoose.model<IGroupDocument>('group', GroupSchema)
