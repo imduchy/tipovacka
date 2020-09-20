@@ -12,7 +12,7 @@ router.get('/:groupId', async (req, res) => {
   try {
     const group = await Group.findById(req.params.groupId)
     if (!group) {
-      logger.info(`Group with _id ${req.params.groupId} doesn't exist.`)
+      logger.warning(`Group with _id ${req.params.groupId} doesn't exist.`)
       res.status(404).json("We couldn't find this group")
       return
     }

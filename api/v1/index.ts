@@ -1,9 +1,13 @@
+import bodyParser from 'body-parser'
+import dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
-import dotenv from 'dotenv'
-import mockResponse from '../../mocks/lastFixture.json'
+import bets from './bets'
+import games from './games'
+import groups from './groups'
+import users from './users'
 
-const app = express()
+export const app = express()
 
 dotenv.config()
 const { DB_NAME, DB_USER, DB_PASSWORD, DB_URL } = process.env
@@ -12,14 +16,22 @@ mongoose.connect(
   `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_URL}/${DB_NAME}?retryWrites=true&w=majority`,
   {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
     useFindAndModify: false,
+    useUnifiedTopology: true,
     useCreateIndex: true,
   }
 )
 
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+
+app.use('/users', users)
+app.use('/groups', groups)
+app.use('/games', games)
+app.use('/bets', bets)
+
 app.get('/', (_, res) => {
-  res.send(mockResponse.response[0])
+  res.send('Hello world')
 })
 
 export default {

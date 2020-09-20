@@ -6,7 +6,7 @@ export interface IUser {
   email: String
   passwordHash: String
   totalScore: ITotalScore[]
-  bets?: IBet[] | Types.ObjectId[]
+  bets?: Types.Array<IBet>
   groupId: Types.ObjectId
 }
 
