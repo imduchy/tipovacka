@@ -8,7 +8,6 @@ export interface ITeam {
 }
 
 export interface IGame {
-  version?: number
   gameId: number
   date: Date
   homeTeam: ITeam
@@ -24,14 +23,15 @@ export interface IGame {
 export type IGameDocument = IGame & Document
 
 const TeamSchema = new Schema({
-  version: { type: Number, default: 1, required: true },
+  _version: { type: Number, default: 1, required: true },
   teamId: { type: Number, required: true },
   name: { type: String, required: true },
   logo: { type: String, required: true },
 })
 
 const GameSchema = new Schema({
-  version: { type: Number, default: 1, required: true },
+  _version: { type: Number, default: 1, required: true },
+  gameId: { type: Number, required: true },
   date: { type: Date, required: true },
   homeTeam: {
     type: TeamSchema,

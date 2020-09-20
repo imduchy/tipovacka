@@ -1,19 +1,18 @@
 import mongoose, { Schema, Document, Types } from 'mongoose'
-import { IBet } from './Bet'
+import { BetSchema, IBet } from './Bet'
 
 export interface IUser {
-  _version?: number
   username: String
   email: String
   passwordHash: String
   totalScore: ITotalScore[]
   bets?: IBet[] | Types.ObjectId[]
+  groupId: Types.ObjectId
 }
 
 export interface IUserDocument extends IUser, Document {}
 
 interface ITotalScore {
-  _version?: number
   competitionId: number
   season: number
   score: number
@@ -37,7 +36,8 @@ const UserSchema = new Schema({
       required: true,
     },
   ],
-  bets: [{ type: Schema.Types.ObjectId, ref: 'bet', default: [] }],
+  bets: [{ type: BetSchema, default: [] }],
+  groupId: { type: Schema.Types.ObjectId, ref: 'group' },
 })
 
 export default mongoose.model<IUserDocument>('user', UserSchema)
