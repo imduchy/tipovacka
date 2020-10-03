@@ -43,9 +43,9 @@ router.post('/', async ({ body }, res) => {
       email: body.email,
       passwordHash: body.passwordHash,
       groupId: body.groupId,
-      totalScore: Array.from(group.competitionsIds, (id) => ({
-        competitionId: id,
-        season: 2020,
+      totalScore: Array.from(group.competitions, (competition) => ({
+        competitionId: competition.competitionId,
+        season: competition.season,
         score: 0,
       })),
     })
