@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import Group from '../../models/Group'
 import logger from '../../utils/logger'
+import { getUpcomingGame } from '../../services/games'
+import Game from '~/models/Game'
 
 const router = Router()
 
@@ -32,13 +34,17 @@ router.get('/:groupId', async (req, res) => {
  */
 router.post('/', async ({ body }, res) => {
   try {
+    const upcommingGame = await getUpcomingGame(body.teamId, body.competitions)
+    const game = await Game.create(upcommingGame)
+
     const group = await Group.create({
       name: body.name,
       email: body.email,
       users: [],
       website: body.website,
       teamId: body.teamId,
-      competitionsIds: body.competitionsIds,
+      competitions: body.competitions,
+      upcommingGame: game._id,
     })
 
     logger.info(`A new group ${group.name} (${group._id}) was created.`)
