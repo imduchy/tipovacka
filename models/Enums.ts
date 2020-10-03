@@ -5,9 +5,9 @@
 export enum GameStatus {
   TBD = 'Time To Be Defined',
   NS = 'Not Started',
-  FirstHalf = 'First Half, Kick Off',
+  '1H' = 'First Half, Kick Off',
   HT = 'Halftime',
-  SecondHalf = 'Second Half, 2nd Half Started',
+  '2H' = 'Second Half, 2nd Half Started',
   ET = 'Extra Time',
   P = 'Penalty In Progress',
   FT = 'Match Finished',
