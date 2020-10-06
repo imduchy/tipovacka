@@ -6,6 +6,7 @@ import bets from './bets'
 import games from './games'
 import groups from './groups'
 import users from './users'
+import auth from './auth'
 
 export const app = express()
 
@@ -25,6 +26,7 @@ mongoose.connect(
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+app.use('/auth', auth)
 app.use('/users', users)
 app.use('/groups', groups)
 app.use('/games', games)
