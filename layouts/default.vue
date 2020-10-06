@@ -2,6 +2,8 @@
   <v-app dark>
     <v-navigation-drawer v-model="drawer" :mini-variant="miniVariant" fixed app>
       <v-list>
+        <v-list-item v-if="$auth.loggedIn">Logged in</v-list-item>
+        <v-list-item v-else> Not logged in </v-list-item>
         <v-list-item
           v-for="(item, i) in items"
           :key="i"

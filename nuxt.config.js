@@ -25,6 +25,9 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
   serverMiddleware: ['~/api/v1/index'],
+  router: {
+    middleware: 'auth',
+  },
   /*
    ** Global CSS
    */
@@ -49,7 +52,29 @@ export default {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    '@nuxtjs/auth',
   ],
+  auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          login: {
+            url: 'http://localhost:3000/api/login',
+            method: 'post',
+            propertyName: 'token',
+          },
+          logout: {
+            url: 'http://localhost:3000/api/logout',
+            method: 'post',
+          },
+        },
+        // tokenRequired: true,
+        // tokenType: 'bearer',
+        // globalToken: true,
+        // autoFetchUser: true
+      },
+    },
+  },
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
