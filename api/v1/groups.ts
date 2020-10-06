@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import Group from '../../models/Group'
+import Group, { IGroupCompetition } from '../../models/Group'
 import logger from '../../utils/logger'
-import { getUpcomingGame } from '../../services/games'
-import Game from '~/models/Game'
+import { findUpcommingGame } from '../../services/games'
+import Game from '../../models/Game'
 
 const router = Router()
 
@@ -12,7 +12,9 @@ const router = Router()
  */
 router.get('/:groupId', async (req, res) => {
   try {
-    const group = await Group.findById(req.params.groupId)
+    const group = await Group.findById(req.params.groupId).populate(
+      'upcommingGame'
+    )
     if (!group) {
       logger.warning(`Group with _id ${req.params.groupId} doesn't exist.`)
       res.status(404).json("We couldn't find this group")
@@ -34,7 +36,11 @@ router.get('/:groupId', async (req, res) => {
  */
 router.post('/', async ({ body }, res) => {
   try {
-    const upcommingGame = await getUpcomingGame(body.teamId, body.competitions)
+    const competitionIds = body.competitions.map(
+      (c: IGroupCompetition) => c.competitionId
+    )
+
+    const upcommingGame = await findUpcommingGame(body.teamId, competitionIds)
     const game = await Game.create(upcommingGame)
 
     const group = await Group.create({

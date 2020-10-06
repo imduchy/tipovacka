@@ -30,8 +30,6 @@ router.get('/:gameId', async (req, res) => {
 
 router.post('/', async ({ body }, res) => {
   try {
-    // Probably also add game to the group
-
     const game = await Game.create({
       gameId: body.gameId,
       date: body.date,

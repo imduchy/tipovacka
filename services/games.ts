@@ -1,8 +1,9 @@
 import axios from 'axios'
 import dotenv from 'dotenv'
 import { FixtureResponse } from '../models/responses/FixtureResponse'
-import { IGame } from '~/models/Game'
-import { GameStatus } from '~/models/Enums'
+import { IGame } from '../models/Game'
+import { GameStatus } from '../models/Enums'
+import logger from '../utils/logger'
 
 dotenv.config()
 
@@ -16,31 +17,82 @@ const URL = `${process.env.API_URL}/fixtures`
  * @param leagueIds list of leagueIds (ids returned from API)
  * @returns an upcoming game for a specified team
  */
-export const getUpcomingGame = async (teamId: number, leagueIds: number[]) => {
-  const upcomingGameResponses: FixtureResponse.Response[] = []
+export const findUpcommingGame = async (
+  teamId: number,
+  leagueIds: number[]
+) => {
+  const upcomingGames: IGame[] = []
 
-  for (const league of leagueIds) {
-    const { response }: FixtureResponse.RootObject = await axios.get(URL, {
-      params: {
-        teamId,
-        league,
-      },
-      headers: {
-        'x-rapidapi-host': process.env.API_HOST,
-        'x-rapidapi-key': process.env.API_KEY,
-      },
-    })
+  try {
+    for (const league of leagueIds) {
+      const response = await getUpcommingGame(teamId, league)
 
-    upcomingGameResponses.push(response[0])
+      if (!response) {
+        // getUpcommingGame logs a warn message
+        break
+      }
+
+      upcomingGames.push(response)
+    }
+  } catch (error) {
+    logger.error(
+      `Error while getting upcoming games for team ${teamId} & leagues ${leagueIds}`
+    )
+    throw error
   }
 
-  upcomingGameResponses.sort((a, b) => {
-    return (
-      new Date(b.fixture.date).getTime() - new Date(a.fixture.date).getTime()
-    )
+  upcomingGames.sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime()
   })
 
-  return responseMapping(upcomingGameResponses[0])
+  logger.info(`
+    Sorted upcoming games in selected leagues for team ${teamId}.\n
+    The upcoming game is ${upcomingGames[0].gameId}.
+  `)
+
+  return upcomingGames[0]
+}
+
+/**
+ * Fetches an upcoming league game of the specified team
+ * from an API and returns it as IGame object.
+ *
+ * @param teamId teamId (id returned from API) of a team
+ * @param leagueId leagueId (id returned from API)
+ * @returns an upcoming league game for the specified team
+ */
+export const getUpcommingGame = async (teamId: number, leagueId: number) => {
+  try {
+    const { data }: { data: FixtureResponse.RootObject } = await axios.get(
+      URL,
+      {
+        params: {
+          team: teamId,
+          league: leagueId,
+          next: 1,
+        },
+        headers: {
+          'x-rapidapi-host': process.env.API_HOST,
+          'x-rapidapi-key': process.env.API_KEY,
+        },
+      }
+    )
+
+    if (data.results === 0) {
+      logger.warn(
+        `There are no results for upcoming games of a team ${teamId} in league ${leagueId}.` +
+          ` Make sure you specified the right IDs.`
+      )
+      return
+    }
+
+    return responseMapping(data.response[0])
+  } catch (error) {
+    logger.error(
+      `Error while getting upcoming games for team ${teamId} & leagues ${leagueId}`
+    )
+    throw error
+  }
 }
 
 /**
@@ -69,7 +121,7 @@ const responseMapping = (response: FixtureResponse.Response): IGame => {
     season: league.season,
     status: GameStatus[fixture.status.short],
     venue: fixture.venue.name,
-    awayTeamScore: score.fulltime.away,
-    homeTeamScore: score.fulltime.home,
+    awayTeamScore: score.fulltime.away ? score.fulltime.away : 0,
+    homeTeamScore: score.fulltime.home ? score.fulltime.away : 0,
   }
 }
