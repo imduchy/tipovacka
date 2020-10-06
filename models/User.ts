@@ -1,11 +1,13 @@
 import mongoose, { Schema, Document, Types } from 'mongoose'
+import logger from '../utils/logger'
 import { BetSchema, IBet } from './Bet'
+import Group from './Group'
 
 export interface IUser {
   username: String
   email: String
   passwordHash: String
-  totalScore: ITotalScore[]
+  totalScore?: ITotalScore[]
   bets?: Types.Array<IBet>
   groupId: Types.ObjectId
 }
@@ -34,10 +36,72 @@ const UserSchema = new Schema({
     {
       type: TotalScoreSchema,
       required: true,
+      default: [],
     },
   ],
   bets: [{ type: BetSchema, default: [] }],
   groupId: { type: Schema.Types.ObjectId, ref: 'group' },
+})
+
+/**
+ * Before a user is saved, create an empty totalScore
+ * objects for each of groups competitions.
+ */
+UserSchema.pre<IUserDocument>('save', function (next) {
+  const self = this
+
+  Group.findById(this.groupId, function (err, res) {
+    if (err) {
+      logger.error(
+        `<User.pre> Error while fetching a group by id ${self.groupId}.`
+      )
+      next(err)
+    } else if (res) {
+      for (const comp of res.competitions) {
+        self.totalScore!.push({
+          competitionId: comp.competitionId,
+          season: comp.season,
+          score: 0,
+        })
+      }
+      logger.info(
+        `<User.pre> Created totalScore objects for a user ${self.email} (${self._id}).`
+      )
+      next()
+    } else {
+      logger.error(
+        `<User.pre> Creation of totalScore objects for a user ` +
+          `${self.email} (${self._id}) was skipped.`
+      )
+      next()
+    }
+  })
+})
+
+/**
+ * After a user is saved, push the user _id
+ * to its group's users array.
+ */
+UserSchema.post<IUserDocument>('save', function (doc) {
+  Group.findOneAndUpdate(
+    { _id: doc.groupId },
+    { $push: { users: doc._id } },
+    function (err, group) {
+      if (err) {
+        logger.error(
+          `<User.post> Error while pushing a user id ${doc._id} to the group ${doc.groupId}.`
+        )
+      } else if (group) {
+        logger.info(
+          `<User.post> Pushed user's id ${doc._id} to the group ${group._id}.`
+        )
+      } else {
+        logger.error(
+          `<User.post> Pushing user's id ${doc._id} to the group ${doc.groupId} was skipped.`
+        )
+      }
+    }
+  )
 })
 
 export default mongoose.model<IUserDocument>('user', UserSchema)
