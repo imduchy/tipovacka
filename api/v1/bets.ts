@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { Types } from 'mongoose'
-import User, { IUser } from '../../models/User'
+import User from '../../models/User'
 import logger from '../../utils/logger'
 import { IBet } from '../../models/Bet'
+import { alreadyBet } from '../../services/bets'
 
 const router = Router()
 
@@ -41,14 +41,5 @@ router.post('/', async ({ body }, res) => {
     res.status(500).json('An internal error occured')
   }
 })
-
-const alreadyBet = (user: IUser, gameId: string | Types.ObjectId): boolean => {
-  const castedGameId =
-    typeof gameId === 'string' ? Types.ObjectId(gameId) : gameId
-
-  return user.bets!.some((bet) =>
-    (bet.game as Types.ObjectId).equals(castedGameId)
-  )
-}
 
 export default router
