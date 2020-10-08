@@ -8,9 +8,9 @@ export interface IGroupCompetition {
 }
 
 export interface IGroup {
-  name: String
-  email: String
-  website: String
+  name: string
+  email: string
+  website: string
   teamId: number
   competitions: IGroupCompetition[]
   upcommingGame: IGame

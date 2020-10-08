@@ -4,9 +4,9 @@ import { BetSchema, IBet } from './Bet'
 import Group from './Group'
 
 export interface IUser {
-  username: String
-  email: String
-  passwordHash: String
+  username: string
+  email: string
+  passwordHash: string
   totalScore?: ITotalScore[]
   bets?: Types.Array<IBet>
   groupId: Types.ObjectId

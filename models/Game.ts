@@ -3,8 +3,8 @@ import { GameStatus } from './Enums'
 
 export interface ITeam {
   teamId: number
-  name: String
-  logo: String
+  name: string
+  logo: string
 }
 
 export interface IGame {
@@ -17,7 +17,7 @@ export interface IGame {
   status: GameStatus
   competition: number
   season: number
-  venue: String
+  venue: string
 }
 
 export type IGameDocument = IGame & Document
