@@ -27,7 +27,7 @@ const TotalScoreSchema = new Schema({
   score: { type: Number, required: true, default: 0 },
 })
 
-const UserSchema = new Schema({
+const UserSchema = new Schema<IUser>({
   _version: { type: Number, required: true, default: 1 },
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
@@ -103,5 +103,21 @@ UserSchema.post<IUserDocument>('save', function (doc) {
     }
   )
 })
+
+UserSchema.path('groupId').validate(function (value: Types.ObjectId) {
+  return Group.findById(value, (err, res) => {
+    if (err) {
+      logger.error(
+        `<User.validate> Fetching provided group ${value} has failed with error. ${err}.`
+      )
+      return false
+    } else if (!res) {
+      logger.error(`<User.validate> Group with _id ${value} was not found.`)
+      return false
+    } else {
+      return true
+    }
+  })
+}, 'A group with id `{VALUE}` was not found')
 
 export default mongoose.model<IUserDocument>('user', UserSchema)
