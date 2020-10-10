@@ -11,8 +11,9 @@
   </v-form>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+export default Vue.extend({
   data() {
     return {
       login: {
@@ -24,14 +25,16 @@ export default {
   methods: {
     async userLogin() {
       try {
-        const response = await this.$auth.loginWith('local', {
-          data: this.login,
+        await this.$auth.loginWith('local', {
+          data: {
+            username: this.login.username,
+            password: this.login.password,
+          },
         })
-        console.log(response)
       } catch (err) {
         console.log(err)
       }
     },
   },
-}
+})
 </script>

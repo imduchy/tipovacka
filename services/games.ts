@@ -7,7 +7,7 @@ import logger from '../utils/logger'
 
 dotenv.config()
 
-const URL = `${process.env.API_URL}/fixtures`
+const URL = `${process.env.API_FOOTBALL_URL}/fixtures`
 
 /**
  * Fetches an upcoming game for each of specified leagues from an API
@@ -72,8 +72,8 @@ export const getUpcommingGame = async (teamId: number, leagueId: number) => {
           next: 1,
         },
         headers: {
-          'x-rapidapi-host': process.env.API_HOST,
-          'x-rapidapi-key': process.env.API_KEY,
+          'x-rapidapi-host': process.env.API_FOOTBALLHOST,
+          'x-rapidapi-key': process.env.API_FOOTBALL_KEY,
         },
       }
     )

@@ -1,5 +1,6 @@
 import express from 'express'
 import bcrypt from 'bcryptjs'
+import passport from 'passport'
 import User from '../../models/User'
 import logger from '../../utils/logger'
 import { PropertyRequiredError, ValidationError } from '../../utils/exceptions'
@@ -7,10 +8,26 @@ import { validateInput } from '../../services/auth'
 
 const router = express.Router()
 
-router.post('/login', (_req, res) => {
-  //   res.send('Hello login')
-  logger.info('Hit')
-  res.status(200).send('login')
+router.get('/users', (req: any, res) => {
+  res.status(200).send(req.user)
+})
+
+router.post('/login', (req, res, next) => {
+  passport.authenticate('local', function (err, user, info) {
+    if (err) {
+      return next(err)
+    }
+    if (!user) {
+      return res.status(401).send(info)
+    }
+    req.logIn(user, function (err) {
+      if (err) {
+        return next(err)
+      }
+      console.log('INFO', info)
+      return res.status(200).send(user)
+    })
+  })(req, res, next)
 })
 
 router.post('/register', async (req, res) => {
@@ -26,13 +43,13 @@ router.post('/register', async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt()
-    const passwordHash = await bcrypt.hash(password, salt)
+    const encryptedPassword = await bcrypt.hash(password, salt)
 
     const newUser = await User.create({
       email,
       username,
       groupId,
-      passwordHash,
+      password: encryptedPassword,
     })
     logger.info(
       `A new user ${newUser.email} (${newUser._id}) has been created in group ${newUser.groupId}`

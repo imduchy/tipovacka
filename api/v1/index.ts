@@ -2,6 +2,9 @@ import bodyParser from 'body-parser'
 import dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
+import passport from 'passport'
+import session from 'express-session'
+import strategy from '../../services/passport'
 import bets from './bets'
 import games from './games'
 import groups from './groups'
@@ -23,8 +26,21 @@ mongoose.connect(
   }
 )
 
+app.use(
+  session({
+    secret: 'QWgdjkqwrDSGasdwe',
+    resave: true,
+    saveUninitialized: true,
+  })
+)
+
+strategy(passport)
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use('/auth', auth)
 app.use('/users', users)

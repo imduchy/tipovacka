@@ -6,7 +6,7 @@ import Group from './Group'
 export interface IUser {
   username: string
   email: string
-  passwordHash: string
+  password: string
   totalScore?: ITotalScore[]
   bets?: Types.Array<IBet>
   groupId: Types.ObjectId
@@ -31,7 +31,7 @@ const UserSchema = new Schema<IUser>({
   _version: { type: Number, required: true, default: 1 },
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
-  passwordHash: { type: String, required: true },
+  password: { type: String, required: true },
   totalScore: [
     {
       type: TotalScoreSchema,

@@ -41,7 +41,7 @@ router.post('/', async ({ body }, res) => {
     const user = await User.create({
       username: body.username,
       email: body.email,
-      passwordHash: body.passwordHash,
+      password: body.password,
       groupId: body.groupId,
       totalScore: Array.from(group.competitions, (competition) => ({
         competitionId: competition.competitionId,
