@@ -8,26 +8,14 @@ import { validateInput } from '../../services/auth'
 
 const router = express.Router()
 
-router.get('/users', (req: any, res) => {
+router.get('/users', (req, res) => {
   res.status(200).send(req.user)
 })
 
-router.post('/login', (req, res, next) => {
-  passport.authenticate('local', function (err, user, info) {
-    if (err) {
-      return next(err)
-    }
-    if (!user) {
-      return res.status(401).send(info)
-    }
-    req.logIn(user, function (err) {
-      if (err) {
-        return next(err)
-      }
-      console.log('INFO', info)
-      return res.status(200).send(user)
-    })
-  })(req, res, next)
+router.post('/login', passport.authenticate('local'), function (req, res) {
+  // If this function gets called, authentication was successful.
+  // `req.user` contains the authenticated user.
+  res.status(200).send(req.user)
 })
 
 router.post('/register', async (req, res) => {

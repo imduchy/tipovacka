@@ -7,13 +7,13 @@ import logger from '../utils/logger'
 export default (passport: PassportStatic) => {
   passport.use(
     new Strategy(
-      { usernameField: 'username' },
+      { usernameField: 'username', passwordField: 'password' },
       (username: string, password: string, done: any) => {
         User.findOne({ username })
           .then((user) => {
             if (!user) {
               return done(null, false, {
-                message: `A user with email ${username} is not registered.`,
+                message: `A user with username ${username} is not registered.`,
               })
             }
 

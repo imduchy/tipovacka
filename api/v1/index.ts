@@ -26,15 +26,18 @@ mongoose.connect(
   }
 )
 
+strategy(passport)
+
 app.use(
   session({
     secret: 'QWgdjkqwrDSGasdwe',
+    cookie: {
+      maxAge: 432000, // 5 days,
+    },
     resave: true,
     saveUninitialized: true,
   })
 )
-
-strategy(passport)
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())

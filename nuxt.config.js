@@ -55,6 +55,11 @@ export default {
     '@nuxtjs/auth',
   ],
   auth: {
+    cookie: {
+      options: {
+        maxAge: 432000, // 5 days
+      },
+    },
     redirect: {
       login: '/login',
       logout: '/login',
@@ -64,16 +69,16 @@ export default {
       local: {
         endpoints: {
           login: {
-            url: 'http://localhost:3000/api/auth/login',
+            url: '/auth/login',
             method: 'post',
-            propertyName: 'data',
+            propertyName: false,
           },
           logout: {
-            url: 'http://localhost:3000/api/auth/logout',
+            url: '/auth/logout',
             method: 'post',
           },
           user: {
-            url: 'http://localhost:3000/api/auth/users',
+            url: '/auth/users',
             method: 'get',
             propertyName: false,
           },
@@ -89,6 +94,7 @@ export default {
    */
   axios: {
     baseURL: 'http://localhost:3000/api',
+    credentials: true,
   },
   /*
    ** vuetify module configuration
