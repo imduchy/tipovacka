@@ -48,6 +48,8 @@ const UserSchema = new Schema<IUser>({
  * objects for each of groups competitions.
  */
 UserSchema.pre<IUserDocument>('save', function (next) {
+  if (this.isNew === false) next()
+
   const self = this
 
   Group.findById(this.groupId, function (err, res) {
