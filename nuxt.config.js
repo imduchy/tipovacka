@@ -75,7 +75,7 @@ export default {
           },
           logout: {
             url: '/auth/logout',
-            method: 'post',
+            method: 'get',
           },
           user: {
             url: '/auth/users',

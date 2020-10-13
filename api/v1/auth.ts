@@ -12,6 +12,11 @@ router.get('/users', (req, res) => {
   res.status(200).send(req.user)
 })
 
+router.get('/logout', (req, res) => {
+  req.logout()
+  res.status(200).send()
+})
+
 router.post('/login', passport.authenticate('local'), function (req, res) {
   // If this function gets called, authentication was successful.
   // `req.user` contains the authenticated user.
