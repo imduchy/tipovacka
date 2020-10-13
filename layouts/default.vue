@@ -30,6 +30,11 @@
 
     <v-main>
       <v-container>
+        <v-row column justify-center align-text>
+          <v-col class="xs12 sm8 md6">
+            <Alert></Alert>
+          </v-col>
+        </v-row>
         <nuxt />
       </v-container>
     </v-main>
@@ -42,7 +47,9 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import Alert from '../components/Alert.vue'
 export default Vue.extend({
+  components: { Alert },
   data() {
     return {
       drawer: false,
@@ -67,11 +74,9 @@ export default Vue.extend({
   },
   methods: {
     async userLogout() {
-      try {
-        await this.$auth.logout()
-      } catch (err) {
-        console.log(err)
-      }
+      await this.$auth.logout()
+      this.$showAlert('Successfully logged out', 'info')
+      this.$router.push('/login')
     },
   },
 })

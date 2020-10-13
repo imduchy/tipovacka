@@ -1,10 +1,12 @@
 import { GetterTree, ActionTree, MutationTree } from 'vuex'
 import { IGroup } from '~/models/Group'
-import { IUser } from '~/models/User'
 
 export const state = () => ({
   group: {} as IGroup,
-  user: {} as IUser,
+  alert: {
+    color: '',
+    message: '',
+  },
 })
 
 export type RootState = ReturnType<typeof state>
@@ -15,7 +17,7 @@ export const getters: GetterTree<RootState, RootState> = {
 
 export const mutations: MutationTree<RootState> = {
   SET_GROUP: (state, group) => (state.group = group),
-  SET_USER: (state, user) => (state.user = user),
+  SHOW_ALERT: (state, payload) => (state.alert = payload),
 }
 
 export const actions: ActionTree<RootState, RootState> = {
@@ -25,10 +27,7 @@ export const actions: ActionTree<RootState, RootState> = {
     )
     commit('SET_GROUP', group)
   },
-  async fetchUser({ commit }, email: string) {
-    const user: IUser = await this.$axios.$get(
-      'http://localhost:3000/api/users/' + email
-    )
-    commit('SET_USER', user)
+  showAlert({ commit }, payload: { color: string; text: string }) {
+    commit('SHOW_ALERT', payload)
   },
 }
