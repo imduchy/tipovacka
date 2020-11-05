@@ -23,7 +23,7 @@ export const mutations: MutationTree<RootState> = {
 export const actions: ActionTree<RootState, RootState> = {
   async fetchGroup({ commit }, groupId: string) {
     const group: IGroup = await this.$axios.$get(
-      'http://localhost:3000/api/groups/' + groupId
+      process.env.BASE_URL + '/api/groups/' + groupId
     )
     commit('SET_GROUP', group)
   },
