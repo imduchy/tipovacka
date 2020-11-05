@@ -97,7 +97,8 @@ export default {
    */
   axios: {
     baseURL: 'http://localhost:3000/api',
-    credentials: true,
+    proxyHeaders: false,
+    credentials: false,
   },
   /*
    ** vuetify module configuration
