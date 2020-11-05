@@ -84,7 +84,9 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn color="primary" nuxt @click="createBet"> Submit </v-btn>
+            <v-btn color="primary" nuxt :disabled="usersBet" @click="createBet">
+              Submit
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -135,20 +137,25 @@ export default Vue.extend({
     },
     async createBet() {
       try {
-        console.log('Submit')
-        const response = await this.$axios.post('/bets', {
+        await this.$axios.post('/bets', {
           gameId: this.$data.upcommingGame._id,
           homeTeamScore: this.homeTeamScore,
           awayTeamScore: this.awayTeamScore,
           userId: this.$auth.user._id,
         })
 
+        this.$showAlert('Successfully placed a bet', 'success darken-2')
         this.$auth.fetchUser()
-
-        console.log(response)
       } catch (error) {
-        if (error === 'You already placed a bet on this game') {
-          console.log('Already bet')
+        const errorObject = error.response
+        if (errorObject.data === 'You already placed a bet on this game') {
+          // Add custom error
+          this.$showAlert('You already placed a bet on this game', 'error')
+        } else {
+          this.$showAlert(
+            'There was an error. Please, try again later.',
+            'error'
+          )
         }
       }
     },
