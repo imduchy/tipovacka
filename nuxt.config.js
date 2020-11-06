@@ -36,10 +36,7 @@ export default {
    ** Plugins to load before mounting the App
    ** https://nuxtjs.org/guide/plugins
    */
-  plugins: [
-    { src: '~/plugins/showAlert.ts', mode: 'client' },
-    { src: '~/plugins/amplify.ts', mode: 'client' },
-  ],
+  plugins: [{ src: '~/plugins/showAlert.ts', mode: 'client' }],
   /*
    ** Auto import components
    ** See https://nuxtjs.org/api/configuration-components
@@ -96,16 +93,14 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: `${process.env.BASE_URL}/api`,
-    proxyHeaders: false,
-    credentials: false,
+    baseURL: 'http://localhost:3000/api',
+    credentials: true,
   },
   /*
    ** vuetify module configuration
-   ** https://github.com/nuxt-community/vuetify-mNODodule
+   ** https://github.com/nuxt-community/vuetify-module
    */
   vuetify: {
-    treeShake: true,
     customVariables: ['~/assets/variables.scss'],
     theme: {
       dark: true,
@@ -135,7 +130,5 @@ export default {
    ** Build configuration
    ** See https://nuxtjs.org/api/configuration-build/
    */
-  build: {
-    extractCSS: true,
-  },
+  build: {},
 }
