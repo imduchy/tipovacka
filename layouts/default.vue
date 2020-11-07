@@ -1,12 +1,29 @@
 <template>
   <v-app dark>
     <v-navigation-drawer v-model="drawer" :mini-variant="miniVariant" fixed app>
-      <v-list>
-        <v-list-item v-if="$auth.loggedIn">
-          {{ $auth.user.username }}
-          <v-btn color="primary" @click="userLogout">Logout</v-btn>
+      <template v-if="$auth.loggedIn" v-slot:prepend>
+        <v-list-item two-line>
+          <v-list-item-avatar>
+            <img src="~/assets/ronaldo.jpg" />
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title>{{ $auth.user.username }}</v-list-item-title>
+            <v-list-item-subtitle>Logged In</v-list-item-subtitle>
+          </v-list-item-content>
         </v-list-item>
-        <v-list-item v-else>Guest</v-list-item>
+      </template>
+      <template v-else v-slot:prepend>
+        <v-list-item two-line>
+          <v-list-item-avatar>
+            <img src="~/assets/ronaldo.jpg" />
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title>Guest</v-list-item-title>
+            <!-- <v-list-item-subtitle>Logged In</v-list-item-subtitle> -->
+          </v-list-item-content>
+        </v-list-item>
+      </template>
+      <v-list>
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
@@ -22,6 +39,11 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      <template v-if="$auth.loggedIn" v-slot:append>
+        <div class="pa-2">
+          <v-btn block color="primary" @click="userLogout">Logout</v-btn>
+        </div>
+      </template>
     </v-navigation-drawer>
     <v-app-bar fixed app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
@@ -40,7 +62,11 @@
     </v-main>
 
     <v-footer :absolute="!fixed" app>
-      <span>&copy; {{ new Date().getFullYear() }}</span>
+      <span class="text-caption"
+        >&copy; {{ new Date().getFullYear() }}
+        <a href="https://www.linkedin.com/in/jakubduchon9/">Jakub Duchon.</a>
+        All rights reserved.</span
+      >
     </v-footer>
   </v-app>
 </template>
