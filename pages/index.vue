@@ -136,7 +136,7 @@ export default Vue.extend({
     async createBet() {
       try {
         console.log('Submit')
-        const response = await this.$axios.post(process.env.HOST + '/bets', {
+        const response = await this.$axios.post('/bets', {
           gameId: this.$data.upcommingGame._id,
           homeTeamScore: this.homeTeamScore,
           awayTeamScore: this.awayTeamScore,
