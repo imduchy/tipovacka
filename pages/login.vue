@@ -25,6 +25,8 @@ export default Vue.extend({
   methods: {
     async userLogin() {
       try {
+        console.log('BASE URL:', this.$axios.defaults.baseURL)
+        console.log('host env:', process.env.HOST)
         await this.$auth.loginWith('local', {
           data: {
             username: this.login.username,
