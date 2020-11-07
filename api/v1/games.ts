@@ -27,7 +27,6 @@ router.get('/:gameId', async (req, res) => {
  * Create game
  * Access: ADMIN
  */
-
 router.post('/', async ({ body }, res) => {
   try {
     const game = await Game.create({
