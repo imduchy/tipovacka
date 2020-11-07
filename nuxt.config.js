@@ -1,4 +1,9 @@
 import colors from 'vuetify/es5/util/colors'
+import dotenv from 'dotenv'
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config()
+}
 
 export default {
   /*
@@ -96,7 +101,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'https://onlinetipovacka.azurewebsites.net/api',
+    baseURL: process.env.API_HOST,
     credentials: true,
   },
   /*

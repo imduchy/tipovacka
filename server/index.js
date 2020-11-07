@@ -1,16 +1,29 @@
 const express = require('express')
-const { Nuxt } = require('nuxt')
+const { Nuxt, Builder } = require('nuxt')
+const dotenv = require('dotenv')
 const app = express()
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config()
+}
 
 // Import and Set Nuxt.js options
 const config = require('../nuxt.config.js')
+config.dev = process.env.NODE_ENV !== 'production'
 
-function start() {
+async function start() {
   // Init Nuxt.js
   const nuxt = new Nuxt(config)
 
-  const host = process.env.HOST || '127.0.0.1'
-  const port = process.env.PORT || 3000
+  const { host, port } = nuxt.options.server
+
+  // Build only in dev mode
+  if (config.dev) {
+    const builder = new Builder(nuxt)
+    await builder.build()
+  } else {
+    await nuxt.ready()
+  }
 
   // Give nuxt middleware to express
   app.use(nuxt.render)
