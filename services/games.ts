@@ -46,7 +46,7 @@ export const findUpcommingGame = async (
   })
 
   logger.info(`
-    Sorted upcoming games in selected leagues for team ${teamId}.\n
+    Sorted upcoming games in selected leagues for team ${teamId}.
     The upcoming game is ${upcomingGames[0].gameId}.
   `)
 
@@ -61,7 +61,7 @@ export const findUpcommingGame = async (
  * @param leagueId leagueId (id returned from API)
  * @returns an upcoming league game for the specified team
  */
-export const getUpcommingGame = async (teamId: number, leagueId: number) => {
+const getUpcommingGame = async (teamId: number, leagueId: number) => {
   try {
     const { data }: { data: FixtureResponse.RootObject } = await axios.get(
       URL,
@@ -72,7 +72,7 @@ export const getUpcommingGame = async (teamId: number, leagueId: number) => {
           next: 1,
         },
         headers: {
-          'x-rapidapi-host': process.env.API_FOOTBALLHOST,
+          'x-rapidapi-host': process.env.API_FOOTBALL_HOST,
           'x-rapidapi-key': process.env.API_FOOTBALL_KEY,
         },
       }

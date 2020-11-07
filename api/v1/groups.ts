@@ -61,4 +61,41 @@ router.post('/', async ({ body }, res) => {
   }
 })
 
+/**
+ * Get upcoming game
+ * Access: ADMIN
+ */
+router.get('/:groupId/upcomingGame', async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.groupId)
+
+    if (!group) {
+      throw new Error(`Group with id ${req.params.groupId} doesn't exist.`)
+    }
+
+    const competitions = group.competitions.map((c) => c.competitionId)
+    const newUpcomingGame = await findUpcommingGame(group.teamId, competitions)
+
+    if (!newUpcomingGame) {
+      console.warn(
+        `Didn't find an upcoming game for the team ${group.teamId} in the following competitions ${competitions}.`
+      )
+      return res.status(200).json("Didn't find any upcoming games.")
+    }
+
+    const game = await Game.create(newUpcomingGame)
+
+    const response = await Group.findByIdAndUpdate(
+      group._id,
+      {
+        upcommingGame: game._id,
+      },
+      { new: true }
+    )
+    res.status(200).json(response)
+  } catch (error) {
+    res.status(400).json(error.message)
+  }
+})
+
 export default router
