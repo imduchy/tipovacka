@@ -34,15 +34,15 @@
         <v-row>
           <v-col align="center">
             <span class="text-caption"
-              ><i>{{ new Date(upcommingGame.date).toUTCString() }}</i></span
+              ><i>{{ formatedGameDate }}</i></span
             >
             <br />
-            <span class="text-overline">In {{ upcommingGame.venue }}</span>
+            <span class="text-caption">In {{ upcommingGame.venue }}</span>
           </v-col>
         </v-row>
-        <v-card>
+        <v-card v-if="!usersBet">
           <v-card-title class="headline"> Bet </v-card-title>
-          <v-card-text v-if="!usersBet">
+          <v-card-text>
             <v-form ref="form">
               <v-row>
                 <v-col cols="6">
@@ -62,7 +62,14 @@
               </v-row>
             </v-form>
           </v-card-text>
-          <v-card-text v-else>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn color="primary" nuxt @click="createBet"> Submit </v-btn>
+          </v-card-actions>
+        </v-card>
+        <v-card v-else>
+          <v-card-title class="headline"> Your bet </v-card-title>
+          <v-card-text>
             <v-row>
               <v-col cols="6">
                 <v-text-field
@@ -82,10 +89,6 @@
               </v-col>
             </v-row>
           </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn color="primary" nuxt @click="createBet"> Submit </v-btn>
-          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -120,6 +123,23 @@ export default Vue.extend({
       const filteredGames = usersBets.filter((b) => b.game === upcommingGameId)
       return filteredGames[0]
     },
+    formatedGameDate(): string {
+      if (this.upcommingGame) {
+        const date = new Date(this.upcommingGame.date)
+        const formatedDate = date.toLocaleDateString('en-GB', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        })
+        const formatedTime = date.toLocaleTimeString('en-GB', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+        return formatedDate + ' at ' + formatedTime
+      }
+      return ''
+    },
   },
   methods: {
     async fetchUpcommingGame() {
@@ -135,17 +155,23 @@ export default Vue.extend({
     },
     async createBet() {
       try {
-        console.log('Submit')
-        const response = await this.$axios.post('/bets', {
-          gameId: this.$data.upcommingGame._id,
-          homeTeamScore: this.homeTeamScore,
-          awayTeamScore: this.awayTeamScore,
-          userId: this.$auth.user._id,
-        })
+        await this.$axios
+          .post('/bets', {
+            gameId: this.$data.upcommingGame._id,
+            homeTeamScore: this.homeTeamScore,
+            awayTeamScore: this.awayTeamScore,
+            userId: this.$auth.user._id,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              this.$showAlert('Bet submited successfully', 'success')
+            }
+          })
+          .catch((err) => {
+            this.$showAlert(err.response.data, 'warning')
+          })
 
         this.$auth.fetchUser()
-
-        console.log(response)
       } catch (error) {
         if (error === 'You already placed a bet on this game') {
           console.log('Already bet')
