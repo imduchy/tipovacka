@@ -28,8 +28,8 @@ jobs:
       - name: create deployment artifact
         run: |
           mkdir deployment
-          cp .nuxt deployment/
-          cp static deployment/
+          cp -r .nuxt deployment/
+          cp -r static deployment/
           cp nuxt.config.js deployment/
           cp package.json deployment/
           cp server/index.js deployment/
