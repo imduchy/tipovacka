@@ -31,7 +31,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "mongoose": "^5.10.3",
-    "nuxt": "^2.13.0",
+    "nuxt": "^2.14.7",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "winston": "^3.3.3"
