@@ -40,13 +40,18 @@
         </v-list-item>
       </v-list>
       <template v-if="$auth.loggedIn" v-slot:append>
-        <div class="pa-2">
-          <v-btn block color="primary" @click="userLogout">Logout</v-btn>
-        </div>
+        <v-list-item @click="userLogout">
+          <v-list-item-action>
+            <v-icon>mdi-logout</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </template>
     </v-navigation-drawer>
     <v-app-bar fixed app>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-app-bar-nav-icon @click.stop="miniVariant = !miniVariant" />
       <v-toolbar-title v-text="title" />
     </v-app-bar>
 
@@ -64,7 +69,9 @@
     <v-footer :absolute="!fixed" app>
       <span class="text-caption"
         >&copy; {{ new Date().getFullYear() }}
-        <a href="https://www.linkedin.com/in/jakubduchon9/">Jakub Duchon.</a>
+        <a href="https://www.linkedin.com/in/jakubduchon9/" target="_blank"
+          >Jakub Duchon.</a
+        >
         All rights reserved.</span
       >
     </v-footer>
@@ -78,23 +85,21 @@ export default Vue.extend({
   components: { Alert },
   data() {
     return {
-      drawer: false,
+      drawer: true,
       fixed: false,
       items: [
         {
-          icon: 'mdi-apps',
+          icon: 'mdi-home',
           title: 'Domov',
           to: '/',
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-seal',
           title: 'Tabuľka',
           to: '/inspire',
         },
       ],
       miniVariant: false,
-      right: true,
-      rightDrawer: false,
       title: 'Tipovačka',
     }
   },
