@@ -50,6 +50,7 @@ router.post('/', async ({ body }, res) => {
       website: body.website,
       teamId: body.teamId,
       competitions: body.competitions,
+      games: [],
       upcommingGame: game._id,
     })
 
@@ -83,6 +84,7 @@ router.get('/:groupId/upcomingGame', async (req, res) => {
       return res.status(200).json("Didn't find any upcoming games.")
     }
 
+    newUpcomingGame.groupId = group._id
     const game = await Game.create(newUpcomingGame)
 
     const response = await Group.findByIdAndUpdate(

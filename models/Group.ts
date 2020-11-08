@@ -13,6 +13,7 @@ export interface IGroup {
   website: string
   teamId: number
   competitions: IGroupCompetition[]
+  games: Types.Array<IGame> | Types.Array<mongoose.Types.ObjectId>
   upcommingGame: IGame
   users: Types.Array<IUserDocument> | Types.Array<mongoose.Types.ObjectId>
 }
@@ -32,6 +33,9 @@ const GroupSchema = new Schema({
   website: { type: String, required: false },
   teamId: { type: Number, required: true },
   competitions: [{ type: GroupCompetitionSchema, required: true, default: [] }],
+  games: [
+    { type: Schema.Types.ObjectId, ref: 'game', required: true, default: [] },
+  ],
   upcommingGame: { type: Schema.Types.ObjectId, ref: 'game' },
   users: [{ type: Schema.Types.ObjectId, ref: 'user' }],
 })

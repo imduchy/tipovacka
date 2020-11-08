@@ -31,6 +31,7 @@ router.post('/', async ({ body }, res) => {
   try {
     const game = await Game.create({
       gameId: body.gameId,
+      groupId: body.groupId,
       date: body.date,
       venue: body.venue,
       awayTeam: body.awayTeam,
