@@ -45,65 +45,69 @@ const UserSchema = new Schema<IUser>({
 
 /**
  * Before a user is saved, create an empty totalScore
- * objects for each of groups competitions.
+ * objects for each of the group's competitions.
  */
 UserSchema.pre<IUserDocument>('save', function (next) {
-  if (this.isNew === false) next()
+  if (!this.isNew) next()
+  else {
+    const self = this
 
-  const self = this
-
-  Group.findById(this.groupId, function (err, res) {
-    if (err) {
-      logger.error(
-        `<User.pre> Error while fetching a group by id ${self.groupId}.`
-      )
-      next(err)
-    } else if (res) {
-      for (const comp of res.competitions) {
-        self.totalScore!.push({
-          competitionId: comp.competitionId,
-          season: comp.season,
-          score: 0,
-        })
+    Group.findById(this.groupId, function (err, res) {
+      if (err) {
+        logger.error(
+          `<User.pre> Error while fetching a group by id ${self.groupId}.`
+        )
+        next(err)
+      } else if (res) {
+        for (const comp of res.competitions) {
+          self.totalScore!.push({
+            competitionId: comp.competitionId,
+            season: comp.season,
+            score: 0,
+          })
+        }
+        logger.info(
+          `<User.pre> Created totalScore objects for a user ${self.email} (${self._id}).`
+        )
+        next()
+      } else {
+        logger.error(
+          `<User.pre> Creation of totalScore objects for a user ` +
+            `${self.email} (${self._id}) was skipped.`
+        )
+        next()
       }
-      logger.info(
-        `<User.pre> Created totalScore objects for a user ${self.email} (${self._id}).`
-      )
-      next()
-    } else {
-      logger.error(
-        `<User.pre> Creation of totalScore objects for a user ` +
-          `${self.email} (${self._id}) was skipped.`
-      )
-      next()
-    }
-  })
+    })
+  }
 })
 
 /**
  * After a user is saved, push the user _id
  * to its group's users array.
  */
-UserSchema.post<IUserDocument>('save', function (doc) {
-  Group.findOneAndUpdate(
-    { _id: doc.groupId },
-    { $push: { users: doc._id } },
-    function (err, group) {
-      if (err) {
-        logger.error(
-          `<User.post> Error while pushing a user id ${doc._id} to the group ${doc.groupId}.`
-        )
-      } else if (group) {
-        logger.info(
-          `<User.post> Pushed user's id ${doc._id} to the group ${group._id}.`
-        )
-      } else {
-        logger.error(
-          `<User.post> Pushing user's id ${doc._id} to the group ${doc.groupId} was skipped.`
-        )
+UserSchema.post<IUserDocument>('save', function (doc, next) {
+  if (!doc.isNew) next()
+  else {
+    Group.findOneAndUpdate(
+      { _id: doc.groupId },
+      { $push: { users: doc._id } },
+      function (err, group) {
+        if (err) {
+          logger.error(
+            `<User.post> Error while pushing a user id ${doc._id} to the group ${doc.groupId}.`
+          )
+        } else if (group) {
+          logger.info(
+            `<User.post> Pushed user's id ${doc._id} to the group ${group._id}.`
+          )
+        } else {
+          logger.error(
+            `<User.post> Pushing user's id ${doc._id} to the group ${doc.groupId} was skipped.`
+          )
+        }
       }
-    }
-  )
+    )
+  }
 })
 
 UserSchema.path('groupId').validate(function (value: Types.ObjectId) {
