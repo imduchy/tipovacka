@@ -4,6 +4,7 @@
     <v-text-field
       v-model="login.password"
       label="Password"
+      type="password"
       required
     ></v-text-field>
 
@@ -25,8 +26,7 @@ export default Vue.extend({
   methods: {
     async userLogin() {
       try {
-        console.log('BASE URL:', this.$axios.defaults.baseURL)
-        console.log('host env:', process.env.HOST)
+        this.$auth.$storage.setUniversal('redirect', '/')
         await this.$auth.loginWith('local', {
           data: {
             username: this.login.username,
