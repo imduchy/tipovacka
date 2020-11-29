@@ -1,15 +1,13 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer v-model="drawer" :mini-variant="miniVariant" fixed app>
+    <v-navigation-drawer v-model="drawer" bottom fixed app>
       <template v-if="$auth.loggedIn" v-slot:prepend>
-        <v-list-item two-line>
+        <v-list-item class="px-2">
           <v-list-item-avatar>
             <img src="~/assets/ronaldo.jpg" />
           </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title>{{ $auth.user.username }}</v-list-item-title>
-            <v-list-item-subtitle>Logged In</v-list-item-subtitle>
-          </v-list-item-content>
+
+          <v-list-item-title>{{ $auth.user.username }} </v-list-item-title>
         </v-list-item>
       </template>
       <template v-else v-slot:prepend>
@@ -24,13 +22,7 @@
         </v-list-item>
       </template>
       <v-list>
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
-        >
+        <v-list-item v-for="(item, i) in items" :key="i" :to="item.to" router exact>
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
@@ -51,7 +43,7 @@
       </template>
     </v-navigation-drawer>
     <v-app-bar fixed app>
-      <v-app-bar-nav-icon @click.stop="miniVariant = !miniVariant" />
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="title" />
     </v-app-bar>
 
@@ -86,7 +78,7 @@ export default Vue.extend({
   data() {
     return {
       drawer: true,
-      fixed: false,
+      fixed: true,
       items: [
         {
           icon: 'mdi-home',
@@ -99,7 +91,6 @@ export default Vue.extend({
           to: '/inspire',
         },
       ],
-      miniVariant: false,
       title: 'Tipovačka',
     }
   },
@@ -107,7 +98,7 @@ export default Vue.extend({
     async userLogout() {
       await this.$auth.logout()
       this.$showAlert('Successfully logged out', 'info')
-      this.$router.push('/login')
+      // this.$router.push('/login')
     },
   },
 })
