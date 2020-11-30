@@ -4,6 +4,7 @@ import { BetSchema, IBet } from './Bet'
 import Group from './Group'
 
 export interface IUser {
+  _id?: Types.ObjectId
   username: string
   email: string
   password: string
@@ -12,7 +13,7 @@ export interface IUser {
   groupId: Types.ObjectId
 }
 
-export interface IUserDocument extends IUser, Document {}
+export type IUserDocument = IUser & Document
 
 interface ITotalScore {
   competitionId: number
@@ -52,11 +53,13 @@ UserSchema.pre<IUserDocument>('save', function (next) {
   else {
     const self = this
 
+    // A dirty workaround to pass isNew property to the post script
+    // https://stackoverflow.com/a/18305924/8475178
+    ;(this as any).wasNew = this.isNew
+
     Group.findById(this.groupId, function (err, res) {
       if (err) {
-        logger.error(
-          `<User.pre> Error while fetching a group by id ${self.groupId}.`
-        )
+        logger.error(`<User.pre> Error while fetching a group by id ${self.groupId}.`)
         next(err)
       } else if (res) {
         for (const comp of res.competitions) {
@@ -86,27 +89,25 @@ UserSchema.pre<IUserDocument>('save', function (next) {
  * to its group's users array.
  */
 UserSchema.post<IUserDocument>('save', function (doc, next) {
-  if (!doc.isNew) next()
+  if (!(doc as any).wasNew) next()
   else {
-    Group.findOneAndUpdate(
-      { _id: doc.groupId },
-      { $push: { users: doc._id } },
-      function (err, group) {
-        if (err) {
-          logger.error(
-            `<User.post> Error while pushing a user id ${doc._id} to the group ${doc.groupId}.`
-          )
-        } else if (group) {
-          logger.info(
-            `<User.post> Pushed user's id ${doc._id} to the group ${group._id}.`
-          )
-        } else {
-          logger.error(
-            `<User.post> Pushing user's id ${doc._id} to the group ${doc.groupId} was skipped.`
-          )
-        }
+    Group.findOneAndUpdate({ _id: doc.groupId }, { $push: { users: doc._id } }, function (
+      err,
+      group
+    ) {
+      if (err) {
+        logger.error(
+          `<User.post> Error while pushing a user id ${doc._id} to the group ${doc.groupId}.`
+        )
+      } else if (group) {
+        logger.info(`<User.post> Pushed user's id ${doc._id} to the group ${group._id}.`)
+      } else {
+        logger.error(
+          `<User.post> Pushing user's id ${doc._id} to the group ${doc.groupId} was skipped.`
+        )
       }
-    )
+      next()
+    })
   }
 })
 

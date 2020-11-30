@@ -10,6 +10,7 @@ export interface ITeam {
 }
 
 export interface IGame {
+  _id?: Types.ObjectId
   gameId: number
   groupId: string
   date: Date
@@ -58,25 +59,22 @@ const GameSchema = new Schema({
  * to the group's games array.
  */
 GameSchema.post<IGameDocument>('save', function (doc) {
-  Group.findOneAndUpdate(
-    { _id: doc.groupId },
-    { $push: { games: doc._id } },
-    function (err, group) {
-      if (err) {
-        logger.error(
-          `<Game.post> Error while pushing a game id ${doc._id} to the group ${doc.groupId}.`
-        )
-      } else if (group) {
-        logger.info(
-          `<Game.post> Pushed game's id ${doc._id} to the group ${group._id}.`
-        )
-      } else {
-        logger.error(
-          `<Game.post> Pushing game's id ${doc._id} to the group ${doc.groupId} was skipped.`
-        )
-      }
+  Group.findOneAndUpdate({ _id: doc.groupId }, { $push: { games: doc._id } }, function (
+    err,
+    group
+  ) {
+    if (err) {
+      logger.error(
+        `<Game.post> Error while pushing a game id ${doc._id} to the group ${doc.groupId}.`
+      )
+    } else if (group) {
+      logger.info(`<Game.post> Pushed game's id ${doc._id} to the group ${group._id}.`)
+    } else {
+      logger.error(
+        `<Game.post> Pushing game's id ${doc._id} to the group ${doc.groupId} was skipped.`
+      )
     }
-  )
+  })
 })
 
 GameSchema.path('groupId').validate(function (value: Types.ObjectId) {
