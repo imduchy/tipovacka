@@ -25,10 +25,10 @@ declare module 'vuex/types/index' {
   }
 }
 
-const myPlugin: Plugin = (context, inject) => {
+const showAlertPlugin: Plugin = (context, inject) => {
   inject('showAlert', (message: string, color: string) =>
     context.store.dispatch('showAlert', { message, color })
   )
 }
 
-export default myPlugin
+export default showAlertPlugin

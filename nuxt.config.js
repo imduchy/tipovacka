@@ -44,7 +44,10 @@ export default {
    ** Plugins to load before mounting the App
    ** https://nuxtjs.org/guide/plugins
    */
-  plugins: [{ src: '~/plugins/showAlert.ts', mode: 'client' }],
+  plugins: [
+    { src: '~/plugins/showAlert.ts', mode: 'client' },
+    { src: '~/plugins/persistedState.ts' },
+  ],
   /*
    ** Auto import components
    ** See https://nuxtjs.org/api/configuration-components
