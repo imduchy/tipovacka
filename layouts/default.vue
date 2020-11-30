@@ -77,7 +77,7 @@ export default Vue.extend({
   components: { Alert },
   data() {
     return {
-      drawer: true,
+      drawer: false,
       fixed: true,
       items: [
         {
@@ -88,7 +88,7 @@ export default Vue.extend({
         {
           icon: 'mdi-seal',
           title: 'Tabuľka',
-          to: '/inspire',
+          to: '/table',
         },
       ],
       title: 'Tipovačka',
