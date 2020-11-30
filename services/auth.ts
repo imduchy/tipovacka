@@ -26,9 +26,7 @@ export const validateInput = ({
         `Username: ${username}, Email: ${email}, ` +
         `Password #: ${password.length}, Password2 #: ${password2.length}`
     )
-    throw new PropertyRequiredError(
-      "You didn't provide all required information."
-    )
+    throw new PropertyRequiredError("You didn't provide all required information.")
   }
 
   if (password !== password2) {
