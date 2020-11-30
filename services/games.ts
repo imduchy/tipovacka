@@ -1,13 +1,11 @@
-import axios from 'axios'
 import dotenv from 'dotenv'
 import { FixtureResponse } from '../models/responses/FixtureResponse'
 import { IGame } from '../models/Game'
 import { GameStatus } from '../models/Enums'
 import logger from '../utils/logger'
+import { getFixture } from './footballApi'
 
 dotenv.config()
-
-const URL = `${process.env.API_FOOTBALL_URL}/fixtures`
 
 /**
  * Fetches an upcoming game for each of specified leagues from an API
@@ -17,10 +15,7 @@ const URL = `${process.env.API_FOOTBALL_URL}/fixtures`
  * @param leagueIds list of leagueIds (ids returned from API)
  * @returns an upcoming game for a specified team
  */
-export const findUpcommingGame = async (
-  teamId: number,
-  leagueIds: number[]
-) => {
+export const findUpcommingGame = async (teamId: number, leagueIds: number[]) => {
   const upcomingGames: IGame[] = []
 
   try {
@@ -63,20 +58,11 @@ export const findUpcommingGame = async (
  */
 const getUpcommingGame = async (teamId: number, leagueId: number) => {
   try {
-    const { data }: { data: FixtureResponse.RootObject } = await axios.get(
-      URL,
-      {
-        params: {
-          team: teamId,
-          league: leagueId,
-          next: 1,
-        },
-        headers: {
-          'x-rapidapi-host': process.env.API_FOOTBALL_HOST,
-          'x-rapidapi-key': process.env.API_FOOTBALL_KEY,
-        },
-      }
-    )
+    const { data } = await getFixture({
+      team: teamId,
+      league: leagueId,
+      next: 1,
+    })
 
     if (data.results === 0) {
       logger.warn(
