@@ -34,7 +34,7 @@ export default {
   },
   serverMiddleware: ['~/api/v1/index'],
   router: {
-    middleware: 'auth',
+    middleware: ['auth', 'groupData'],
   },
   /*
    ** Global CSS
