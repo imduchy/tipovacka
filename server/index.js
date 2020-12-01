@@ -1,21 +1,20 @@
 const express = require('express')
-const { Nuxt, Builder } = require('nuxt')
+const { loadNuxt, build } = require('nuxt')
 const app = express()
 
-// Import and Set Nuxt.js options
-const config = require('../nuxt.config.js')
-config.dev = process.env.NODE_ENV !== 'production'
+const isDev = process.env.NODE_ENV !== 'production'
+
+console.log(`Running nuxt in ${process.env.NODE_ENV} environment.`)
 
 async function start() {
   // Init Nuxt.js
-  const nuxt = new Nuxt(config)
+  const nuxt = await loadNuxt(isDev ? 'dev' : 'start')
 
   const { host, port } = nuxt.options.server
 
   // Build only in dev mode
-  if (config.dev) {
-    const builder = new Builder(nuxt)
-    await builder.build()
+  if (isDev) {
+    build(nuxt)
   } else {
     await nuxt.ready()
   }
