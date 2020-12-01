@@ -1,9 +1,13 @@
-import colors from 'vuetify/es5/util/colors'
-import dotenv from 'dotenv'
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config()
-}
+/**
+ * The bellow line throws an error in Azure App Service
+ * "Application has thrown an uncaught exception and is
+ * terminated:C:\home\site\wwwroot\nuxt.config.js:1(function
+ * (exports, require, module, __filename, __dirname) { import
+ * colors from 'vuetify/es5/util/colors'
+ * SyntaxError: Cannot use import statement outside a module"
+ */
+// eslint-disable-next-line nuxt/no-cjs-in-config
+const colors = require('vuetify/es5/util/colors')
 
 export default {
   /*

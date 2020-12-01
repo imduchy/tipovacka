@@ -1,11 +1,6 @@
 const express = require('express')
 const { Nuxt, Builder } = require('nuxt')
-const dotenv = require('dotenv')
 const app = express()
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config()
-}
 
 // Import and Set Nuxt.js options
 const config = require('../nuxt.config.js')
