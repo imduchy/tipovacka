@@ -1,4 +1,7 @@
-export default {
+// Use commonjs module.exports as specified in docs
+// https://nuxtjs.org/faq/deployment-azure-portal/
+// eslint-disable-next-line nuxt/no-cjs-in-config
+module.exports = {
   /*
    ** Nuxt target
    ** See https://nuxtjs.org/api/configuration-target
