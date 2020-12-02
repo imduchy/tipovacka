@@ -28,7 +28,7 @@ module.exports = {
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
-  serverMiddleware: ['~/api/v1/index'],
+  serverMiddleware: ['./api/v1/index'],
   router: {
     middleware: ['auth', 'groupData'],
   },
@@ -41,8 +41,8 @@ module.exports = {
    ** https://nuxtjs.org/guide/plugins
    */
   plugins: [
-    { src: '~/plugins/showAlert.ts', mode: 'client' },
-    { src: '~/plugins/persistedState.ts' },
+    { src: './plugins/showAlert.ts', mode: 'client' },
+    { src: './plugins/persistedState.ts' },
   ],
   /*
    ** Auto import components
