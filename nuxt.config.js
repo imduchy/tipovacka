@@ -99,11 +99,18 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'http://localhost:3000/api', // Overwritten by API_HOST
+    baseURL: 'http://localhost:3000/api',
     credentials: true,
   },
   publicRuntimeConfig: {
-    browserBaseURL: process.env.API_URL_BROWSER || 'http://localhost:3000/api',
+    axios: {
+      browserBaseURL: process.env.BROWSER_BASE_URL,
+    },
+  },
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL,
+    },
   },
   /*
    ** vuetify module configuration
