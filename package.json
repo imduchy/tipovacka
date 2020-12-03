@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "nuxt-ts",
     "build": "nuxt-ts build",
-    "start": "nuxt-ts start",
+    "start": "node server.js",
+    "start-nuxt": "nuxt-ts start",
     "export": "nuxt-ts export",
     "serve": "nuxt-ts serve",
     "postinstall": "npm run build",
