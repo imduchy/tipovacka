@@ -7,14 +7,29 @@ import Game from '../../models/Game'
 const router = Router()
 
 /**
+ * Get all users from a specific group
+ * Access: External function
+ */
+router.get('/:groupId/users', async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.groupId).populate('users')
+    if (group) {
+      res.status(200).json(group.users)
+    } else {
+      res.status(404)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+/**
  * Get a group by ID
  * Access: Private
  */
 router.get('/:groupId', async (req, res) => {
   try {
-    const group = await Group.findById(req.params.groupId).populate(
-      'upcommingGame'
-    )
+    const group = await Group.findById(req.params.groupId).populate('upcommingGame')
     if (!group) {
       logger.warn(`Group with _id ${req.params.groupId} doesn't exist.`)
       res.status(404).json("We couldn't find this group")
@@ -23,9 +38,7 @@ router.get('/:groupId', async (req, res) => {
 
     res.status(200).json(group)
   } catch (error) {
-    logger.error(
-      `Couldn't fetch a group ${req.params.groupId}. Error: ${error}`
-    )
+    logger.error(`Couldn't fetch a group ${req.params.groupId}. Error: ${error}`)
     res.status(500).json('Internal server error')
   }
 })
