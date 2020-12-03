@@ -1,7 +1,11 @@
-// Use commonjs module.exports as specified in docs
-// https://nuxtjs.org/faq/deployment-azure-portal/
-// eslint-disable-next-line nuxt/no-cjs-in-config
-module.exports = {
+import colors from 'vuetify/es5/util/colors'
+import dotenv from 'dotenv'
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config()
+}
+
+export default {
   /*
    ** Nuxt target
    ** See https://nuxtjs.org/api/configuration-target
@@ -28,7 +32,7 @@ module.exports = {
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
-  serverMiddleware: ['./api/v1/index'],
+  serverMiddleware: ['~/api/v1/index'],
   router: {
     middleware: ['auth', 'groupData'],
   },
@@ -41,8 +45,8 @@ module.exports = {
    ** https://nuxtjs.org/guide/plugins
    */
   plugins: [
-    { src: './plugins/showAlert.ts', mode: 'client' },
-    { src: './plugins/persistedState.ts' },
+    { src: '~/plugins/showAlert.ts', mode: 'client' },
+    { src: '~/plugins/persistedState.ts' },
   ],
   /*
    ** Auto import components
@@ -108,7 +112,30 @@ module.exports = {
    ** https://github.com/nuxt-community/vuetify-module
    */
   vuetify: {
-    optionsPath: './vuetify.options.js',
+    customVariables: ['~/assets/variables.scss'],
+    theme: {
+      dark: true,
+      themes: {
+        dark: {
+          primary: colors.blue.darken2,
+          accent: colors.grey.darken3,
+          secondary: colors.amber.darken3,
+          info: colors.teal.lighten1,
+          warning: colors.amber.base,
+          error: colors.deepOrange.accent4,
+          success: colors.green.accent3,
+        },
+        light: {
+          primary: colors.blue.darken2,
+          accent: colors.grey.darken3,
+          secondary: colors.amber.darken3,
+          info: colors.teal.lighten1,
+          warning: colors.amber.base,
+          error: colors.deepOrange.accent4,
+          success: colors.green.accent3,
+        },
+      },
+    },
   },
   /*
    ** Build configuration
