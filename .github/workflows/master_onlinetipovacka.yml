@@ -17,18 +17,18 @@ jobs:
 
     - uses: azure/docker-login@v1
       with:
-        login-server: https://repo.treescale.com/
-        username: ${{ secrets.AzureAppService_ContainerUsername_9c1ab8389cbe4d6a957c00e264e22ff0 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_c22e420283964d0a9667799cf65add0a }}
+        login-server: https://onlinetipovacka.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_79652d7c45334eddb4e22ca105cf219e }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_b239b0132512450eb8453fe2eca5b29d }}
 
     - run: |
-        docker build . -t repo.treescale.com/${{ secrets.AzureAppService_ContainerUsername_9c1ab8389cbe4d6a957c00e264e22ff0 }}/duchy/onlinetipovacka:${{ github.sha }}
-        docker push repo.treescale.com/${{ secrets.AzureAppService_ContainerUsername_9c1ab8389cbe4d6a957c00e264e22ff0 }}/duchy/onlinetipovacka:${{ github.sha }}
+        docker build . -t onlinetipovacka.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_79652d7c45334eddb4e22ca105cf219e }}/onlinetipovacka/onlinetipovacka:${{ github.sha }}
+        docker push onlinetipovacka.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_79652d7c45334eddb4e22ca105cf219e }}/onlinetipovacka/onlinetipovacka:${{ github.sha }}
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'onlinetipovacka'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_b8baf9bb1a8d4609a6e10cb730e2081b }}
-        images: 'repo.treescale.com/${{ secrets.AzureAppService_ContainerUsername_9c1ab8389cbe4d6a957c00e264e22ff0 }}/duchy/onlinetipovacka:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_4c094b755e1e4009a6adb367e729bb4a }}
+        images: 'onlinetipovacka.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_79652d7c45334eddb4e22ca105cf219e }}/onlinetipovacka/onlinetipovacka:${{ github.sha }}'
