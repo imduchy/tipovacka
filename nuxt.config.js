@@ -7,7 +7,7 @@ export default {
    */
   target: 'server',
   server: {
-    port: process.env.PORT, // default: 3000
+    port: process.env.PORT || 3000, // default: 3000
   },
   /*
    ** Headers of the page
