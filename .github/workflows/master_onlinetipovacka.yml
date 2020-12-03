@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - onlinetipovacka
+name: Build and deploy container app to Azure Web App - onlinetipovacka
 
 on:
   push:
@@ -10,26 +10,25 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: 'ubuntu-latest'
 
     steps:
     - uses: actions/checkout@master
 
-    - name: Set up Node.js version
-      uses: actions/setup-node@v1
+    - uses: azure/docker-login@v1
       with:
-        node-version: '12.13.0'
+        login-server: https://repo.treescale.com/
+        username: ${{ secrets.AzureAppService_ContainerUsername_9c1ab8389cbe4d6a957c00e264e22ff0 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_c22e420283964d0a9667799cf65add0a }}
 
-    - name: npm install, build, and test
-      run: |
-        npm install
-        npm run build --if-present
-        npm run test --if-present
+    - run: |
+        docker build . -t repo.treescale.com/${{ secrets.AzureAppService_ContainerUsername_9c1ab8389cbe4d6a957c00e264e22ff0 }}/duchy/onlinetipovacka:${{ github.sha }}
+        docker push repo.treescale.com/${{ secrets.AzureAppService_ContainerUsername_9c1ab8389cbe4d6a957c00e264e22ff0 }}/duchy/onlinetipovacka:${{ github.sha }}
 
-    - name: 'Deploy to Azure Web App'
+    - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'onlinetipovacka'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_709d6432ded448748ccb51aaed571329 }}
-        package: .
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_b8baf9bb1a8d4609a6e10cb730e2081b }}
+        images: 'repo.treescale.com/${{ secrets.AzureAppService_ContainerUsername_9c1ab8389cbe4d6a957c00e264e22ff0 }}/duchy/onlinetipovacka:${{ github.sha }}'
