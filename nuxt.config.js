@@ -102,6 +102,9 @@ export default {
     baseURL: 'http://localhost:3000/api', // Overwritten by API_HOST
     credentials: true,
   },
+  publicRuntimeConfig: {
+    browserBaseURL: process.env.API_URL_BROWSER || 'http://localhost:3000/api',
+  },
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
