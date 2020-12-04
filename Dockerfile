@@ -20,4 +20,4 @@ EXPOSE 2222
 
 WORKDIR /home/site/wwwroot
 
-ENTRYPOINT ["azure_startup.sh"]
+ENTRYPOINT ["/home/site/wwwroot/azure_startup.sh"]
