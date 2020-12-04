@@ -26,7 +26,7 @@ export default Vue.extend({
   methods: {
     async userLogin() {
       try {
-        this.$auth.$storage.setUniversal('redirect', '/')
+        // this.$auth.$storage.setUniversal('redirect', '/')
         await this.$auth.loginWith('local', {
           data: {
             username: this.login.username,

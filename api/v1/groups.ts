@@ -2,9 +2,39 @@ import { Router } from 'express'
 import Group, { IGroupCompetition } from '../../models/Group'
 import logger from '../../utils/logger'
 import { findUpcommingGame } from '../../services/games'
-import Game from '../../models/Game'
+import Game, { IGame } from '../../models/Game'
+import { evaluateBetsForGame, updateGame } from '../../services/results'
+import { IUser } from '../../models/User'
 
 const router = Router()
+
+router.get('/:groupId/latestFixture', async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.groupId)
+      .populate('games')
+      .populate('users')
+    const latestGame = group?.games.slice(-1).pop() as IGame
+    const users = group?.users as IUser[]
+    console.log('Users length', users.length)
+    console.log('Latest game', latestGame.awayTeam, 'vs', latestGame.homeTeam)
+    await evaluateBetsForGame(latestGame, users)
+    res.status(200).json(latestGame)
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+router.get('/:groupId/latestFixtureUpdate', async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.groupId).populate('games')
+    const game = group!.games.slice(-1)[0] as IGame
+    console.log('Game:', game)
+    const latestGame = await updateGame(game)
+    res.status(200).json(latestGame)
+  } catch (error) {
+    console.error(error)
+  }
+})
 
 /**
  * Get all users from a specific group
@@ -19,7 +49,7 @@ router.get('/:groupId/users', async (req, res) => {
       res.status(404)
     }
   } catch (error) {
-    console.error(error)
+    logger.error(error) // TODO: Update this
   }
 })
 
