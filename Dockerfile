@@ -9,8 +9,7 @@ COPY . /usr/src/tipovacka/
 RUN npm install
 RUN npm run build
 
-COPY azure_startup.sh /home/site/wwwroot/
-RUN chmod +x /home/site/wwwroot/azure_startup.sh
+RUN chmod +x /usr/src/tipovacka/azure_startup.sh
 
 ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=3000
@@ -21,4 +20,6 @@ ENV PATH ${PATH}:/home/site/wwwroot
 EXPOSE 3000
 EXPOSE 2222
 
-ENTRYPOINT ["/home/site/wwwroot/azure_startup.sh"]
+WORKDIR /usr/src/tipovacka
+
+ENTRYPOINT ./azure_startup.sh
