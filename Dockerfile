@@ -5,8 +5,8 @@ RUN mkdir -p /usr/src/tipovacka
 WORKDIR /usr/src/tipovacka
 
 # update and install dependencies
-RUN apk update && apk upgrade
-RUN apk add git
+RUN apt-get update \
+        && apt-get install -y --no-install-recommends git
 
 # copy the app, note .dockerignore
 COPY . /usr/src/tipovacka/
