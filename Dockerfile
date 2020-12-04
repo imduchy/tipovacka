@@ -23,5 +23,8 @@ EXPOSE 3000
 
 ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=3000
+ENV PATH ${PATH}:/home/site/wwwroot
 
-ENTRYPOINT ["bash", "azure_startup.sh"]
+WORKDIR /home/site/wwwroot
+
+ENTRYPOINT ["azure_startup.sh"]
