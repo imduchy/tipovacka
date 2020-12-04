@@ -18,6 +18,4 @@ ENV PATH ${PATH}:/home/site/wwwroot
 EXPOSE 3000
 EXPOSE 2222
 
-WORKDIR /home/site/wwwroot
-
 ENTRYPOINT ["/home/site/wwwroot/azure_startup.sh"]
