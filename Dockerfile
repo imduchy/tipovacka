@@ -10,11 +10,11 @@ RUN apk add git
 
 # https://docs.microsoft.com/en-us/azure/app-service/configure-custom-container?pivots=container-linux#enable-ssh
 ENV SSH_PASSWD "root:Docker!"
-RUN apt-get update \
-        && apt-get install -y --no-install-recommends dialog \
-        && apt-get update \
-  && apt-get install -y --no-install-recommends openssh-server \
-  && echo "$SSH_PASSWD" | chpasswd 
+RUN apk update && apk upgrade
+RUN apk add git
+RUN apk add openssh
+RUN apk add dialog
+RUN echo "$SSH_PASSWD" | chpasswd 
 
 COPY sshd_config /etc/ssh/
 COPY azure_startup.sh /usr/local/bin/
