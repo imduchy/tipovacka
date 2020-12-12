@@ -32,7 +32,7 @@
             <span class="text-caption">In {{ upcomingGame.venue }}</span>
           </v-col>
         </v-row>
-        <v-card v-if="!usersBet">
+        <v-card v-if="!alreadyBet">
           <v-card-title class="headline"> Bet </v-card-title>
           <v-card-text>
             <v-form ref="form">
@@ -56,7 +56,9 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn color="primary" nuxt @click="createBet"> Submit </v-btn>
+            <v-btn ref="submit-btn" color="primary" nuxt @click="createBet">
+              Submit
+            </v-btn>
           </v-card-actions>
         </v-card>
         <v-card v-else>
@@ -65,7 +67,7 @@
             <v-row>
               <v-col cols="6">
                 <v-text-field
-                  :value="usersBet.homeTeamScore"
+                  :value="getCurrentBet().homeTeamScore"
                   type="number"
                   :label="`${upcomingGame.homeTeam.name} score`"
                   disabled
@@ -73,7 +75,7 @@
               </v-col>
               <v-col cols="6">
                 <v-text-field
-                  :value="usersBet.awayTeamScore"
+                  :value="getCurrentBet().awayTeamScore"
                   type="number"
                   :label="`${upcomingGame.awayTeam.name} score`"
                   disabled
@@ -89,8 +91,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { IGame } from '../models/Game'
-import { IUser } from '../models/User'
+import { mapGetters } from 'vuex'
 import { IGroup } from '~/models/Group'
 import { IBet } from '~/models/Bet'
 
@@ -99,20 +100,19 @@ export default Vue.extend({
     return {
       homeTeamScore: 0,
       awayTeamScore: 0,
+      usersBets: this.$auth.user.bets,
     }
   },
   computed: {
-    upcomingGame(): IGame | undefined {
-      return this.$store.getters.upcomingGame()
-    },
-    usersBet(): IBet | undefined {
-      const upcomingGameId = (this.upcomingGame as IGame)._id
-      const usersBets = (this.$auth.user as IUser).bets
-      if (!usersBets) {
-        return undefined
+    ...mapGetters({
+      upcomingGame: 'upcomingGame',
+    }),
+    alreadyBet(): boolean {
+      const upcomingGame = this.upcomingGame._id
+      if (this.usersBets !== undefined) {
+        return this.usersBets.some((bet: IBet) => bet.game === upcomingGame)
       }
-      const filteredGames = usersBets.filter((b) => b.game === upcomingGameId)
-      return filteredGames[0]
+      return false
     },
     formatedGameDate(): string {
       if (this.upcomingGame) {
@@ -133,6 +133,14 @@ export default Vue.extend({
     },
   },
   methods: {
+    getCurrentBet(): IBet | undefined {
+      if (!this.alreadyBet || !this.usersBets) return undefined
+
+      const filteredGames: IBet[] = this.usersBets.filter(
+        (b: IBet) => b.game === this.upcomingGame._id
+      )
+      return filteredGames[0]
+    },
     async fetchUpcommingGame() {
       try {
         return await this.$axios
@@ -144,25 +152,25 @@ export default Vue.extend({
         console.log(error)
       }
     },
-    async createBet() {
+    createBet() {
       try {
-        await this.$axios
+        this.$axios
           .post('/bets', {
-            gameId: this.$data.upcomingGame._id,
+            gameId: this.upcomingGame!._id,
             homeTeamScore: this.homeTeamScore,
             awayTeamScore: this.awayTeamScore,
             userId: this.$auth.user._id,
           })
           .then((response) => {
             if (response.status === 200) {
+              this.$auth.fetchUser()
               this.$showAlert('Bet submited successfully', 'success')
+              this.$forceUpdate()
             }
           })
           .catch((err) => {
             this.$showAlert(err.response.data, 'warning')
           })
-
-        this.$auth.fetchUser()
       } catch (error) {
         if (error === 'You already placed a bet on this game') {
           // TODO: Change this!
