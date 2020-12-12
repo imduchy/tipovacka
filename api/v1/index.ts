@@ -1,5 +1,4 @@
 import bodyParser from 'body-parser'
-import dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
 import passport from 'passport'
@@ -13,7 +12,6 @@ import auth from './auth'
 
 export const app = express()
 
-dotenv.config()
 const { DB_NAME, DB_USER, DB_PASSWORD, DB_URL } = process.env
 
 mongoose.connect(

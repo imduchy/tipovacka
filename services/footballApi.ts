@@ -1,9 +1,6 @@
 import axios, { AxiosResponse } from 'axios'
-import dotenv from 'dotenv'
 import logger from '../utils/logger'
 import { FixtureResponse } from '~/models/responses/FixtureResponse'
-
-dotenv.config()
 
 export function getFixture(
   params: any

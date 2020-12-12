@@ -1,12 +1,9 @@
-import dotenv from 'dotenv'
 import { Types } from 'mongoose'
 import Game, { IGame, IGameDocument } from '../models/Game'
 import User, { IUser } from '../models/User'
 import { IBet } from '../models/Bet'
 import { GameStatus } from '../models/Enums'
 import * as FootballApi from './footballApi'
-
-dotenv.config()
 
 /**
  * Fetches a given fixture from the API and updates the matching

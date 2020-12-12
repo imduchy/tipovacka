@@ -1,11 +1,8 @@
-import dotenv from 'dotenv'
 import { FixtureResponse } from '../models/responses/FixtureResponse'
 import { IGame } from '../models/Game'
 import { GameStatus } from '../models/Enums'
 import logger from '../utils/logger'
 import { getFixture } from './footballApi'
-
-dotenv.config()
 
 /**
  * Fetches an upcoming game for each of specified leagues from an API
