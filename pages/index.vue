@@ -100,13 +100,15 @@ export default Vue.extend({
     return {
       homeTeamScore: 0,
       awayTeamScore: 0,
-      usersBets: this.$auth.user.bets,
     }
   },
   computed: {
     ...mapGetters({
       upcomingGame: 'upcomingGame',
     }),
+    usersBets(): IBet[] {
+      return this.$auth.user.bets
+    },
     alreadyBet(): boolean {
       const upcomingGame = this.upcomingGame._id
       if (this.usersBets !== undefined) {
