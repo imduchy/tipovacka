@@ -163,11 +163,10 @@ export default Vue.extend({
             awayTeamScore: this.awayTeamScore,
             userId: this.$auth.user._id,
           })
-          .then((response) => {
+          .then(async (response) => {
             if (response.status === 200) {
-              this.$auth.fetchUser()
               this.$showAlert('Bet submited successfully', 'success')
-              this.$forceUpdate()
+              await this.$auth.fetchUser()
             }
           })
           .catch((err) => {
