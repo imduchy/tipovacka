@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy container app to Azure Web App - onlinetipovacka
+name: Build and deploy container app to Azure Web App
 
 on:
   push:
@@ -13,22 +10,22 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     steps:
-    - uses: actions/checkout@master
+      - uses: actions/checkout@master
 
-    - uses: azure/docker-login@v1
-      with:
-        login-server: https://jakubduchon.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_a8283638a36a4c9c9584fa959a958900 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_417670919b9b48a98c38f5ebd95b48e0 }}
+      - uses: azure/docker-login@v1
+        with:
+          login-server: https://jakubduchon.azurecr.io/
+          username: ${{ secrets.AzureAppService_ContainerUsername_a8283638a36a4c9c9584fa959a958900 }}
+          password: ${{ secrets.AzureAppService_ContainerPassword_417670919b9b48a98c38f5ebd95b48e0 }}
 
-    - run: |
-        docker build . -t jakubduchon.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_a8283638a36a4c9c9584fa959a958900 }}/tipovacka/appsvc:${{ github.sha }}
-        docker push jakubduchon.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_a8283638a36a4c9c9584fa959a958900 }}/tipovacka/appsvc:${{ github.sha }}
+      - run: |
+          docker build . -t jakubduchon.azurecr.io/tipovacka/appsvc:${{ github.sha }}
+          docker push jakubduchon.azurecr.io/tipovacka/appsvc:${{ github.sha }}
 
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'onlinetipovacka'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5d871d8bbb9e43d5b37ccac4aa9e56de }}
-        images: 'jakubduchon.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_a8283638a36a4c9c9584fa959a958900 }}/tipovacka/appsvc:${{ github.sha }}'
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'onlinetipovacka'
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_5d871d8bbb9e43d5b37ccac4aa9e56de }}
+          images: 'jakubduchon.azurecr.io/tipovacka/appsvc:${{ github.sha }}'
