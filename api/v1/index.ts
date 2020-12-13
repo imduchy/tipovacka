@@ -3,6 +3,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import passport from 'passport'
 import session from 'express-session'
+import connectMongo from 'connect-mongo'
 import strategy from '../../services/passport'
 import bets from './bets'
 import games from './games'
@@ -11,6 +12,7 @@ import users from './users'
 import auth from './auth'
 
 export const app = express()
+const MongoStore = connectMongo(session)
 
 const { DB_NAME, DB_USER, DB_PASSWORD, DB_URL } = process.env
 
@@ -34,6 +36,7 @@ app.use(
     },
     resave: true,
     saveUninitialized: true,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
   })
 )
 
