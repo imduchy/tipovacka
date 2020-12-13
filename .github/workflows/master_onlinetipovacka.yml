@@ -17,18 +17,18 @@ jobs:
 
     - uses: azure/docker-login@v1
       with:
-        login-server: https://onlinetipovacka.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_79652d7c45334eddb4e22ca105cf219e }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_b239b0132512450eb8453fe2eca5b29d }}
+        login-server: https://jakubduchon.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_a8283638a36a4c9c9584fa959a958900 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_417670919b9b48a98c38f5ebd95b48e0 }}
 
     - run: |
-        docker build . -t onlinetipovacka.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_79652d7c45334eddb4e22ca105cf219e }}/onlinetipovacka/onlinetipovacka:${{ github.sha }}
-        docker push onlinetipovacka.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_79652d7c45334eddb4e22ca105cf219e }}/onlinetipovacka/onlinetipovacka:${{ github.sha }}
+        docker build . -t jakubduchon.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_a8283638a36a4c9c9584fa959a958900 }}/tipovacka/appsvc:${{ github.sha }}
+        docker push jakubduchon.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_a8283638a36a4c9c9584fa959a958900 }}/tipovacka/appsvc:${{ github.sha }}
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'onlinetipovacka'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_4c094b755e1e4009a6adb367e729bb4a }}
-        images: 'onlinetipovacka.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_79652d7c45334eddb4e22ca105cf219e }}/onlinetipovacka/onlinetipovacka:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5d871d8bbb9e43d5b37ccac4aa9e56de }}
+        images: 'jakubduchon.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_a8283638a36a4c9c9584fa959a958900 }}/tipovacka/appsvc:${{ github.sha }}'
