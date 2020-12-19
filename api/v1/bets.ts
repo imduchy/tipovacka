@@ -3,6 +3,7 @@ import User from '../../models/User'
 import logger from '../../utils/logger'
 import { IBet } from '../../models/Bet'
 import { alreadyBet } from '../../services/bets'
+import Game from '../../models/Game'
 
 const router = Router()
 
@@ -24,6 +25,17 @@ router.post('/', async ({ body }, res) => {
         `User ${body.userId} has already placed a bet on the game ${body.gameId}`
       )
       res.status(400).json('You already placed a bet on this game')
+      return
+    }
+
+    const game = await Game.findById(body.gameId)
+    if (!game) {
+      res.status(404).json('Game not found')
+      return
+    }
+
+    if (new Date().getTime() > game.date.getTime()) {
+      res.status(400).json('Game already started')
       return
     }
 

@@ -35,12 +35,15 @@
         <v-card v-if="!alreadyBet">
           <v-card-title class="headline"> Bet </v-card-title>
           <v-card-text>
-            <v-form ref="form">
+            <v-form ref="form" v-model="validScoreInput">
               <v-row>
                 <v-col cols="6">
                   <v-text-field
                     v-model="homeTeamScore"
                     type="number"
+                    min="0"
+                    max="99"
+                    :rules="[rules.minInput, rules.maxInput]"
                     :label="`${upcomingGame.homeTeam.name} score`"
                   ></v-text-field>
                 </v-col>
@@ -48,6 +51,9 @@
                   <v-text-field
                     v-model="awayTeamScore"
                     type="number"
+                    min="0"
+                    max="99"
+                    :rules="[rules.minInput, rules.maxInput]"
                     :label="`${upcomingGame.awayTeam.name} score`"
                   ></v-text-field>
                 </v-col>
@@ -56,7 +62,13 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn ref="submit-btn" color="primary" nuxt @click="createBet">
+            <v-btn
+              ref="submit-btn"
+              color="primary"
+              :disabled="alreadyStarted || !validScoreInput"
+              nuxt
+              @click="createBet"
+            >
               Submit
             </v-btn>
           </v-card-actions>
@@ -100,6 +112,15 @@ export default Vue.extend({
     return {
       homeTeamScore: 0,
       awayTeamScore: 0,
+      rules: {
+        minInput: (value: string) =>
+          (Number.isInteger(parseInt(value)) && parseInt(value) >= 0) ||
+          'Skóre môže byť v rozsahu od 0 do 99',
+        maxInput: (value: string) =>
+          (Number.isInteger(parseInt(value)) && parseInt(value) < 100) ||
+          'Skóre môže byť v rozsahu od 0 do 99',
+      },
+      validScoreInput: true,
     }
   },
   computed: {
@@ -115,6 +136,9 @@ export default Vue.extend({
         return this.usersBets.some((bet: IBet) => bet.game === upcomingGame)
       }
       return false
+    },
+    alreadyStarted(): boolean {
+      return new Date().getTime() > new Date(this.upcomingGame.date).getTime()
     },
     formatedGameDate(): string {
       if (this.upcomingGame) {
