@@ -7,7 +7,7 @@ import logger from '../../utils/logger'
 const router = Router()
 
 /**
- * Get all users from a specific group
+ * Get users of a group by group's _id
  * Access: External function
  */
 router.get('/:groupId/users', async (req, res) => {
@@ -20,11 +20,12 @@ router.get('/:groupId/users', async (req, res) => {
     }
   } catch (error) {
     logger.error(error) // TODO: Update this
+    res.status(404)
   }
 })
 
 /**
- * Get a group by ID
+ * Get a group by _id
  * Access: Private
  */
 router.get('/:groupId', async (req, res) => {
@@ -32,10 +33,9 @@ router.get('/:groupId', async (req, res) => {
     const group = await Group.findById(req.params.groupId).populate('upcommingGame')
     if (!group) {
       logger.warn(`Group with _id ${req.params.groupId} doesn't exist.`)
-      res.status(404).json("We couldn't find this group")
+      res.status(404).json("Group doesn't exist")
       return
     }
-
     res.status(200).json(group)
   } catch (error) {
     logger.error(`Couldn't fetch a group ${req.params.groupId}. Error: ${error}`)
@@ -72,44 +72,6 @@ router.post('/', async ({ body }, res) => {
   } catch (error) {
     logger.error(`Couldn't create a new group. Error: ${error}`)
     res.status(500).json('Internal server error')
-  }
-})
-
-/**
- * Get upcoming game
- * Access: ADMIN
- */
-router.get('/:groupId/upcomingGame', async (req, res) => {
-  try {
-    const group = await Group.findById(req.params.groupId)
-
-    if (!group) {
-      throw new Error(`Group with id ${req.params.groupId} doesn't exist.`)
-    }
-
-    const competitions = group.competitions.map((c) => c.competitionId)
-    const newUpcomingGame = await findUpcommingGame(group.teamId, competitions)
-
-    if (!newUpcomingGame) {
-      console.warn(
-        `Didn't find an upcoming game for the team ${group.teamId} in the following competitions ${competitions}.`
-      )
-      return res.status(200).json("Didn't find any upcoming games.")
-    }
-
-    newUpcomingGame.groupId = group._id
-    const game = await Game.create(newUpcomingGame)
-
-    const response = await Group.findByIdAndUpdate(
-      group._id,
-      {
-        upcommingGame: game._id,
-      },
-      { new: true }
-    )
-    res.status(200).json(response)
-  } catch (error) {
-    res.status(400).json(error.message)
   }
 })
 
