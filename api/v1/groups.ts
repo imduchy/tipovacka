@@ -49,13 +49,6 @@ router.get('/:groupId', async (req, res) => {
  */
 router.post('/', async ({ body }, res) => {
   try {
-    const competitionIds = body.competitions.map(
-      (c: IGroupCompetition) => c.competitionId
-    )
-
-    const upcommingGame = await findUpcommingGame(body.teamId, competitionIds)
-    const game = await Game.create(upcommingGame)
-
     const group = await Group.create({
       name: body.name,
       email: body.email,
@@ -64,8 +57,17 @@ router.post('/', async ({ body }, res) => {
       teamId: body.teamId,
       competitions: body.competitions,
       games: [],
-      upcommingGame: game._id,
     })
+
+    const competitionIds = body.competitions.map(
+      (c: IGroupCompetition) => c.competitionId
+    )
+    const upcommingGame = await findUpcommingGame(body.teamId, competitionIds)
+    upcommingGame.groupId = group._id
+    const game = await Game.create(upcommingGame)
+
+    group.upcommingGame = game._id
+    await group.save()
 
     logger.info(`A new group ${group.name} (${group._id}) was created.`)
     res.status(200).json(group)
