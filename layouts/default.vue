@@ -4,7 +4,7 @@
       <template v-if="$auth.loggedIn" v-slot:prepend>
         <v-list-item class="px-2">
           <v-list-item-avatar>
-            <img src="~/assets/ronaldo.jpg" />
+            <img src="/user-icon.png" />
           </v-list-item-avatar>
 
           <v-list-item-title>{{ $auth.user.username }} </v-list-item-title>
@@ -13,7 +13,7 @@
       <template v-else v-slot:prepend>
         <v-list-item two-line>
           <v-list-item-avatar>
-            <img src="~/assets/ronaldo.jpg" />
+            <img src="/user-icon.png" />
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>Guest</v-list-item-title>
