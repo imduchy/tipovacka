@@ -1,15 +1,15 @@
 import bodyParser from 'body-parser'
+import connectMongo from 'connect-mongo'
 import express from 'express'
+import session from 'express-session'
 import mongoose from 'mongoose'
 import passport from 'passport'
-import session from 'express-session'
-import connectMongo from 'connect-mongo'
 import strategy from '../../services/passport'
+import auth from './auth'
 import bets from './bets'
 import games from './games'
 import groups from './groups'
 import users from './users'
-import auth from './auth'
 
 export const app = express()
 const MongoStore = connectMongo(session)
@@ -30,9 +30,9 @@ strategy(passport)
 
 app.use(
   session({
-    secret: 'QWgdjkqwrDSGasdwe',
+    secret: process.env.SESSION_SECRET!,
     cookie: {
-      maxAge: 432000, // 5 days,
+      maxAge: 172800000, // 2 days,
     },
     resave: true,
     saveUninitialized: true,
@@ -51,10 +51,6 @@ app.use('/users', users)
 app.use('/groups', groups)
 app.use('/games', games)
 app.use('/bets', bets)
-
-app.get('/', (_, res) => {
-  res.send('Hello world')
-})
 
 export default {
   path: '/api/',

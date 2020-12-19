@@ -16,7 +16,7 @@ router.get('/:gameId', async (req, res) => {
       res.status(404).json("We couldn't find this game")
     }
 
-    return game
+    res.status(200).json(game)
   } catch (error) {
     logger.error(`Couldn't fetch a game ${req.params.gameId}. Error: ${error}`)
     res.status(500).json('Internal server error')
