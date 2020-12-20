@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <Navbar></Navbar>
+    <navbar></navbar>
     <v-main>
       <v-system-bar class="hidden-sm-and-down" color="warning" height="32">
         <v-spacer></v-spacer>
@@ -13,7 +13,7 @@
       <v-container>
         <v-row column justify-center align-text>
           <v-col class="xs12 sm8 md6">
-            <Alert></Alert>
+            <alert></alert>
           </v-col>
         </v-row>
         <nuxt />

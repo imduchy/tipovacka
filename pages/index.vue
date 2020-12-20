@@ -11,27 +11,8 @@
         </div>
       </v-col>
       <v-col v-else xs12 sm8 md6>
-        <div class="text-h4" align="center">Upcoming game</div>
-        <v-row align="center">
-          <v-col align="center">
-            <v-img :src="upcomingGame.homeTeam.logo" height="100px" width="100px" />
-            <div class="text-h5">{{ upcomingGame.homeTeam.name }}</div>
-          </v-col>
-          <div class="text-h4">vs</div>
-          <v-col align="center">
-            <v-img :src="upcomingGame.awayTeam.logo" height="100px" width="100px" />
-            <div class="text-h5">{{ upcomingGame.awayTeam.name }}</div>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col align="center">
-            <span class="text-caption"
-              ><i>{{ formatedGameDate }}</i></span
-            >
-            <br />
-            <span class="text-caption">In {{ upcomingGame.venue }}</span>
-          </v-col>
-        </v-row>
+        <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
+
         <v-card v-if="!alreadyBet">
           <v-card-title class="headline"> Bet </v-card-title>
           <v-card-text>
@@ -104,10 +85,12 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
+import UpcomingGame from '../components/UpcomingGame.vue'
 import { IGroup } from '~/models/Group'
 import { IBet } from '~/models/Bet'
 
 export default Vue.extend({
+  components: { UpcomingGame },
   data() {
     return {
       homeTeamScore: 0,
@@ -139,23 +122,6 @@ export default Vue.extend({
     },
     alreadyStarted(): boolean {
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime()
-    },
-    formatedGameDate(): string {
-      if (this.upcomingGame) {
-        const date = new Date(this.upcomingGame.date)
-        const formatedDate = date.toLocaleDateString('en-GB', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        })
-        const formatedTime = date.toLocaleTimeString('en-GB', {
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-        return formatedDate + ' at ' + formatedTime
-      }
-      return ''
     },
   },
   methods: {

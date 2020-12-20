@@ -1,0 +1,57 @@
+<template>
+  <v-card color="secondary" class="pa-5" elevation="12" light>
+    <v-row align="center" justify="center">
+      <v-col cols="4" align="center">
+        <v-img :src="upcomingGame.homeTeam.logo" height="100px" width="100px" />
+        <div class="text-h4 font-weight-light mt-3">{{ upcomingGame.homeTeam.name }}</div>
+      </v-col>
+      <v-col cols="4" align="center">
+        <div>
+          <span class="text-h4 font-weight-light">{{ formatedDate }}</span>
+          <span class="text-h4 font-weight-black">{{ formatedTime }}</span>
+        </div>
+        <v-row class="mt-3" justify="center">
+          <v-icon class="mr-3">mdi-stadium</v-icon>
+          <div class="text-subtitle-2 font-weight-light">
+            {{ upcomingGame.venue }}
+          </div>
+        </v-row>
+        <v-row class="mt-1" justify="center">
+          <v-icon class="mr-3">mdi-trophy-variant</v-icon>
+          <div class="text-subtitle-2 font-weight-light">La Liga</div>
+        </v-row>
+      </v-col>
+      <v-col cols="4" align="center">
+        <v-img :src="upcomingGame.awayTeam.logo" height="100px" width="100px" />
+        <div class="text-h4 font-weight-light mt-3">{{ upcomingGame.awayTeam.name }}</div>
+      </v-col>
+    </v-row>
+  </v-card>
+</template>
+
+<script lang="ts">
+import Vue, { PropType } from 'vue'
+import { IGame } from '~/models/Game'
+export default Vue.extend({
+  props: {
+    upcomingGame: {
+      type: Object as PropType<IGame>,
+      default: {} as IGame,
+    },
+  },
+  computed: {
+    formatedDate(): string {
+      return new Date(this.upcomingGame.date).toLocaleDateString('sk-SK', {
+        month: 'long',
+        day: 'numeric',
+      })
+    },
+    formatedTime(): string {
+      return new Date(this.upcomingGame.date).toLocaleTimeString('sk-SK', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    },
+  },
+})
+</script>

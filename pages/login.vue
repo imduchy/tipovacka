@@ -5,7 +5,7 @@
       <p class="text-subtitle-1">
         Prihlasovacia stránka pre členov fanklubu La Peňa Madridista de Eslovaquia
       </p>
-      <v-card color="secondary pa-5" elevation="12">
+      <v-card color="secondary" class="pa-5" elevation="12">
         <v-form>
           <v-text-field
             v-model="login.username"
