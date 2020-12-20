@@ -53,7 +53,6 @@ export default Vue.extend({
   methods: {
     async userLogout() {
       await this.$auth.logout()
-      this.$showAlert('Successfully logged out', 'info')
       // this.$router.push('/login')
     },
   },

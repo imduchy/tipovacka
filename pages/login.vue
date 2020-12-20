@@ -58,7 +58,6 @@ export default Vue.extend({
             password: this.login.password,
           },
         })
-        this.$showAlert('Successfully logged-in', 'success darken-2')
       } catch (err) {
         this.$showAlert('Wrong credentials', 'error')
         console.log(err)
