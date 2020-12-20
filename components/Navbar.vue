@@ -95,7 +95,7 @@ export default Vue.extend({
         to: '/',
       },
       {
-        icon: 'mdi-seal',
+        icon: 'mdi-trophy',
         title: 'Tabuľka',
         to: '/table',
       },
