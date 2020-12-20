@@ -1,8 +1,15 @@
 <template>
   <v-app dark>
     <Navbar></Navbar>
-
     <v-main>
+      <v-system-bar color="warning" height="30">
+        <v-spacer></v-spacer>
+        <span class="black--text"
+          >Na stránke sa pracuje. Ak máte pripomienky alebo návrhy, kontaktujte ma na
+          WhatsApp.</span
+        >
+        <v-spacer></v-spacer>
+      </v-system-bar>
       <v-container>
         <v-row column justify-center align-text>
           <v-col class="xs12 sm8 md6">

@@ -3,7 +3,7 @@
     <v-col cols="12" md="6" class="pa-12 text-center">
       <h4 class="text-h4 mb-5">Vítajte na Tipovačke</h4>
       <p class="text-subtitle-1">
-        Prihlasovacia stránka pre členov fanklubu Halamadrid.sk
+        Prihlasovacia stránka pre členov fanklubu La Peňa Madridista de Eslovaquia
       </p>
       <v-card color="secondary pa-5" elevation="12">
         <v-form>
