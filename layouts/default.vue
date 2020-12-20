@@ -42,7 +42,7 @@
         </v-list-item>
       </template>
     </v-navigation-drawer>
-    <v-app-bar fixed app>
+    <v-app-bar color="primary" fixed app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="title" />
     </v-app-bar>
@@ -58,7 +58,7 @@
       </v-container>
     </v-main>
 
-    <v-footer :absolute="!fixed" app>
+    <v-footer color="secondary" light :absolute="!fixed" app>
       <span class="text-caption"
         >&copy; {{ new Date().getFullYear() }}
         <a href="https://www.linkedin.com/in/jakubduchon9/" target="_blank"
