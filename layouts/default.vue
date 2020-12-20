@@ -2,11 +2,11 @@
   <v-app dark>
     <Navbar></Navbar>
     <v-main>
-      <v-system-bar color="warning" height="30">
+      <v-system-bar class="hidden-sm-and-down" color="warning" height="32">
         <v-spacer></v-spacer>
         <span class="black--text"
-          >Na stránke sa pracuje. Ak máte pripomienky alebo návrhy, kontaktujte ma na
-          WhatsApp.</span
+          >Na stránke sa pracuje. Ak máte pripomienky, návrhy, alebo nájdete chybu v
+          stránke, kontaktujte ma na WhatsApp.</span
         >
         <v-spacer></v-spacer>
       </v-system-bar>
