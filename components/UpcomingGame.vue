@@ -57,6 +57,19 @@ export default Vue.extend({
       default: {} as IGame,
     },
   },
+  data: () => ({
+    inputRules: {
+      minInput: (value: string) =>
+        (Number.isInteger(parseInt(value)) && parseInt(value) >= 0) ||
+        'Skóre môže byť v rozsahu od 0 do 99',
+      maxInput: (value: string) =>
+        (Number.isInteger(parseInt(value)) && parseInt(value) < 100) ||
+        'Skóre môže byť v rozsahu od 0 do 99',
+    },
+    homeTeamScore: 0,
+    awayTeamScore: 0,
+    validScoreInput: true,
+  }),
   computed: {
     formatedDate(): string {
       return new Date(this.upcomingGame.date).toLocaleDateString('sk-SK', {

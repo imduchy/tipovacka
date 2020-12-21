@@ -13,70 +13,14 @@
       <v-col v-else xs12 sm8 md6>
         <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
 
-        <v-card v-if="!alreadyBet">
-          <v-card-title class="headline"> Bet </v-card-title>
-          <v-card-text>
-            <v-form ref="form" v-model="validScoreInput">
-              <v-row>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="homeTeamScore"
-                    type="number"
-                    min="0"
-                    max="99"
-                    :rules="[rules.minInput, rules.maxInput]"
-                    :label="`${upcomingGame.homeTeam.name} score`"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="awayTeamScore"
-                    type="number"
-                    min="0"
-                    max="99"
-                    :rules="[rules.minInput, rules.maxInput]"
-                    :label="`${upcomingGame.awayTeam.name} score`"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              ref="submit-btn"
-              color="primary"
-              :disabled="alreadyStarted || !validScoreInput"
-              nuxt
-              @click="createBet"
-            >
-              Submit
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-        <v-card v-else>
-          <v-card-title class="headline"> Your bet </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="6">
-                <v-text-field
-                  :value="getCurrentBet().homeTeamScore"
-                  type="number"
-                  :label="`${upcomingGame.homeTeam.name} score`"
-                  disabled
-                ></v-text-field>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  :value="getCurrentBet().awayTeamScore"
-                  type="number"
-                  :label="`${upcomingGame.awayTeam.name} score`"
-                  disabled
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
+        <v-row>
+          <v-col cols="12" class="pt-0">
+            <v-card class="pt-8 px-8">
+              <bet-input v-if="!alreadyBet" :upcoming-game="upcomingGame"></bet-input>
+              <user-bet v-else :upcoming-game="upcomingGame"></user-bet>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>
@@ -86,23 +30,18 @@
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
 import UpcomingGame from '../components/UpcomingGame.vue'
+import BetInput from '../components/BetInput.vue'
+import UserBet from '../components/UserBet.vue'
+
 import { IGroup } from '~/models/Group'
 import { IBet } from '~/models/Bet'
 
 export default Vue.extend({
-  components: { UpcomingGame },
+  components: { UpcomingGame, BetInput, UserBet },
   data() {
     return {
       homeTeamScore: 0,
       awayTeamScore: 0,
-      rules: {
-        minInput: (value: string) =>
-          (Number.isInteger(parseInt(value)) && parseInt(value) >= 0) ||
-          'Skóre môže byť v rozsahu od 0 do 99',
-        maxInput: (value: string) =>
-          (Number.isInteger(parseInt(value)) && parseInt(value) < 100) ||
-          'Skóre môže byť v rozsahu od 0 do 99',
-      },
       validScoreInput: true,
     }
   },
@@ -110,6 +49,9 @@ export default Vue.extend({
     ...mapGetters({
       upcomingGame: 'upcomingGame',
     }),
+    alreadyStarted(): boolean {
+      return new Date().getTime() > new Date(this.upcomingGame.date).getTime()
+    },
     usersBets(): IBet[] {
       return this.$auth.user.bets
     },
@@ -120,19 +62,8 @@ export default Vue.extend({
       }
       return false
     },
-    alreadyStarted(): boolean {
-      return new Date().getTime() > new Date(this.upcomingGame.date).getTime()
-    },
   },
   methods: {
-    getCurrentBet(): IBet | undefined {
-      if (!this.alreadyBet || !this.usersBets) return undefined
-
-      const filteredGames: IBet[] = this.usersBets.filter(
-        (b: IBet) => b.game === this.upcomingGame._id
-      )
-      return filteredGames[0]
-    },
     async fetchUpcommingGame() {
       try {
         return await this.$axios
@@ -142,31 +73,6 @@ export default Vue.extend({
           })
       } catch (error) {
         console.log(error)
-      }
-    },
-    createBet() {
-      try {
-        this.$axios
-          .post('/bets', {
-            gameId: this.upcomingGame!._id,
-            homeTeamScore: this.homeTeamScore,
-            awayTeamScore: this.awayTeamScore,
-            userId: this.$auth.user._id,
-          })
-          .then(async (response) => {
-            if (response.status === 200) {
-              this.$showAlert('Bet submited successfully', 'success')
-              await this.$auth.fetchUser()
-            }
-          })
-          .catch((err) => {
-            this.$showAlert(err.response.data, 'warning')
-          })
-      } catch (error) {
-        if (error === 'You already placed a bet on this game') {
-          // TODO: Change this!
-          console.log('Already bet')
-        }
       }
     },
   },
