@@ -28,21 +28,26 @@ const TotalScoreSchema = new Schema({
   score: { type: Number, required: true, default: 0 },
 })
 
-const UserSchema = new Schema<IUser>({
-  _version: { type: Number, required: true, default: 1 },
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  totalScore: [
-    {
-      type: TotalScoreSchema,
-      required: true,
-      default: [],
-    },
-  ],
-  bets: [{ type: BetSchema, default: [] }],
-  groupId: { type: Schema.Types.ObjectId, ref: 'group' },
-})
+const UserSchema = new Schema<IUser>(
+  {
+    _version: { type: Number, required: true, default: 1 },
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    totalScore: [
+      {
+        type: TotalScoreSchema,
+        required: true,
+        default: [],
+      },
+    ],
+    bets: [{ type: BetSchema, default: [] }],
+    groupId: { type: Schema.Types.ObjectId, ref: 'group' },
+  },
+  {
+    timestamps: true,
+  }
+)
 
 /**
  * Before a user is saved, create an empty totalScore

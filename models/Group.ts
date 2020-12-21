@@ -26,16 +26,21 @@ const GroupCompetitionSchema = new Schema({
   season: { type: Number, required: true, validate: { validator: /^20\d{2}/ } },
 })
 
-const GroupSchema = new Schema({
-  _version: { type: Number, required: true, default: 1 },
-  name: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  website: { type: String, required: false },
-  teamId: { type: Number, required: true },
-  competitions: [{ type: GroupCompetitionSchema, required: true, default: [] }],
-  games: [{ type: Schema.Types.ObjectId, ref: 'game', required: true, default: [] }],
-  upcommingGame: { type: Schema.Types.ObjectId, ref: 'game' },
-  users: [{ type: Schema.Types.ObjectId, ref: 'user' }],
-})
+const GroupSchema = new Schema(
+  {
+    _version: { type: Number, required: true, default: 1 },
+    name: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    website: { type: String, required: false },
+    teamId: { type: Number, required: true },
+    competitions: [{ type: GroupCompetitionSchema, required: true, default: [] }],
+    games: [{ type: Schema.Types.ObjectId, ref: 'game', required: true, default: [] }],
+    upcommingGame: { type: Schema.Types.ObjectId, ref: 'game' },
+    users: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+  },
+  {
+    timestamps: true,
+  }
+)
 
 export default mongoose.model<IGroupDocument>('group', GroupSchema)

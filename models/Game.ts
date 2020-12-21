@@ -33,26 +33,31 @@ const TeamSchema = new Schema({
   logo: { type: String, required: true },
 })
 
-const GameSchema = new Schema({
-  _version: { type: Number, default: 1, required: true },
-  gameId: { type: Number, required: true },
-  groupId: { type: Schema.Types.ObjectId, ref: 'group', required: true },
-  date: { type: Date, required: true },
-  homeTeam: {
-    type: TeamSchema,
-    required: true,
+const GameSchema = new Schema(
+  {
+    _version: { type: Number, default: 1, required: true },
+    gameId: { type: Number, required: true },
+    groupId: { type: Schema.Types.ObjectId, ref: 'group', required: true },
+    date: { type: Date, required: true },
+    homeTeam: {
+      type: TeamSchema,
+      required: true,
+    },
+    awayTeam: {
+      type: TeamSchema,
+      required: true,
+    },
+    homeTeamScore: { type: Number, required: true, default: 0 },
+    awayTeamScore: { type: Number, required: true, default: 0 },
+    status: { type: GameStatus, required: true },
+    competition: { type: Number, required: true },
+    season: { type: Number, required: true },
+    venue: { type: String, required: true },
   },
-  awayTeam: {
-    type: TeamSchema,
-    required: true,
-  },
-  homeTeamScore: { type: Number, required: true, default: 0 },
-  awayTeamScore: { type: Number, required: true, default: 0 },
-  status: { type: GameStatus, required: true },
-  competition: { type: Number, required: true },
-  season: { type: Number, required: true },
-  venue: { type: String, required: true },
-})
+  {
+    timestamps: true,
+  }
+)
 
 /**
  * After a game is saved, push the game _id
