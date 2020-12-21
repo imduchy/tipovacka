@@ -29,12 +29,6 @@
     <!-- Navigation drawer -->
     <!-- App bar -->
     <v-app-bar app color="primary">
-      <span class="hidden-md-and-up">
-        <v-app-bar-nav-icon
-          v-if="$auth.loggedIn"
-          @click="sidebar = !sidebar"
-        ></v-app-bar-nav-icon>
-      </span>
       <v-toolbar-title>
         <router-link to="/" tag="span" style="cursor: pointer">
           {{ title }}
@@ -78,6 +72,12 @@
             </v-list>
           </v-menu>
           <!-- Additional menu -->
+        </span>
+        <span class="hidden-md-and-up">
+          <v-app-bar-nav-icon
+            v-if="$auth.loggedIn"
+            @click="sidebar = !sidebar"
+          ></v-app-bar-nav-icon>
         </span>
       </template>
     </v-app-bar>
