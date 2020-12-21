@@ -82,7 +82,7 @@ export default Vue.extend({
           })
           .then(async (response) => {
             if (response.status === 200) {
-              this.$showAlert('Bet submited successfully', 'success')
+              this.$showAlert('Tip úspešne odoslaný', 'success')
               await this.$auth.fetchUser()
             }
           })

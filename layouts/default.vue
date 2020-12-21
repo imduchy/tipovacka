@@ -5,16 +5,17 @@
       <v-system-bar
         v-if="systemBar"
         class="hidden-sm-and-down"
-        color="warning"
+        color="accent"
         height="32"
       >
+        <v-spacer></v-spacer>
         <span class="black--text"
           >Na stránke sa pracuje. Ak máte pripomienky, návrhy, alebo nájdete chybu v
           stránke, kontaktujte ma na WhatsApp.</span
         >
         <v-spacer></v-spacer>
         <v-btn icon @click="systemBar = false">
-          <v-icon>mdi-close</v-icon>
+          <v-icon color="grey darken-2">mdi-close</v-icon>
         </v-btn>
       </v-system-bar>
       <v-container>
