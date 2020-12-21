@@ -2,13 +2,20 @@
   <v-app dark>
     <navbar></navbar>
     <v-main>
-      <v-system-bar class="hidden-sm-and-down" color="warning" height="32">
-        <v-spacer></v-spacer>
+      <v-system-bar
+        v-if="systemBar"
+        class="hidden-sm-and-down"
+        color="warning"
+        height="32"
+      >
         <span class="black--text"
           >Na stránke sa pracuje. Ak máte pripomienky, návrhy, alebo nájdete chybu v
           stránke, kontaktujte ma na WhatsApp.</span
         >
         <v-spacer></v-spacer>
+        <v-btn icon @click="systemBar = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
       </v-system-bar>
       <v-container>
         <v-row column justify-center align-text>
@@ -38,6 +45,8 @@ import Alert from '../components/Alert.vue'
 import Navbar from '../components/Navbar.vue'
 export default Vue.extend({
   components: { Alert, Navbar },
-  data: () => ({}),
+  data: () => ({
+    systemBar: true,
+  }),
 })
 </script>
