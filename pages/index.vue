@@ -17,7 +17,7 @@
           <v-col cols="12" class="pt-0">
             <v-card class="pt-8 px-8">
               <bet-input v-if="!alreadyBet" :upcoming-game="upcomingGame"></bet-input>
-              <user-bet v-else :upcoming-game="upcomingGame"></user-bet>
+              <current-bet v-else :upcoming-game="upcomingGame"></current-bet>
             </v-card>
           </v-col>
         </v-row>
@@ -31,13 +31,13 @@ import Vue from 'vue'
 import { mapGetters } from 'vuex'
 import UpcomingGame from '../components/UpcomingGame.vue'
 import BetInput from '../components/BetInput.vue'
-import UserBet from '../components/UserBet.vue'
+import CurrentBet from '../components/CurrentBet.vue'
 
 import { IGroup } from '~/models/Group'
 import { IBet } from '~/models/Bet'
 
 export default Vue.extend({
-  components: { UpcomingGame, BetInput, UserBet },
+  components: { UpcomingGame, BetInput, CurrentBet },
   data() {
     return {
       homeTeamScore: 0,
