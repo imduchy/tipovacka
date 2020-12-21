@@ -48,3 +48,5 @@ router.get('/:groupId/upcomingGame', async (req, res) => {
     res.status(400).json(error.message)
   }
 })
+
+export default router

@@ -5,6 +5,7 @@ import session from 'express-session'
 import mongoose from 'mongoose'
 import passport from 'passport'
 import strategy from '../../services/passport'
+import admin from './admin'
 import auth from './auth'
 import bets from './bets'
 import games from './games'
@@ -47,6 +48,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use('/auth', auth)
+app.use('/admin', admin)
 app.use('/users', users)
 app.use('/groups', groups)
 app.use('/games', games)
