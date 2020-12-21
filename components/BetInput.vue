@@ -35,7 +35,7 @@
           nuxt
           @click="createBet"
         >
-          Submit
+          Odoslať tip
         </v-btn>
       </v-col>
     </v-row>
