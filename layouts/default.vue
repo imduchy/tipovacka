@@ -28,7 +28,7 @@
       </v-container>
     </v-main>
 
-    <v-footer color="secondary" light app>
+    <v-footer color="secondary" absolute light app>
       <span class="text-caption"
         >&copy; {{ new Date().getFullYear() }}
         <a href="https://www.linkedin.com/in/jakubduchon9/" target="_blank"
