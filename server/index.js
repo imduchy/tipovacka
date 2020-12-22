@@ -4,8 +4,6 @@ const app = express()
 
 const isDev = process.env.NODE_ENV !== 'production'
 
-console.log(`Running nuxt in ${process.env.NODE_ENV} environment.`)
-
 async function start() {
   // Init Nuxt.js
   const nuxt = await loadNuxt(isDev ? 'dev' : 'start')

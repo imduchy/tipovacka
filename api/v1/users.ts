@@ -11,9 +11,13 @@ const router = express.Router()
  */
 router.get('/:userId', async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId)
+    const user = await User.findById(req.params.userId).populate({
+      path: 'bets',
+      model: 'bet',
+      populate: { path: 'game', model: 'game' },
+    })
     if (!user) {
-      logger.warning(`User with _id ${req.params.userId} doesn't exist.`)
+      logger.warn(`User with _id ${req.params.userId} doesn't exist.`)
       res.status(404).json("We couldn't find this user")
       return
     }
@@ -53,15 +57,11 @@ router.post('/', async ({ body }, res) => {
 
     group.users.addToSet(user._id)
     await group.save()
-    logger.info(
-      `User ${user._id} added to the group ${group.name} (${group._id}).`
-    )
+    logger.info(`User ${user._id} added to the group ${group.name} (${group._id}).`)
 
     res.status(200).json(user)
   } catch (error) {
-    logger.error(
-      `Couldn't create a user in a group ${body.groupId}. Error: ${error}.`
-    )
+    logger.error(`Couldn't create a user in a group ${body.groupId}. Error: ${error}.`)
     res.status(500).json('Internal server error')
   }
 })
