@@ -37,7 +37,10 @@ app.use(
     },
     resave: true,
     saveUninitialized: true,
-    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    store:
+      process.env.NODE_ENV === 'production'
+        ? new MongoStore({ mongooseConnection: mongoose.connection })
+        : new session.MemoryStore(),
   })
 )
 

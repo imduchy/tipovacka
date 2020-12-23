@@ -13,6 +13,11 @@ router.get('/users', (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
+  req.session?.destroy((err) => {
+    logger.info(
+      `Couldn't destory session ${req.sessionID} for ` + `user ${req.user}. Error: ${err}`
+    )
+  })
   req.logout()
   res.status(200).send()
 })
