@@ -2,7 +2,7 @@
   <v-card>
     <v-row align="center">
       <v-col cols="4" align="center">
-        <v-img :src="homeTeam.logo" width="50px"></v-img
+        <v-img :src="homeTeam.logo" width="70px"></v-img
       ></v-col>
       <v-col cols="4" align="center">
         <v-row justify="center">
@@ -24,7 +24,7 @@
         </v-row>
       </v-col>
       <v-col cols="4" align="center">
-        <v-img :src="awayTeam.logo" width="50px"></v-img
+        <v-img :src="awayTeam.logo" width="70px"></v-img
       ></v-col>
     </v-row>
     <v-progress-linear :color="resultColor" value="100"></v-progress-linear>

@@ -33,14 +33,14 @@
           <!-- Last bets -->
           <div class="mt-5 text-h5">Posledné tipy</div>
           <v-row>
-            <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
-              <user-bet :bet="usersBets[0]"></user-bet>
+            <v-col v-if="evaluatedBets[2]" cols="12" lg="4">
+              <user-bet :bet="usersBets[2]"></user-bet>
             </v-col>
             <v-col v-if="evaluatedBets[1]" cols="12" lg="4">
               <user-bet :bet="usersBets[1]"></user-bet>
             </v-col>
-            <v-col v-if="evaluatedBets[2]" cols="12" lg="4">
-              <user-bet :bet="usersBets[2]"></user-bet>
+            <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
+              <user-bet :bet="usersBets[0]"></user-bet>
             </v-col>
           </v-row>
         </v-col>
@@ -92,6 +92,7 @@ export default Vue.extend({
     evaluatedBets(): IBet[] {
       const bets: IBet[] = this.$auth.user.bets
       if (bets) {
+        // TODO: Optimize to shortcut after finding first (last) 3 items
         return bets.filter((b) => b.status === BetStatus.EVALUATED)
       }
       return []
