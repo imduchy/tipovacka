@@ -21,12 +21,15 @@ interface ITotalScore {
   score: number
 }
 
-const TotalScoreSchema = new Schema({
-  _version: { type: Number, default: 1, required: true },
-  competitionId: { type: Number, required: true },
-  season: { type: Number, required: true },
-  score: { type: Number, required: true, default: 0 },
-})
+const TotalScoreSchema = new Schema(
+  {
+    _version: { type: Number, default: 1, required: true },
+    competitionId: { type: Number, required: true },
+    season: { type: Number, required: true },
+    score: { type: Number, required: true, default: 0 },
+  },
+  { timestamps: true }
+)
 
 const UserSchema = new Schema<IUser>(
   {
