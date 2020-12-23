@@ -42,7 +42,7 @@ export default Vue.extend({
       if (!this.usersBets) return undefined
 
       const filteredGames: IBet[] = this.usersBets.filter(
-        (b: IBet) => b.game === this.upcomingGame._id
+        (b: IBet) => (b.game as IGame)._id === this.upcomingGame._id
       )
       return filteredGames[0]
     },

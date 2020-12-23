@@ -43,6 +43,10 @@ export default (passport: PassportStatic) => {
   passport.deserializeUser((id, done) => {
     User.findById(id, (err, user) => {
       done(err, user)
+    }).populate({
+      path: 'bets',
+      model: 'bet',
+      populate: { path: 'game', model: 'game' },
     })
   })
 }

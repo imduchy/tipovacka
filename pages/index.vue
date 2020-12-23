@@ -1,28 +1,51 @@
 <template>
   <v-container>
-    <v-row column justify-center align-center>
-      <v-col v-if="!upcomingGame" class="xs12 sm8 md6">
-        <div class="text-center">
-          <v-progress-circular
-            indeterminate
-            :size="50"
-            color="amber"
-          ></v-progress-circular>
-        </div>
-      </v-col>
-      <v-col v-else xs12 sm8 md6>
-        <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
+    <!-- Loading bar -->
+    <template v-if="!upcomingGame">
+      <v-row column justify-center align-center>
+        <v-col cols="12">
+          <div class="text-center">
+            <v-progress-circular
+              indeterminate
+              :size="50"
+              color="amber"
+            ></v-progress-circular>
+          </div>
+        </v-col>
+      </v-row>
+    </template>
+    <!-- Loading bar -->
+    <template v-else>
+      <v-row>
+        <v-col cols="12">
+          <!-- Upcoming game -->
+          <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
 
-        <v-row>
-          <v-col cols="12" class="pt-0">
-            <v-card class="pt-8 px-8">
-              <bet-input v-if="!alreadyBet" :upcoming-game="upcomingGame"></bet-input>
-              <current-bet v-else :upcoming-game="upcomingGame"></current-bet>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
+          <v-row>
+            <v-col cols="12" class="pt-0">
+              <v-card class="pt-8 px-8">
+                <!-- Input field / Current bet -->
+                <bet-input v-if="!alreadyBet" :upcoming-game="upcomingGame"></bet-input>
+                <current-bet v-else :upcoming-game="upcomingGame"></current-bet>
+              </v-card>
+            </v-col>
+          </v-row>
+          <!-- Last bets -->
+          <div class="mt-5 text-h5">Posledné tipy</div>
+          <v-row>
+            <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
+              <user-bet :bet="usersBets[0]"></user-bet>
+            </v-col>
+            <v-col v-if="evaluatedBets[1]" cols="12" lg="4">
+              <user-bet :bet="usersBets[1]"></user-bet>
+            </v-col>
+            <v-col v-if="evaluatedBets[2]" cols="12" lg="4">
+              <user-bet :bet="usersBets[2]"></user-bet>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+    </template>
   </v-container>
 </template>
 
@@ -34,10 +57,12 @@ import BetInput from '../components/BetInput.vue'
 import CurrentBet from '../components/CurrentBet.vue'
 
 import { IGroup } from '~/models/Group'
-import { IBet } from '~/models/Bet'
+import { BetStatus, IBet } from '~/models/Bet'
+import UserBet from '~/components/UserBet.vue'
+import { IGame } from '~/models/Game'
 
 export default Vue.extend({
-  components: { UpcomingGame, BetInput, CurrentBet },
+  components: { UpcomingGame, BetInput, CurrentBet, UserBet },
   data() {
     return {
       homeTeamScore: 0,
@@ -58,9 +83,18 @@ export default Vue.extend({
     alreadyBet(): boolean {
       const upcomingGame = this.upcomingGame._id
       if (this.usersBets !== undefined) {
-        return this.usersBets.some((bet: IBet) => bet.game === upcomingGame)
+        return this.usersBets.some(
+          (bet: IBet) => (bet.game as IGame)._id === upcomingGame
+        )
       }
       return false
+    },
+    evaluatedBets(): IBet[] {
+      const bets: IBet[] = this.$auth.user.bets
+      if (bets) {
+        return bets.filter((b) => b.status === BetStatus.EVALUATED)
+      }
+      return []
     },
   },
   methods: {

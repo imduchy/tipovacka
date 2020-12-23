@@ -2,9 +2,9 @@ import mongoose, { Schema } from 'mongoose'
 import { IGame } from './Game'
 import { IUser } from './User'
 
-enum BetStatus {
-  'EVALUATED',
-  'PENDING',
+export enum BetStatus {
+  EVALUATED = 'EVALUATED',
+  PENDING = 'PENDING',
 }
 
 export interface IBet {
@@ -24,7 +24,7 @@ export const BetSchema = new Schema(
     awayTeamScore: { type: Number, required: true, default: 1 },
     game: { type: Schema.Types.ObjectId, ref: 'game' },
     user: { type: Schema.Types.ObjectId, ref: 'user' },
-    status: { type: BetStatus, default: BetStatus.PENDING },
+    status: { type: String, default: BetStatus.PENDING, enum: Object.values(BetStatus) },
   },
   {
     timestamps: true,
