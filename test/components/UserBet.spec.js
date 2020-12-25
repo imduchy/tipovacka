@@ -1,0 +1,151 @@
+import '@testing-library/jest-dom'
+import { render } from '@testing-library/vue'
+import Vue from 'vue'
+import Vuetify from 'vuetify'
+import UserBet from '../../components/UserBet'
+
+// We need to use a global Vue instance, otherwise Vuetify will complain about
+// read-only attributes.
+// This could also be done in a custom Jest-test-setup file to execute for all tests.
+// More info: https://github.com/vuetifyjs/vuetify/issues/4068
+//            https://vuetifyjs.com/en/getting-started/unit-testing
+Vue.use(Vuetify)
+
+// Custom container to integrate Vuetify with Vue Testing Library.
+// Vuetify requires you to wrap your app with a v-app component that provides
+// a <div data-app="true"> node.
+const renderWithVuetify = (component, options, callback) => {
+  const root = document.createElement('div')
+  root.setAttribute('data-app', 'true')
+
+  return render(
+    component,
+    {
+      container: document.body.appendChild(root),
+      // for Vuetify components that use the $vuetify instance property
+      vuetify: new Vuetify(),
+      ...options,
+    },
+    callback
+  )
+}
+
+test('displays game score', () => {
+  const { getByText } = renderWithVuetify(UserBet, {
+    props: {
+      bet: mockBet,
+    },
+  })
+
+  const text = mockBet.game.homeTeamScore + ' : ' + mockBet.game.awayTeamScore
+
+  expect(getByText(text)).toBeInTheDocument()
+})
+
+test('displays score bet on the home team', () => {
+  const { getByText } = renderWithVuetify(UserBet, {
+    props: {
+      bet: mockBet,
+    },
+  })
+
+  expect(getByText(`(${mockBet.homeTeamScore})`)).toBeInTheDocument()
+})
+
+test('displays score bet on the away team', () => {
+  const { getByText } = renderWithVuetify(UserBet, {
+    props: {
+      bet: mockBet,
+    },
+  })
+
+  expect(getByText(`(${mockBet.awayTeamScore})`)).toBeInTheDocument()
+})
+
+test('displays home team logo', () => {
+  const { getByRole } = renderWithVuetify(UserBet, {
+    props: {
+      bet: mockBet,
+    },
+  })
+
+  expect(getByRole('img', { name: 'home team logo' })).toBeInTheDocument()
+})
+
+test('displays away team logo', () => {
+  const { getByRole } = renderWithVuetify(UserBet, {
+    props: {
+      bet: mockBet,
+    },
+  })
+
+  expect(getByRole('img', { name: 'away team logo' })).toBeInTheDocument()
+})
+
+test('displays correct date', () => {
+  const { getByText } = renderWithVuetify(UserBet, {
+    props: {
+      bet: mockBet,
+    },
+  })
+
+  expect(getByText('February 19')).toBeInTheDocument()
+})
+
+test('displays correct time', () => {
+  const { getByText } = renderWithVuetify(UserBet, {
+    props: {
+      bet: mockBet,
+    },
+  })
+
+  expect(getByText('12:10 PM')).toBeInTheDocument()
+})
+
+test('displays correct color of progress bar for correct bets', () => {
+  const { getByRole } = renderWithVuetify(UserBet, {
+    props: {
+      bet: mockBet,
+    },
+  })
+
+  expect(getByRole('progressbar').firstElementChild).toHaveClass('info')
+})
+
+test('displays correct color of progress bar for exact score', () => {
+  const { getByRole } = renderWithVuetify(UserBet, {
+    props: {
+      bet: { ...mockBet, homeTeamScore: 3, awayTeamScore: 4 },
+    },
+  })
+
+  expect(getByRole('progressbar').firstElementChild).toHaveClass('success')
+})
+
+test('displays correct color of progress bar for incorrect bets', () => {
+  const { getByRole } = renderWithVuetify(UserBet, {
+    props: {
+      bet: { ...mockBet, homeTeamScore: 2, awayTeamScore: 1 },
+    },
+  })
+
+  expect(getByRole('progressbar').firstElementChild).toHaveClass('error')
+})
+
+const date = new Date('February 19, 1998 12:10:00')
+
+const mockBet = {
+  homeTeamScore: 1,
+  awayTeamScore: 2,
+  game: {
+    homeTeamScore: 3,
+    awayTeamScore: 4,
+    homeTeam: {
+      logo: 'https://media.api-sports.io/football/teams/541.png',
+    },
+    awayTeam: {
+      logo: 'https://media.api-sports.io/football/teams/715.png',
+    },
+    date,
+  },
+}
