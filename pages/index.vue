@@ -64,13 +64,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
-import UpcomingGame from '../components/UpcomingGame.vue'
 import BetInput from '../components/BetInput.vue'
 import CurrentBet from '../components/CurrentBet.vue'
-
-import { IGroup } from '~/models/Group'
-import { BetStatus, IBet } from '~/models/Bet'
+import UpcomingGame from '../components/UpcomingGame.vue'
 import UserBet from '~/components/UserBet.vue'
+import { BetStatus, IBet } from '~/models/Bet'
 import { IGame } from '~/models/Game'
 
 export default Vue.extend({
@@ -108,19 +106,6 @@ export default Vue.extend({
         return bets.filter((b) => b.status === BetStatus.EVALUATED)
       }
       return []
-    },
-  },
-  methods: {
-    async fetchUpcommingGame() {
-      try {
-        return await this.$axios
-          .get('/groups/' + this.$auth.user.groupId)
-          .then(({ data }: { data: IGroup }) => {
-            return data.upcommingGame
-          })
-      } catch (error) {
-        console.log(error)
-      }
     },
   },
 })

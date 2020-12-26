@@ -1,5 +1,5 @@
 import CurrentBet from '../../components/CurrentBet'
-import { renderWithVuetify } from './setup'
+import { renderWithVuetify } from '../setup'
 import '@testing-library/jest-dom'
 
 test('input fields display scores from a bet', () => {

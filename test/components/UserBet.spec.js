@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import UserBet from '../../components/UserBet'
-import { renderWithVuetify } from './setup'
+import { renderWithVuetify } from '../setup'
 
 test('displays game score', () => {
   const { getByText } = renderWithVuetify(UserBet, {

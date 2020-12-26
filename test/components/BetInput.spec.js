@@ -3,7 +3,7 @@ import { fireEvent, waitFor } from '@testing-library/vue'
 import Vue from 'vue'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import BetInput from '../../components/BetInput'
-import { renderWithVuetify } from './setup'
+import { renderWithVuetify } from '../setup'
 
 test('score input form has default values', () => {
   const { getByLabelText } = renderWithVuetify(BetInput, {
