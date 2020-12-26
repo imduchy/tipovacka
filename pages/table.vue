@@ -3,9 +3,9 @@
     <v-col cols="12">
       <v-data-table
         :headers="[
-          { text: 'Name', value: 'username' },
-          { text: 'Points', value: 'points' },
-          { text: 'Bets', value: 'bets' },
+          { text: 'Meno', value: 'username' },
+          { text: 'Body', value: 'points' },
+          { text: '# tipov', value: 'bets' },
         ]"
         :items="users"
         :sort-by="['points']"
