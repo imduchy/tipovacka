@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card data-testid="user-bet">
     <v-row align="center">
       <v-col cols="4" align="center">
         <v-img alt="home team logo" :src="homeTeam.logo" width="70px"></v-img

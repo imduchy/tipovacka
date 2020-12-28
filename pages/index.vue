@@ -2,7 +2,7 @@
   <v-container>
     <!-- Loading bar -->
     <template v-if="!upcomingGame">
-      <v-row column justify-center align-center>
+      <v-row data-testid="progress-circular" column justify-center align-center>
         <v-col cols="12">
           <div class="text-center">
             <v-progress-circular

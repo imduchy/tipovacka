@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" v-model="validScoreInput">
+  <v-form ref="form" v-model="validScoreInput" data-testid="bet-input">
     <v-row>
       <v-col cols="6">
         <v-text-field

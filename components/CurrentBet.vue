@@ -1,24 +1,22 @@
 <template>
-  <span>
-    <v-row>
-      <v-col cols="6">
-        <v-text-field
-          :value="getCurrentBet().homeTeamScore"
-          :label="`${upcomingGame.homeTeam.name} skóre`"
-          outlined
-          disabled
-        ></v-text-field>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          :value="getCurrentBet().awayTeamScore"
-          :label="`${upcomingGame.awayTeam.name} skóre`"
-          outlined
-          disabled
-        ></v-text-field>
-      </v-col>
-    </v-row>
-  </span>
+  <v-row data-testid="current-bet">
+    <v-col cols="6">
+      <v-text-field
+        :value="getCurrentBet().homeTeamScore"
+        :label="`${upcomingGame.homeTeam.name} skóre`"
+        outlined
+        disabled
+      ></v-text-field>
+    </v-col>
+    <v-col cols="6">
+      <v-text-field
+        :value="getCurrentBet().awayTeamScore"
+        :label="`${upcomingGame.awayTeam.name} skóre`"
+        outlined
+        disabled
+      ></v-text-field>
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">

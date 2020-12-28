@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom'
 import IndexPage from '../../pages/index'
 import { renderWithVuetify } from '../setup'
+import { BetStatus } from '~/models/Bet'
 
 test('displays teams names', () => {
   const { getByText } = renderWithVuetify(IndexPage, {
@@ -21,7 +22,7 @@ test('displays teams names', () => {
 })
 
 test('shows loading bar when upcomingGame is undefined', () => {
-  const { getByRole } = renderWithVuetify(IndexPage, {
+  const { getByTestId } = renderWithVuetify(IndexPage, {
     store: {
       getters: {
         upcomingGame: () => undefined,
@@ -31,13 +32,13 @@ test('shows loading bar when upcomingGame is undefined', () => {
       $auth: mockAuth,
     },
   })
-  const progressBar = getByRole('progressbar')
+  const progressBar = getByTestId('progress-circular')
 
   expect(progressBar).toBeVisible()
 })
 
-test('hides loading bar when upcomingGame is fetched', () => {
-  const { queryByRole } = renderWithVuetify(IndexPage, {
+test('hides loading bar when upcomingGame is not undefined', () => {
+  const { queryByTestId } = renderWithVuetify(IndexPage, {
     store: {
       getters: {
         upcomingGame: () => mockUpcomingGame(),
@@ -48,15 +49,119 @@ test('hides loading bar when upcomingGame is fetched', () => {
     },
   })
 
-  expect(queryByRole('progressbar')).toBe(null)
+  expect(queryByTestId('progress-circular')).toBe(null)
 })
 
-const date = new Date('February 19, 2050 12:10:00')
+test('displays upcoming-game component when upcomingGame is not undefined', () => {
+  const { getByTestId } = renderWithVuetify(IndexPage, {
+    store: {
+      getters: {
+        upcomingGame: () => mockUpcomingGame(),
+      },
+    },
+    mocks: {
+      $auth: mockAuth,
+    },
+  })
+
+  expect(getByTestId('upcoming-game')).not.toBeNull()
+})
+
+test("displays bet-input component if user haven't placed a bet yet", () => {
+  const { getByTestId, queryByTestId } = renderWithVuetify(IndexPage, {
+    store: {
+      getters: {
+        upcomingGame: () => mockUpcomingGame(),
+      },
+    },
+    mocks: {
+      $auth: { user: { bets: [] } },
+    },
+  })
+
+  expect(getByTestId('bet-input')).not.toBeNull()
+  expect(queryByTestId('current-bet')).toBeNull()
+})
+
+test("displays bet-input component if user haven't placed a bet yet", () => {
+  const { getByTestId, queryByTestId } = renderWithVuetify(IndexPage, {
+    store: {
+      getters: {
+        upcomingGame: () => mockUpcomingGame(),
+      },
+    },
+    mocks: {
+      $auth: mockAuth,
+    },
+  })
+
+  expect(getByTestId('current-bet')).not.toBeNull()
+  expect(queryByTestId('bet-input')).toBeNull()
+})
+
+test('displays 3 user-bet components if user has 3 or more evaluated bets', () => {
+  const { getAllByTestId } = renderWithVuetify(IndexPage, {
+    store: {
+      getters: {
+        upcomingGame: () => mockUpcomingGame(),
+      },
+    },
+    mocks: {
+      $auth: mockAuth,
+    },
+  })
+
+  expect(getAllByTestId('user-bet').length).toBe(3)
+})
+
+test('displays 1 user-bet component if user has 1 evaluated bet', () => {
+  const { getAllByTestId } = renderWithVuetify(IndexPage, {
+    store: {
+      getters: {
+        upcomingGame: () => mockUpcomingGame(),
+      },
+    },
+    mocks: {
+      $auth: {
+        user: {
+          ...mockAuth.user,
+          // Only use the first 2 bets defined in the mockAuth object
+          bets: mockAuth.user.bets.slice(0, 2),
+        },
+      },
+    },
+  })
+
+  expect(getAllByTestId('user-bet').length).toBe(1)
+})
+
+test('displays no user-bet components if user has no evaluated bet', () => {
+  const { queryByTestId } = renderWithVuetify(IndexPage, {
+    store: {
+      getters: {
+        upcomingGame: () => mockUpcomingGame(),
+      },
+    },
+    mocks: {
+      $auth: {
+        user: {
+          ...mockAuth.user,
+          // Only use the first 2 bets defined in the mockAuth object
+          bets: mockAuth.user.bets.slice(0, 1),
+        },
+      },
+    },
+  })
+
+  expect(queryByTestId('user-bet')).toBeNull()
+})
+
+const mockDate = new Date('February 19, 2050 12:10:00')
 
 const mockUpcomingGame = () => ({
   _id: '5f00000000000000000000',
-  date,
-  homeTeamScore: 3,
+  date: mockDate,
+  homeTeamScore: 0,
   awayTeamScore: 0,
   homeTeam: { name: 'Real Madrid', logo: 'hometeam.logo' },
   awayTeam: { name: 'Barcelona', logo: 'awayteam.logo' },
@@ -69,14 +174,98 @@ const mockAuth = {
       {
         game: {
           _id: '5f00000000000000000000',
+          homeTeamScore: 2,
+          awayTeamScore: 1,
+          homeTeam: {
+            logo: 'hometeamlogo.png',
+            name: 'Real Madrid',
+          },
+          awayTeam: {
+            logo: 'awayteamlogo.png',
+            name: 'Barcelona',
+          },
+          date: mockDate,
         },
         homeTeamScore: 2,
         awayTeamScore: 1,
+        status: BetStatus.PENDING,
       },
-      { game: { _id: '5f00000000000000000001' } },
-      { game: { _id: '5f00000000000000000002' } },
-      { game: { _id: '5f00000000000000000003' } },
-      { game: { _id: '5f00000000000000000004' } },
+      {
+        game: {
+          _id: '5f00000000000000000001',
+          homeTeamScore: 3,
+          awayTeamScore: 2,
+          homeTeam: {
+            logo: 'hometeamlogo.png',
+            name: 'Real Madrid',
+          },
+          awayTeam: {
+            logo: 'awayteamlogo.png',
+            name: 'Barcelona',
+          },
+          date: mockDate,
+        },
+        homeTeamScore: 4,
+        awayTeamScore: 1,
+        status: BetStatus.EVALUATED,
+      },
+      {
+        game: {
+          _id: '5f00000000000000000002',
+          homeTeamScore: 3,
+          awayTeamScore: 0,
+          homeTeam: {
+            logo: 'hometeamlogo.png',
+            name: 'Real Madrid',
+          },
+          awayTeam: {
+            logo: 'awayteamlogo.png',
+            name: 'Barcelona',
+          },
+          date: mockDate,
+        },
+        homeTeamScore: 0,
+        awayTeamScore: 2,
+        status: BetStatus.EVALUATED,
+      },
+      {
+        game: {
+          _id: '5f00000000000000000003',
+          homeTeamScore: 4,
+          awayTeamScore: 4,
+          homeTeam: {
+            logo: 'hometeamlogo.png',
+            name: 'Real Madrid',
+          },
+          awayTeam: {
+            logo: 'awayteamlogo.png',
+            name: 'Barcelona',
+          },
+          date: mockDate,
+        },
+        homeTeamScore: 2,
+        awayTeamScore: 2,
+        status: BetStatus.EVALUATED,
+      },
+      {
+        game: {
+          _id: '5f00000000000000000004',
+          homeTeamScore: 0,
+          awayTeamScore: 0,
+          homeTeam: {
+            logo: 'hometeamlogo.png',
+            name: 'Real Madrid',
+          },
+          awayTeam: {
+            logo: 'awayteamlogo.png',
+            name: 'Barcelona',
+          },
+          date: mockDate,
+        },
+        homeTeamScore: 0,
+        awayTeamScore: 0,
+        status: BetStatus.EVALUATED,
+      },
     ],
   },
 }
