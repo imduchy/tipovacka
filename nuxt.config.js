@@ -143,5 +143,11 @@ export default {
    ** Build configuration
    ** See https://nuxtjs.org/api/configuration-build/
    */
-  build: {},
+  build: {
+    extend(config, { _, __ }) {
+      config.node = {
+        fs: 'empty',
+      }
+    },
+  },
 }

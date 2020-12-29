@@ -1,21 +1,46 @@
-import { Router } from 'express'
-import User from '../../models/User'
-import logger from '../../utils/logger'
+import { NextFunction, Request, Response, Router } from 'express'
+import { isAdmin, isLoggedIn } from '../../utils/auth'
 import { IBet } from '../../models/Bet'
-import { alreadyBet } from '../../services/bets'
 import Game from '../../models/Game'
+import User, { IUser } from '../../models/User'
+import { alreadyBet } from '../../services/bets'
+import logger from '../../utils/logger'
 
 const router = Router()
 
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // If req.headers contains the admin key, continue
+  if (isAdmin(req)) {
+    next()
+    return
+  }
+
+  if (isLoggedIn(req)) {
+    const user = req.user as IUser
+    // Only allow user to create bet if user ids match
+    if (user._id!.equals(req.body.userId)) {
+      next()
+      return
+    }
+  }
+
+  logger.warn(
+    `[${req.method} ${req.originalUrl}] Unauthorized request was made by user ${
+      req.user && (req.user as IUser)._id
+    } from IP: ${req.ip}.`
+  )
+  res.status(401).send('Unauthorized request')
+}
+
 /**
  * Create a bet
- * Access: Private
+ * Access: Authenticated
  */
-router.post('/', async ({ body }, res) => {
+router.post('/', authMiddleware, async ({ body }, res) => {
   try {
     const user = await User.findById(body.userId)
     if (!user) {
-      logger.warning(`User with _id ${body.userId} doesn't exist.`)
+      logger.warn(`User with _id ${body.userId} doesn't exist.`)
       res.status(404).json('Something went wrong.')
       return
     }

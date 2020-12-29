@@ -1,15 +1,39 @@
-import express from 'express'
+import express, { NextFunction, Request, Response } from 'express'
+import { isAdmin, isLoggedIn } from '../../utils/auth'
+import User, { IUser } from '../../models/User'
 import logger from '../../utils/logger'
-import Group from '../../models/Group'
-import User from '../../models/User'
 
 const router = express.Router()
 
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // If req.headers contains the admin key, continue
+  if (isAdmin(req)) {
+    next()
+    return
+  }
+
+  if (isLoggedIn(req)) {
+    const user = req.user as IUser
+    // Only allow user to access his own User object
+    if (user._id!.equals(req.params.userId)) {
+      next()
+      return
+    }
+  }
+
+  logger.warn(
+    `[${req.originalUrl}] Unauthorized request was made by user ${
+      req.user && (req.user as IUser)._id
+    } from IP: ${req.ip}.`
+  )
+  res.status(401).send('Unauthorized request')
+}
+
 /**
  * Get a user
- * Access: Private (owner)
+ * Access: Protected
  */
-router.get('/:userId', async (req, res) => {
+router.get('/:userId', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).populate({
       path: 'bets',
@@ -25,43 +49,6 @@ router.get('/:userId', async (req, res) => {
     res.status(200).json(user)
   } catch (error) {
     logger.error(`Couldn't fetch a user ${req.params.userId}. Error: ${error}.`)
-    res.status(500).json('Internal server error')
-  }
-})
-
-/**
- * Create a user
- * Access: ADMIN
- */
-router.post('/', async ({ body }, res) => {
-  try {
-    const group = await Group.findById(body.groupId)
-    if (!group) {
-      logger.warning(`Group with _id ${body.groupId} doesn't exist.`)
-      res.status(404).json("We couldn't find this group")
-      return
-    }
-
-    const user = await User.create({
-      username: body.username,
-      email: body.email,
-      password: body.password,
-      groupId: body.groupId,
-      totalScore: Array.from(group.competitions, (competition) => ({
-        competitionId: competition.competitionId,
-        season: competition.season,
-        score: 0,
-      })),
-    })
-    logger.info(`User ${user._id} created.`)
-
-    group.users.addToSet(user._id)
-    await group.save()
-    logger.info(`User ${user._id} added to the group ${group.name} (${group._id}).`)
-
-    res.status(200).json(user)
-  } catch (error) {
-    logger.error(`Couldn't create a user in a group ${body.groupId}. Error: ${error}.`)
     res.status(500).json('Internal server error')
   }
 })

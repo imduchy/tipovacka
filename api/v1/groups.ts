@@ -1,16 +1,40 @@
-import { Router } from 'express'
-import Game from '../../models/Game'
-import Group, { IGroupCompetition } from '../../models/Group'
-import { findUpcommingGame } from '../../services/games'
+import { NextFunction, Request, Response, Router } from 'express'
+import { isAdmin, isLoggedIn } from '../../utils/auth'
+import Group from '../../models/Group'
+import { IUser } from '../../models/User'
 import logger from '../../utils/logger'
 
 const router = Router()
+
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // If req.headers contains the admin key, continue
+  if (isAdmin(req)) {
+    next()
+    return
+  }
+
+  if (isLoggedIn(req)) {
+    const user = req.user as IUser
+    // Only allow user to access his own User object
+    if (user.groupId!.equals(req.params.groupId)) {
+      next()
+      return
+    }
+  }
+
+  logger.warn(
+    `[${req.originalUrl}] Unauthorized request was made by user ${
+      req.user && (req.user as IUser)._id
+    } from IP: ${req.ip}.`
+  )
+  res.status(401).send('Unauthorized request')
+}
 
 /**
  * Get users of a group by group's _id
  * Access: External function
  */
-router.get('/:groupId/users', async (req, res) => {
+router.get('/:groupId/users', authMiddleware, async (req, res) => {
   try {
     const group = await Group.findById(req.params.groupId).populate('users')
     if (group) {
@@ -28,7 +52,7 @@ router.get('/:groupId/users', async (req, res) => {
  * Get a group by _id
  * Access: Private
  */
-router.get('/:groupId', async (req, res) => {
+router.get('/:groupId', authMiddleware, async (req, res) => {
   try {
     const group = await Group.findById(req.params.groupId).populate('upcommingGame')
     if (!group) {
@@ -39,40 +63,6 @@ router.get('/:groupId', async (req, res) => {
     res.status(200).json(group)
   } catch (error) {
     logger.error(`Couldn't fetch a group ${req.params.groupId}. Error: ${error}`)
-    res.status(500).json('Internal server error')
-  }
-})
-
-/**
- * Create a group
- * Access: ADMIN
- */
-router.post('/', async ({ body }, res) => {
-  try {
-    const group = await Group.create({
-      name: body.name,
-      email: body.email,
-      users: [],
-      website: body.website,
-      teamId: body.teamId,
-      competitions: body.competitions,
-      games: [],
-    })
-
-    const competitionIds = body.competitions.map(
-      (c: IGroupCompetition) => c.competitionId
-    )
-    const upcommingGame = await findUpcommingGame(body.teamId, competitionIds)
-    upcommingGame.groupId = group._id
-    const game = await Game.create(upcommingGame)
-
-    group.upcommingGame = game._id
-    await group.save()
-
-    logger.info(`A new group ${group.name} (${group._id}) was created.`)
-    res.status(200).json(group)
-  } catch (error) {
-    logger.error(`Couldn't create a new group. Error: ${error}`)
     res.status(500).json('Internal server error')
   }
 })
