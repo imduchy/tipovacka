@@ -79,7 +79,7 @@ router.get('/:groupId/upcomingGame', authMiddleware, async (req, res) => {
  * Create a user
  * Access: ADMIN
  */
-router.post('/', authMiddleware, async ({ body }, res) => {
+router.post('/users', authMiddleware, async ({ body }, res) => {
   try {
     const group = await Group.findById(body.groupId)
     if (!group) {
@@ -116,7 +116,7 @@ router.post('/', authMiddleware, async ({ body }, res) => {
  * Create game
  * Access: ADMIN
  */
-router.post('/', authMiddleware, async ({ body }, res) => {
+router.post('/games', authMiddleware, async ({ body }, res) => {
   try {
     const game = await Game.create({
       gameId: body.gameId,
@@ -125,7 +125,8 @@ router.post('/', authMiddleware, async ({ body }, res) => {
       venue: body.venue,
       awayTeam: body.awayTeam,
       homeTeam: body.homeTeam,
-      competition: body.competition,
+      competitionId: body.competition,
+      competitionName: body.competitionName,
       season: body.season,
       status: body.status,
     })
@@ -142,7 +143,7 @@ router.post('/', authMiddleware, async ({ body }, res) => {
  * Create a group
  * Access: ADMIN
  */
-router.post('/', authMiddleware, async ({ body }, res) => {
+router.post('/groups', authMiddleware, async ({ body }, res) => {
   try {
     const group = await Group.create({
       name: body.name,
@@ -154,7 +155,7 @@ router.post('/', authMiddleware, async ({ body }, res) => {
       games: [],
     })
 
-    const competitionIds = body.competitions.map(
+    const competitionIds: number[] = body.competitions.map(
       (c: IGroupCompetition) => c.competitionId
     )
     const upcommingGame = await findUpcommingGame(body.teamId, competitionIds)
