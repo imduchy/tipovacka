@@ -19,7 +19,8 @@ export interface IGame {
   homeTeamScore?: number
   awayTeamScore?: number
   status: GameStatus
-  competition: number
+  competitionId: number
+  competitionName: string
   season: number
   venue: string
 }
@@ -50,7 +51,8 @@ const GameSchema = new Schema(
     homeTeamScore: { type: Number, required: true, default: 0 },
     awayTeamScore: { type: Number, required: true, default: 0 },
     status: { type: GameStatus, required: true },
-    competition: { type: Number, required: true },
+    competitionId: { type: Number, required: true },
+    competitionName: { type: String, required: true },
     season: { type: Number, required: true },
     venue: { type: String, required: true },
   },

@@ -3,6 +3,7 @@ import { IGame } from './Game'
 import { IUserDocument } from './User'
 
 export interface IGroupCompetition {
+  competitionName: string
   competitionId: number
   season: number
 }
@@ -22,6 +23,7 @@ export type IGroupDocument = IGroup & Document
 
 const GroupCompetitionSchema = new Schema({
   _version: { type: Number, required: true, default: 1 },
+  competitionName: { type: String, required: true },
   competitionId: { type: Number, required: true },
   season: { type: Number, required: true, validate: { validator: /^20\d{2}/ } },
 })

@@ -91,7 +91,8 @@ const responseMapping = (response: FixtureResponse.Response): IGame => {
     date: new Date(fixture.date),
     gameId: fixture.id,
     groupId: '',
-    competition: league.id,
+    competitionId: league.id,
+    competitionName: league.name,
     awayTeam: {
       teamId: teams.away.id,
       name: teams.away.name,
