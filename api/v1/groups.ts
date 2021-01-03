@@ -54,7 +54,7 @@ router.get('/:groupId/users', authMiddleware, async (req, res) => {
  */
 router.get('/:groupId', authMiddleware, async (req, res) => {
   try {
-    const group = await Group.findById(req.params.groupId).populate('upcommingGame')
+    const group = await Group.findById(req.params.groupId).populate('upcomingGame')
     if (!group) {
       logger.warn(`Group with _id ${req.params.groupId} doesn't exist.`)
       res.status(404).json("Group doesn't exist")

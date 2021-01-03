@@ -12,15 +12,15 @@ import { getFixture } from './footballApi'
  * @param leagueIds list of leagueIds (ids returned from API)
  * @returns an upcoming game for a specified team
  */
-export const findUpcommingGame = async (teamId: number, leagueIds: number[]) => {
+export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
   const upcomingGames: IGame[] = []
 
   try {
     for (const league of leagueIds) {
-      const response = await getUpcommingGame(teamId, league)
+      const response = await getUpcomingGame(teamId, league)
 
       if (!response) {
-        // getUpcommingGame logs a warn message
+        // getUpcomingGame logs a warn message
         break
       }
 
@@ -53,7 +53,7 @@ export const findUpcommingGame = async (teamId: number, leagueIds: number[]) => 
  * @param leagueId leagueId (id returned from API)
  * @returns an upcoming league game for the specified team
  */
-const getUpcommingGame = async (teamId: number, leagueId: number) => {
+const getUpcomingGame = async (teamId: number, leagueId: number) => {
   try {
     const { data } = await getFixture({
       team: teamId,

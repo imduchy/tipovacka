@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from 'express'
 import logger from '../../utils/logger'
 import Game from '../../models/Game'
 import Group, { IGroupCompetition } from '../../models/Group'
-import { findUpcommingGame } from '../../services/games'
+import { findUpcomingGame } from '../../services/games'
 import User, { IUser } from '../../models/User'
 import { isAdmin } from '../../utils/auth'
 
@@ -38,14 +38,14 @@ router.get('/test', (req, res) => {
  */
 router.get('/:groupId/upcomingGame', authMiddleware, async (req, res) => {
   try {
-    const group = await Group.findById(req.params.groupId).populate('upcommingGame')
+    const group = await Group.findById(req.params.groupId).populate('upcomingGame')
 
     if (!group) {
       throw new Error(`Group with id ${req.params.groupId} doesn't exist.`)
     }
 
     const competitions = group.competitions.map((c) => c.competitionId)
-    const newUpcomingGame = await findUpcommingGame(group.teamId, competitions)
+    const newUpcomingGame = await findUpcomingGame(group.teamId, competitions)
 
     if (!newUpcomingGame) {
       logger.warn(
@@ -55,7 +55,7 @@ router.get('/:groupId/upcomingGame', authMiddleware, async (req, res) => {
       return res.status(200).json("Didn't find any upcoming games.")
     }
 
-    if (newUpcomingGame.gameId === group.upcommingGame?.gameId) {
+    if (newUpcomingGame.gameId === group.upcomingGame?.gameId) {
       res.status(304).json('The current upcoming game is correct. No changes needed.')
       return
     }
@@ -65,7 +65,7 @@ router.get('/:groupId/upcomingGame', authMiddleware, async (req, res) => {
     const response = await Group.findByIdAndUpdate(
       group._id,
       {
-        upcommingGame: game._id,
+        upcomingGame: game._id,
       },
       { new: true }
     )
@@ -158,11 +158,11 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
     const competitionIds: number[] = body.competitions.map(
       (c: IGroupCompetition) => c.competitionId
     )
-    const upcommingGame = await findUpcommingGame(body.teamId, competitionIds)
-    upcommingGame.groupId = group._id
-    const game = await Game.create(upcommingGame)
+    const upcomingGame = await findUpcomingGame(body.teamId, competitionIds)
+    upcomingGame.groupId = group._id
+    const game = await Game.create(upcomingGame)
 
-    group.upcommingGame = game._id
+    group.upcomingGame = game._id
     await group.save()
 
     logger.info(`A new group ${group.name} (${group._id}) was created.`)
