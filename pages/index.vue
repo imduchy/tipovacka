@@ -45,14 +45,14 @@
           </div>
 
           <v-row>
-            <v-col v-if="evaluatedBets[2]" cols="12" lg="4">
-              <user-bet :bet="usersBets[2]"></user-bet>
+            <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
+              <user-bet :bet="evaluatedBets[0]"></user-bet>
             </v-col>
             <v-col v-if="evaluatedBets[1]" cols="12" lg="4">
-              <user-bet :bet="usersBets[1]"></user-bet>
+              <user-bet :bet="evaluatedBets[1]"></user-bet>
             </v-col>
-            <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
-              <user-bet :bet="usersBets[0]"></user-bet>
+            <v-col v-if="evaluatedBets[2]" cols="12" lg="4">
+              <user-bet :bet="evaluatedBets[2]"></user-bet>
             </v-col>
           </v-row>
         </v-col>
@@ -103,7 +103,7 @@ export default Vue.extend({
       const bets: IBet[] = this.$auth.user.bets
       if (bets) {
         // TODO: Optimize to shortcut after finding first (last) 3 items
-        return bets.filter((b) => b.status === BetStatus.EVALUATED)
+        return bets.filter((b) => b.status === BetStatus.EVALUATED).reverse()
       }
       return []
     },

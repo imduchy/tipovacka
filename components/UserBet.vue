@@ -17,10 +17,14 @@
           </div>
         </v-row>
         <v-row justify="center" align="center" class="pa-3">
-          <div class="text-caption font-weight-light">
-            {{ formatedDate }}
-          </div>
-          <div class="text-caption font-weight-bold">{{ formatedTime }}</div>
+          <v-col cols="12" class="pa-0">
+            <div class="text-caption font-weight-light">
+              {{ formatedDate }}
+            </div>
+          </v-col>
+          <v-col cols="12" class="pa-0">
+            <div class="text-caption font-weight-bold">{{ formatedTime }}</div>
+          </v-col>
         </v-row>
       </v-col>
       <v-col cols="4" align="center">
