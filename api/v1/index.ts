@@ -49,7 +49,12 @@ app.use(
     saveUninitialized: true,
     store:
       process.env.NODE_ENV === 'production'
-        ? new MongoStore({ mongooseConnection: mongoose.connection })
+        ? new MongoStore({
+            mongooseConnection: mongoose.connection,
+            ttl: 24 * 60 * 60 * 1000,
+            autoRemove: 'internal',
+            autoRemoveInterval: 10,
+          })
         : new session.MemoryStore(),
   })
 )
