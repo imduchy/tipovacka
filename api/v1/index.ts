@@ -5,6 +5,7 @@ import session from 'express-session'
 import mongoose from 'mongoose'
 import passport from 'passport'
 import strategy from '../../services/passport'
+import logger from '../../utils/logger'
 import admin from './admin'
 import auth from './auth'
 import bets from './bets'
@@ -15,17 +16,26 @@ import users from './users'
 export const app = express()
 const MongoStore = connectMongo(session)
 
-const { DB_NAME, DB_USER, DB_PASSWORD, DB_URL } = process.env
+const { DB_CONNECTION_STRING } = process.env
 
-mongoose.connect(
-  `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_URL}/${DB_NAME}?retryWrites=true&w=majority`,
-  {
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
+try {
+  if (!DB_CONNECTION_STRING) {
+    throw new Error('Database connection string is undefined')
   }
-)
+  mongoose
+    .connect(DB_CONNECTION_STRING, {
+      useNewUrlParser: true,
+      useFindAndModify: false,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    })
+    .then((_) => {
+      logger.info('Successfully connected to the database.')
+    })
+} catch (error) {
+  logger.error('Error while connecting to the database. Error: ' + error)
+  throw error
+}
 
 strategy(passport)
 
