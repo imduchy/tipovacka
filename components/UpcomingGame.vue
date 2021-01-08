@@ -36,7 +36,9 @@
         </v-row>
         <v-row class="hidden-xs-only mt-1" justify="center">
           <v-icon class="mr-3">mdi-trophy-variant</v-icon>
-          <div class="text-sm-subtitle-1 font-weight-light">La Liga</div>
+          <div class="text-sm-subtitle-1 font-weight-light">
+            {{ upcomingGame.competitionName }}
+          </div>
         </v-row>
       </v-col>
       <v-col cols="4" align="center">
