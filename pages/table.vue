@@ -11,6 +11,7 @@
         :sort-by="['points']"
         :sort-desc="[true]"
         :items-per-page="30"
+        mobile-breakpoint="0"
         hide-default-footer
         class="elevation-1"
       >
