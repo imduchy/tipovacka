@@ -11,7 +11,7 @@
         <v-spacer></v-spacer>
         <span class="black--text"
           >Na stránke sa pracuje. Ak máte pripomienky, návrhy, alebo nájdete chybu v
-          stránke, kontaktujte ma na WhatsApp.</span
+          stránke, kontaktujte nás prosím na Facebooku.</span
         >
         <v-spacer></v-spacer>
         <v-btn icon @click="systemBar = false">
