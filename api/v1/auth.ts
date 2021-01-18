@@ -1,6 +1,7 @@
 import express from 'express'
 import bcrypt from 'bcryptjs'
 import passport from 'passport'
+import mongoose from 'mongoose'
 import User from '../../models/User'
 import logger from '../../utils/logger'
 import { PropertyRequiredError, ValidationError } from '../../utils/exceptions'
@@ -13,10 +14,19 @@ router.get('/users', (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
-  req.session?.destroy((err) => {
-    logger.info(
-      `Couldn't destory session ${req.sessionID} for ` + `user ${req.user}. Error: ${err}`
-    )
+  req.session?.destroy(async (err) => {
+    if (err) {
+      logger.info(
+        `Couldn't destory session ${req.sessionID} for a user ${req.user}. Error: ${err}`
+      )
+    }
+
+    const Sessions = mongoose.connection.collection('sessions')
+    await Sessions.findOneAndDelete({ _id: req.sessionID }).catch((err) => {
+      logger.warn(
+        `Couldn't delete sessions ${req.sessionID} from the database. Error: ${err}`
+      )
+    })
   })
   req.logout()
   res.status(200).send()
