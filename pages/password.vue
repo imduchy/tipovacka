@@ -40,13 +40,8 @@
             :rules="[passwordsMatch]"
           ></v-text-field>
 
-          <v-btn
-            color="warning"
-            block
-            light
-            :disabled="!validPasswordInput"
-            @click="changePassword"
-          >
+          <!-- UPDATE THIS -->
+          <v-btn color="warning" block light disabled @click="changePassword">
             Zmeniť heslo
           </v-btn>
         </v-form>

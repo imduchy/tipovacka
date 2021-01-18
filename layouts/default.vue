@@ -14,7 +14,8 @@
           stránke, kontaktujte nás prosím na Facebooku.</span
         >
         <span v-else class="black--text"
-          >Teraz si môžete zmeniť heslo kliknutím na avatár v pravom hornom rohu stránky.
+          >Momentálne pracujeme na možnosti zmeniť si heslo. Funkcia bude dostupná tento
+          týždeň.
         </span>
         <v-spacer></v-spacer>
         <v-btn icon @click="systemBar2 = false">
