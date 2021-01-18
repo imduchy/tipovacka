@@ -25,9 +25,7 @@
             required
           ></v-text-field>
 
-          <v-btn color="accent" block class="text-black" @click="userLogin">
-            Prihlásiť sa
-          </v-btn>
+          <v-btn color="accent" block @click="userLogin"> Prihlásiť sa </v-btn>
         </v-form>
       </v-card>
     </v-col>

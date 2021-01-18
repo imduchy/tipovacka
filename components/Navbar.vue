@@ -47,19 +47,24 @@
           >
             <v-icon>{{ item.icon }}</v-icon>
           </v-btn>
-          <v-avatar color="accent" size="38" class="mr-3">
-            <img alt="Avatar" src="/user-icon.png" />
-          </v-avatar>
           <!-- Additional menu -->
           <v-menu bottom offset-y>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn icon v-bind="attrs" v-on="on">
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
+              <v-avatar v-bind="attrs" color="accent" size="38" class="mr-3" v-on="on">
+                <img alt="Avatar" src="/user-icon.png" />
+              </v-avatar>
             </template>
 
-            <v-list dense width="200px">
+            <v-list dense color="grey darken-3" width="200px">
               <v-list-item-group>
+                <v-list-item to="password">
+                  <v-list-item-icon>
+                    <v-icon>mdi-lock</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Zmeniť heslo</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-list-item @click="logout">
                   <v-list-item-icon>
                     <v-icon>mdi-logout</v-icon>

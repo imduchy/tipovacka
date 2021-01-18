@@ -3,18 +3,21 @@
     <navbar></navbar>
     <v-main>
       <v-system-bar
-        v-if="systemBar"
+        v-if="systemBar2"
         class="hidden-sm-and-down"
         color="accent"
         height="32"
       >
         <v-spacer></v-spacer>
-        <span class="black--text"
+        <span v-if="$nuxt.$route.path === '/login'" class="black--text"
           >Na stránke sa pracuje. Ak máte pripomienky, návrhy, alebo nájdete chybu v
           stránke, kontaktujte nás prosím na Facebooku.</span
         >
+        <span v-else class="black--text"
+          >Teraz si môžete zmeniť heslo kliknutím na avatár v pravom hornom rohu stránky.
+        </span>
         <v-spacer></v-spacer>
-        <v-btn icon @click="systemBar = false">
+        <v-btn icon @click="systemBar2 = false">
           <v-icon color="grey darken-2">mdi-close</v-icon>
         </v-btn>
       </v-system-bar>
@@ -48,6 +51,7 @@ export default Vue.extend({
   components: { Alert, Navbar },
   data: () => ({
     systemBar: true,
+    systemBar2: true,
   }),
 })
 </script>

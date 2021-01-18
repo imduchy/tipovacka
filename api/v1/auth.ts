@@ -2,10 +2,11 @@ import express from 'express'
 import bcrypt from 'bcryptjs'
 import passport from 'passport'
 import mongoose from 'mongoose'
-import User from '../../models/User'
+import User, { IUserDocument } from '../../models/User'
 import logger from '../../utils/logger'
 import { PropertyRequiredError, ValidationError } from '../../utils/exceptions'
 import { validateInput } from '../../services/auth'
+import { isLoggedIn } from '../../utils/auth'
 
 const router = express.Router()
 
@@ -73,6 +74,41 @@ router.post('/register', async (req, res) => {
       logger.error(`Error: ${error}.`)
       res.status(500).send('Internal error')
     }
+  }
+})
+
+router.post('/password', isLoggedIn, async (req, res) => {
+  const { oldPassword, newPassword, confirmedPassword } = req.body
+
+  if (!oldPassword || !newPassword || !confirmedPassword) {
+    res.status(400).send('Not all values were provided.')
+    return
+  }
+
+  if (newPassword !== confirmedPassword) {
+    res.status(400).send("New passwords doesn't match.")
+    return
+  }
+
+  try {
+    const user = (await User.findOne({ _id: (req.user as any)._id })) as IUserDocument
+
+    const passwordsMatch = await bcrypt.compare(oldPassword, user.password)
+    if (!passwordsMatch) {
+      res.status(400).send('Wrong password')
+      return
+    }
+
+    const salt = await bcrypt.genSalt()
+    const newEncryptedPassword = await bcrypt.hash(newPassword, salt)
+    user.password = newEncryptedPassword
+    await user.save()
+
+    logger.info(`Password for a user ${user.email} (${user._id}) was changed.`)
+
+    res.status(200).send()
+  } catch (error) {
+    res.status(500).send('Internal error')
   }
 })
 
