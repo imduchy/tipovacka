@@ -173,4 +173,15 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
   }
 })
 
+router.delete('/users', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findOneAndDelete({ _id: req.body.userId })
+    logger.info(`A user with id ${req.body.userId} successfully removed.`)
+    res.status(200).json(user)
+  } catch (error) {
+    logger.error(`Couldn't remove a user with id ${req.body.userId}. Error: ${error}`)
+    res.status(500).json('Internal server error')
+  }
+})
+
 export default router
