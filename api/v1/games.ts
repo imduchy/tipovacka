@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express'
+import Game from '../../models/Game'
 import { IUser } from '../../models/User'
 import { isAdmin, isLoggedIn } from '../../utils/auth'
-import Game from '../../models/Game'
 import logger from '../../utils/logger'
 
 const router = express.Router()

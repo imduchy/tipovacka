@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema, Types } from 'mongoose'
 import { IGame } from './Game'
 import { IUser } from './User'
 
@@ -15,9 +15,9 @@ export interface IBet {
   status?: BetStatus
 }
 
-// export type IBetDocument = IBet & Document
+export type IBetDocument = IBet & Types.Subdocument
 
-export const BetSchema = new Schema(
+export const BetSchema = new Schema<IBetDocument>(
   {
     _version: { type: Number, required: true, default: 1 },
     homeTeamScore: { type: Number, required: true, default: 1 },

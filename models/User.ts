@@ -21,7 +21,9 @@ interface ITotalScore {
   score: number
 }
 
-const TotalScoreSchema = new Schema(
+type ITotalScoreDocument = ITotalScore & Types.Subdocument
+
+const TotalScoreSchema = new Schema<ITotalScoreDocument>(
   {
     _version: { type: Number, default: 1, required: true },
     competitionId: { type: Number, required: true },
@@ -31,7 +33,7 @@ const TotalScoreSchema = new Schema(
   { timestamps: true }
 )
 
-const UserSchema = new Schema<IUser>(
+const UserSchema = new Schema<IUserDocument>(
   {
     _version: { type: Number, required: true, default: 1 },
     username: { type: String, required: true, unique: true },
@@ -65,7 +67,7 @@ UserSchema.pre<IUserDocument>('save', function (next) {
     // https://stackoverflow.com/a/18305924/8475178
     ;(this as any).wasNew = this.isNew
 
-    Group.findById(this.groupId, function (err, res) {
+    Group.findById(this.groupId, {}, {}, (err, res) => {
       if (err) {
         logger.error(`<User.pre> Error while fetching a group by id ${self.groupId}.`)
         next(err)
@@ -93,34 +95,63 @@ UserSchema.pre<IUserDocument>('save', function (next) {
 })
 
 /**
+ * After a user is deleted, also delete its id from the group
+ * he's a part of.
+ */
+// @ts-ignore
+// because findOneAndDelete seems to be missing as an option and gives an error
+UserSchema.post<IUserDocument>('findOneAndDelete', function (doc: IUserDocument) {
+  Group.findByIdAndUpdate(
+    doc.groupId,
+    { $pull: { users: doc._id } },
+    { new: true },
+    (err, _) => {
+      if (err) {
+        logger.error(
+          `<User.post> Error while removing a user id ${doc._id} from the group ${doc.groupId}.`
+        )
+      } else {
+        logger.info(
+          `<User.post> Successfully removed user ${doc._id} from the group ${doc.groupId}.`
+        )
+      }
+    }
+  )
+})
+
+/**
  * After a user is saved, push the user _id
  * to its group's users array.
  */
 UserSchema.post<IUserDocument>('save', function (doc, next) {
   if (!(doc as any).wasNew) next()
   else {
-    Group.findOneAndUpdate({ _id: doc.groupId }, { $push: { users: doc._id } }, function (
-      err,
-      group
-    ) {
-      if (err) {
-        logger.error(
-          `<User.post> Error while pushing a user id ${doc._id} to the group ${doc.groupId}.`
-        )
-      } else if (group) {
-        logger.info(`<User.post> Pushed user's id ${doc._id} to the group ${group._id}.`)
-      } else {
-        logger.error(
-          `<User.post> Pushing user's id ${doc._id} to the group ${doc.groupId} was skipped.`
-        )
+    Group.findOneAndUpdate(
+      { _id: doc.groupId },
+      { $push: { users: doc._id } },
+      {},
+      (err, group, _) => {
+        if (err) {
+          logger.error(
+            `<User.post> Error while pushing a user id ${doc._id} to the group ${doc.groupId}.`
+          )
+        } else if (group) {
+          logger.info(
+            `<User.post> Pushed user's id ${doc._id} to the group ${group._id}.`
+          )
+        } else {
+          logger.error(
+            `<User.post> Pushing user's id ${doc._id} to the group ${doc.groupId} was skipped.`
+          )
+        }
+        next()
       }
-      next()
-    })
+    )
   }
 })
 
 UserSchema.path('groupId').validate(function (value: Types.ObjectId) {
-  return Group.findById(value, (err, res) => {
+  return Group.findById(value, {}, {}, (err, res) => {
     if (err) {
       logger.error(
         `<User.validate> Fetching provided group ${value} has failed with error. ${err}.`

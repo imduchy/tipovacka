@@ -9,6 +9,8 @@ export interface ITeam {
   logo: string
 }
 
+type ITeamDocument = ITeam & Types.Subdocument
+
 export interface IGame {
   _id?: Types.ObjectId
   gameId: number
@@ -27,14 +29,14 @@ export interface IGame {
 
 export type IGameDocument = IGame & Document
 
-const TeamSchema = new Schema({
+const TeamSchema = new Schema<ITeamDocument>({
   _version: { type: Number, default: 1, required: true },
   teamId: { type: Number, required: true },
   name: { type: String, required: true },
   logo: { type: String, required: true },
 })
 
-const GameSchema = new Schema(
+const GameSchema = new Schema<IGameDocument>(
   {
     _version: { type: Number, default: 1, required: true },
     gameId: { type: Number, required: true },
@@ -66,26 +68,28 @@ const GameSchema = new Schema(
  * to the group's games array.
  */
 GameSchema.post<IGameDocument>('save', function (doc) {
-  Group.findOneAndUpdate({ _id: doc.groupId }, { $push: { games: doc._id } }, function (
-    err,
-    group
-  ) {
-    if (err) {
-      logger.error(
-        `<Game.post> Error while pushing a game id ${doc._id} to the group ${doc.groupId}.`
-      )
-    } else if (group) {
-      logger.info(`<Game.post> Pushed game's id ${doc._id} to the group ${group._id}.`)
-    } else {
-      logger.error(
-        `<Game.post> Pushing game's id ${doc._id} to the group ${doc.groupId} was skipped.`
-      )
+  Group.findOneAndUpdate(
+    { _id: doc.groupId },
+    { $push: { games: doc._id } },
+    {},
+    function (err, group) {
+      if (err) {
+        logger.error(
+          `<Game.post> Error while pushing a game id ${doc._id} to the group ${doc.groupId}.`
+        )
+      } else if (group) {
+        logger.info(`<Game.post> Pushed game's id ${doc._id} to the group ${group._id}.`)
+      } else {
+        logger.error(
+          `<Game.post> Pushing game's id ${doc._id} to the group ${doc.groupId} was skipped.`
+        )
+      }
     }
-  })
+  )
 })
 
 GameSchema.path('groupId').validate(function (value: Types.ObjectId) {
-  return Group.findById(value, (err, res) => {
+  return Group.findById(value, {}, {}, (err, res) => {
     if (err) {
       logger.error(
         `<Game.validate> Fetching provided group ${value} has failed with error. ${err}.`

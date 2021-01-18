@@ -8,6 +8,8 @@ export interface IGroupCompetition {
   season: number
 }
 
+type IGroupCompetitionDocument = IGroupDocument & Types.Subdocument
+
 export interface IGroup {
   name: string
   email: string
@@ -21,11 +23,11 @@ export interface IGroup {
 
 export type IGroupDocument = IGroup & Document
 
-const GroupCompetitionSchema = new Schema({
+const GroupCompetitionSchema = new Schema<IGroupCompetitionDocument>({
   _version: { type: Number, required: true, default: 1 },
   competitionName: { type: String, required: true },
   competitionId: { type: Number, required: true },
-  season: { type: Number, required: true, validate: { validator: /^20\d{2}/ } },
+  season: { type: Number, required: true, min: 2020, max: 2099 },
 })
 
 const GroupSchema = new Schema(
