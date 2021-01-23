@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response, Router } from 'express'
+import logger from '../../utils/logger'
 import Game from '../../models/Game'
 import Group, { IGroupCompetition } from '../../models/Group'
-import User from '../../models/User'
 import { findUpcomingGame } from '../../services/games'
+import User, { IUser } from '../../models/User'
 import { isAdmin } from '../../utils/auth'
-import logger from '../../utils/logger'
 
 const router = Router()
 
@@ -17,7 +17,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   logger.warn(
     `[${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && req.user._id
+      req.user && (req.user as IUser)._id
     } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${JSON.stringify(
       req.header('tipovacka-auth-token')
     )}`
