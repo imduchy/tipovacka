@@ -1,19 +1,23 @@
+import crypto from 'crypto'
 import mongoose, { Schema, Document, Types } from 'mongoose'
 import logger from '../utils/logger'
 import { BetSchema, IBet } from './Bet'
 import Group from './Group'
 
 export interface IUser {
-  _id?: Types.ObjectId
   username: string
   email: string
   password: string
   totalScore?: ITotalScore[]
   bets?: Types.Array<IBet>
   groupId: Types.ObjectId
+  resetPasswordToken?: string
+  resetPasswordExpires?: Date
 }
 
-export type IUserDocument = IUser & Document
+export interface IUserDocument extends IUser, Document {
+  generatePasswordReset(): void
+}
 
 interface ITotalScore {
   competitionId: number
@@ -38,7 +42,7 @@ const UserSchema = new Schema<IUserDocument>(
     _version: { type: Number, required: true, default: 1 },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true, select: false },
     totalScore: [
       {
         type: TotalScoreSchema,
@@ -48,6 +52,8 @@ const UserSchema = new Schema<IUserDocument>(
     ],
     bets: [{ type: BetSchema, default: [] }],
     groupId: { type: Schema.Types.ObjectId, ref: 'group' },
+    resetPasswordToken: { type: String, default: undefined, select: false },
+    resetPasswordExpires: { type: Date, default: undefined, select: false },
   },
   {
     timestamps: true,
@@ -165,5 +171,10 @@ UserSchema.path('groupId').validate(function (value: Types.ObjectId) {
     }
   })
 }, 'A group with id `{VALUE}` was not found')
+
+UserSchema.methods.generatePasswordReset = function () {
+  this.resetPasswordToken = crypto.randomBytes(20).toString('hex')
+  this.resetPasswordExpires = new Date(Date.now() + 3600000)
+}
 
 export default mongoose.model<IUserDocument>('user', UserSchema)

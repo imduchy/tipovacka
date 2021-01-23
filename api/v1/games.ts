@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express'
 import Game from '../../models/Game'
-import { IUser } from '../../models/User'
 import { isAdmin, isLoggedIn } from '../../utils/auth'
 import logger from '../../utils/logger'
 
@@ -15,7 +14,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   logger.warn(
     `[${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUser)._id
+      req.user && req.user._id
     } from IP: ${req.ip}.`
   )
   res.status(401).send('Unauthorized request')

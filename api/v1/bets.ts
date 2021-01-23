@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response, Router } from 'express'
-import { isAdmin, isLoggedIn } from '../../utils/auth'
 import { IBet } from '../../models/Bet'
 import Game from '../../models/Game'
-import User, { IUser } from '../../models/User'
+import User from '../../models/User'
 import { alreadyBet } from '../../services/bets'
+import { isAdmin, isLoggedIn } from '../../utils/auth'
 import logger from '../../utils/logger'
 
 const router = Router()
@@ -16,9 +16,9 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   if (isLoggedIn(req)) {
-    const user = req.user as IUser
+    const user = req.user
     // Only allow user to create bet if user ids match
-    if (user._id!.equals(req.body.userId)) {
+    if (user && user._id.equals(req.body.userId)) {
       next()
       return
     }
@@ -26,7 +26,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   logger.warn(
     `[${req.method} ${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUser)._id
+      req.user && req.user._id
     } from IP: ${req.ip}.`
   )
   res.status(401).send('Unauthorized request')

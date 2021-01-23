@@ -17,7 +17,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   } else {
     logger.warn(
       `[${req.originalUrl}] Unauthorized request was made by user ${
-        req.user && (req.user as IUser)._id
+        req.user && req.user._id
       } from IP: ${req.ip}.`
     )
     res.status(401).send('Unauthorized request')
@@ -28,6 +28,10 @@ router.get('/users', (req, res) => {
   res.status(200).send(req.user)
 })
 
+/**
+ * Logout a user
+ * Access: Logged-in user
+ */
 router.get('/logout', (req, res) => {
   req.session?.destroy(async (err) => {
     if (err) {
@@ -47,6 +51,10 @@ router.get('/logout', (req, res) => {
   res.status(200).send()
 })
 
+/**
+ * Log-in
+ * Access: Guest
+ */
 router.post('/login', passport.authenticate('local'), function (req, res) {
   // If this function gets called, authentication was successful.
   // `req.user` contains the authenticated user.
@@ -91,6 +99,10 @@ router.post('/register', async (req, res) => {
   }
 })
 
+/**
+ * Change password
+ * Access: Logged-in user
+ */
 router.post('/password', authMiddleware, async (req, res) => {
   const { oldPassword, newPassword, confirmedPassword } = req.body
 

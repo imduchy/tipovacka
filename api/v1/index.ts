@@ -2,8 +2,9 @@ import bodyParser from 'body-parser'
 import connectMongo from 'connect-mongo'
 import express from 'express'
 import session from 'express-session'
-import mongoose from 'mongoose'
+import mongoose, { Types } from 'mongoose'
 import passport from 'passport'
+import { IUser } from '../../models/User'
 import strategy from '../../services/passport'
 import logger from '../../utils/logger'
 import admin from './admin'
@@ -15,6 +16,16 @@ import users from './users'
 
 export const app = express()
 const MongoStore = connectMongo(session)
+
+interface RequestUser extends IUser {
+  _id: Types.ObjectId
+}
+
+declare global {
+  namespace Express {
+    interface User extends RequestUser {}
+  }
+}
 
 const { DB_CONNECTION_STRING } = process.env
 
