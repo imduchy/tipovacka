@@ -41,7 +41,13 @@
           ></v-text-field>
 
           <!-- UPDATE THIS -->
-          <v-btn color="warning" block light disabled @click="changePassword">
+          <v-btn
+            color="warning"
+            block
+            light
+            :disabled="!validPasswordInput"
+            @click="changePassword"
+          >
             Zmeniť heslo
           </v-btn>
         </v-form>

@@ -1,14 +1,28 @@
-import express from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import passport from 'passport'
 import mongoose from 'mongoose'
-import User, { IUserDocument } from '../../models/User'
+import User, { IUser, IUserDocument } from '../../models/User'
 import logger from '../../utils/logger'
 import { PropertyRequiredError, ValidationError } from '../../utils/exceptions'
 import { validateInput } from '../../services/auth'
 import { isLoggedIn } from '../../utils/auth'
 
 const router = express.Router()
+
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // If req.headers contains the admin key, continue
+  if (isLoggedIn(req)) {
+    next()
+  } else {
+    logger.warn(
+      `[${req.originalUrl}] Unauthorized request was made by user ${
+        req.user && (req.user as IUser)._id
+      } from IP: ${req.ip}.`
+    )
+    res.status(401).send('Unauthorized request')
+  }
+}
 
 router.get('/users', (req, res) => {
   res.status(200).send(req.user)
@@ -77,7 +91,7 @@ router.post('/register', async (req, res) => {
   }
 })
 
-router.post('/password', isLoggedIn, async (req, res) => {
+router.post('/password', authMiddleware, async (req, res) => {
   const { oldPassword, newPassword, confirmedPassword } = req.body
 
   if (!oldPassword || !newPassword || !confirmedPassword) {
