@@ -24,7 +24,8 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-router.get('/users', (req, res) => {
+router.get('/user', (req, res) => {
+  logger.info('auth user endpoint, ' + req.user)
   res.status(200).send(req.user)
 })
 
@@ -48,6 +49,7 @@ router.get('/logout', (req, res) => {
 })
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
+  logger.info('auth login endpoint, ' + req.user)
   // If this function gets called, authentication was successful.
   // `req.user` contains the authenticated user.
   res.status(200).send(req.user)

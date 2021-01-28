@@ -81,7 +81,7 @@ export default {
             method: 'get',
           },
           user: {
-            url: '/auth/users',
+            url: '/auth/user',
             method: 'get',
             propertyName: false,
           },
