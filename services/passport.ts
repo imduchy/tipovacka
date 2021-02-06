@@ -1,7 +1,7 @@
+import { IUserDocument, User } from '@duchynko/tipovacka-models'
 import bcrypt from 'bcryptjs'
 import { PassportStatic } from 'passport'
 import { Strategy } from 'passport-local'
-import User, { IUserDocument } from '../models/User'
 import logger from '../utils/logger'
 
 export default (passport: PassportStatic) => {

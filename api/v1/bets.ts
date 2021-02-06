@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express'
+import { IBet, Game, User, IUser } from '@duchynko/tipovacka-models'
+import { Types } from 'mongoose'
 import { isAdmin, isLoggedIn } from '../../utils/auth'
-import { IBet } from '../../models/Bet'
-import Game from '../../models/Game'
-import User, { IUser } from '../../models/User'
 import { alreadyBet } from '../../services/bets'
 import logger from '../../utils/logger'
 
@@ -16,7 +15,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   if (isLoggedIn(req)) {
-    const user = req.user as IUser
+    const user = req.user as IUser & { _id: Types.ObjectId }
     // Only allow user to create bet if user ids match
     if (user._id!.equals(req.body.userId)) {
       next()
@@ -26,7 +25,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   logger.warn(
     `[${req.method} ${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUser)._id
+      req.user && (req.user as IUser & { _id: Types.ObjectId })._id
     } from IP: ${req.ip}.`
   )
   res.status(401).send('Unauthorized request')

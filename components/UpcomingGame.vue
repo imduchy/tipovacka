@@ -58,8 +58,8 @@
 </template>
 
 <script lang="ts">
+import { IGame } from '@duchynko/tipovacka-models'
 import Vue, { PropType } from 'vue'
-import { IGame } from '~/models/Game'
 export default Vue.extend({
   props: {
     upcomingGame: {

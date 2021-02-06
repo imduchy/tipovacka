@@ -1,6 +1,5 @@
-import { FixtureResponse } from '../models/responses/FixtureResponse'
-import { IGame } from '../models/Game'
-import { GameStatus } from '../models/Enums'
+import { FixtureResponse, GameStatus, IGame } from '@duchynko/tipovacka-models'
+import { Types } from 'mongoose'
 import logger from '../utils/logger'
 import { getFixture } from './footballApi'
 
@@ -90,7 +89,7 @@ const responseMapping = (response: FixtureResponse.Response): IGame => {
   return {
     date: new Date(fixture.date),
     gameId: fixture.id,
-    groupId: '',
+    groupId: Types.ObjectId(''), // This is just a placeholder
     competitionId: league.id,
     competitionName: league.name,
     awayTeam: {

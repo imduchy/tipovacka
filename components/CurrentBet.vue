@@ -20,14 +20,13 @@
 </template>
 
 <script lang="ts">
+import { IBet, IGame } from '@duchynko/tipovacka-models'
 import Vue, { PropType } from 'vue'
-import { IBet } from '~/models/Bet'
-import { IGame } from '~/models/Game'
 export default Vue.extend({
   props: {
     upcomingGame: {
-      type: Object as PropType<IGame>,
-      default: {} as IGame,
+      type: Object as PropType<IGame & { _id: string }>,
+      default: {} as IGame & { _id: string },
     },
   },
   computed: {
@@ -40,7 +39,7 @@ export default Vue.extend({
       if (!this.usersBets) return undefined
 
       const filteredGames: IBet[] = this.usersBets.filter(
-        (b: IBet) => (b.game as IGame)._id === this.upcomingGame._id
+        (b: IBet) => (b.game as IGame & { _id: string })._id === this.upcomingGame._id
       )
       return filteredGames[0]
     },

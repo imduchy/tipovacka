@@ -36,9 +36,8 @@
 </template>
 
 <script lang="ts">
+import { IBet, IGame, ITeam } from '@duchynko/tipovacka-models'
 import Vue, { PropType } from 'vue'
-import { IBet } from '~/models/Bet'
-import { IGame, ITeam } from '~/models/Game'
 export default Vue.extend({
   props: {
     bet: {

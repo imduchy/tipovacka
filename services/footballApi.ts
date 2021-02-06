@@ -1,6 +1,6 @@
+import { FixtureResponse } from '@duchynko/tipovacka-models'
 import axios, { AxiosResponse } from 'axios'
 import logger from '../utils/logger'
-import { FixtureResponse } from '~/models/responses/FixtureResponse'
 
 export function getFixture(
   params: any

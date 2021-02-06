@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import passport from 'passport'
 import mongoose from 'mongoose'
-import User, { IUser, IUserDocument } from '../../models/User'
+import { User, IUser, IUserDocument } from '@duchynko/tipovacka-models'
 import logger from '../../utils/logger'
 import { PropertyRequiredError, ValidationError } from '../../utils/exceptions'
 import { validateInput } from '../../services/auth'
@@ -17,7 +17,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   } else {
     logger.warn(
       `[${req.originalUrl}] Unauthorized request was made by user ${
-        req.user && (req.user as IUser)._id
+        req.user && (req.user as IUser & { _id: string })._id
       } from IP: ${req.ip}.`
     )
     res.status(401).send('Unauthorized request')
@@ -25,7 +25,6 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 }
 
 router.get('/user', (req, res) => {
-  logger.info('auth user endpoint, ' + req.user)
   res.status(200).send(req.user)
 })
 
@@ -49,7 +48,6 @@ router.get('/logout', (req, res) => {
 })
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
-  logger.info('auth login endpoint, ' + req.user)
   // If this function gets called, authentication was successful.
   // `req.user` contains the authenticated user.
   res.status(200).send(req.user)

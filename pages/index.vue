@@ -64,12 +64,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
+import { BetStatus, IBet, IGame } from '@duchynko/tipovacka-models'
 import BetInput from '../components/BetInput.vue'
 import CurrentBet from '../components/CurrentBet.vue'
 import UpcomingGame from '../components/UpcomingGame.vue'
 import UserBet from '~/components/UserBet.vue'
-import { BetStatus, IBet } from '~/models/Bet'
-import { IGame } from '~/models/Game'
 
 export default Vue.extend({
   components: { UpcomingGame, BetInput, CurrentBet, UserBet },
@@ -94,7 +93,7 @@ export default Vue.extend({
       const upcomingGame = this.upcomingGame._id
       if (this.usersBets !== undefined) {
         return this.usersBets.some(
-          (bet: IBet) => (bet.game as IGame)._id === upcomingGame
+          (bet: IBet) => (bet.game as IGame & { _id: string })._id === upcomingGame
         )
       }
       return false

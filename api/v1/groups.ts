@@ -1,7 +1,7 @@
+import { Group, IUser } from '@duchynko/tipovacka-models'
 import { NextFunction, Request, Response, Router } from 'express'
+import { Types } from 'mongoose'
 import { isAdmin, isLoggedIn } from '../../utils/auth'
-import Group from '../../models/Group'
-import { IUser } from '../../models/User'
 import logger from '../../utils/logger'
 
 const router = Router()
@@ -24,7 +24,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   logger.warn(
     `[${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUser)._id
+      req.user && (req.user as IUser & { _id: Types.ObjectId })._id
     } from IP: ${req.ip}.`
   )
   res.status(401).send('Unauthorized request')

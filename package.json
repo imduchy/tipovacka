@@ -17,7 +17,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged & npm run test"
     }
   },
   "dependencies": {
@@ -33,11 +33,12 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "js-cookie": "^2.2.1",
-    "mongoose": "^5.11.11",
+    "mongoose": "^5.11.14",
     "nuxt": "2.14.12",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "@duchynko/tipovacka-models": "^0.0.2"
   },
   "devDependencies": {
     "@nuxt/typescript-build": "^1.0.3",

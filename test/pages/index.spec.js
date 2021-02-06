@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
+import { BetStatus } from '@duchynko/tipovacka-models'
 import IndexPage from '../../pages/index'
 import { renderWithVuetify } from '../setup'
-import { BetStatus } from '~/models/Bet'
 
 test('displays teams names', () => {
   const { getByText } = renderWithVuetify(IndexPage, {

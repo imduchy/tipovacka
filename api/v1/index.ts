@@ -1,3 +1,4 @@
+import { exportModels } from '@duchynko/tipovacka-models'
 import bodyParser from 'body-parser'
 import connectMongo from 'connect-mongo'
 import express from 'express'
@@ -17,6 +18,8 @@ export const app = express()
 const MongoStore = connectMongo(session)
 
 const { DB_CONNECTION_STRING } = process.env
+
+exportModels(mongoose)
 
 try {
   if (!DB_CONNECTION_STRING) {

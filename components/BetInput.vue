@@ -43,13 +43,13 @@
 </template>
 
 <script lang="ts">
+import { IGame } from '@duchynko/tipovacka-models'
 import Vue, { PropType } from 'vue'
-import { IGame } from '~/models/Game'
 export default Vue.extend({
   props: {
     upcomingGame: {
-      type: Object as PropType<IGame>,
-      default: {} as IGame,
+      type: Object as PropType<IGame & { _id: string }>,
+      default: {} as IGame & { _id: string },
     },
   },
   data: () => ({
