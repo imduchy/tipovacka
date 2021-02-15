@@ -20,14 +20,16 @@ jobs:
         with:
           node-version: 12.x
 
-      - name: 'Run tests'
+      - name: 'Install and run tests'
         working-directory: 'client'
-        run: npm run test
+        run: |
+          npm install
+          npm run test
 
       - name: 'Generate static site'
         working-directory: 'client'
         run: |
-          'npm run generate'
+          npm run generate
         env:
           NODE_ENV: 'production'
           BASE_URL: 'https://api.onlinetipovacka.sk/api'
@@ -41,15 +43,15 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            'az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} -d '$web' -s ./client'
+            az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} -d '$web' -s ./client
 
       - name: 'Purge CDN endpoint'
         uses: 'azure/CLI@v1'
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            'az cdn endpoint purge --content-paths  "/*" --profile-name ${{ secrets.CDN_PROFILE_NAME }} --name ${{ secrets.CDN_ENDPOINT }} --resource-group onlinetipovacka'
+            az cdn endpoint purge --content-paths  "/*" --profile-name ${{ secrets.CDN_PROFILE_NAME }} --name ${{ secrets.CDN_ENDPOINT }} --resource-group onlinetipovacka
 
       - name: 'Azure Logout'
         run: |
-          'az logout'
+          az logout
