@@ -9,10 +9,6 @@ on:
     paths:
       - 'client/**'
 
-defaults:
-  run:
-    working-directory: 'client'
-
 jobs:
   deploy:
     runs-on: 'ubuntu-latest'
@@ -25,10 +21,12 @@ jobs:
           node-version: 12.x
 
       - name: 'Run tests'
+        working-directory: 'client'
         run: |
           'npm run test'
 
       - name: 'Generate static site'
+        working-directory: 'client'
         run: |
           'npm run generate'
         env:
@@ -44,7 +42,7 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            'az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} -d '$web' -s .'
+            'az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} -d '$web' -s ./client'
 
       - name: 'Purge CDN endpoint'
         uses: 'azure/CLI@v1'
