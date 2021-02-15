@@ -9,6 +9,10 @@ on:
     paths:
       - 'client/**'
 
+defaults:
+  run:
+    working-directory: 'client'
+
 jobs:
   deploy:
     runs-on: 'ubuntu-latest'
@@ -22,7 +26,6 @@ jobs:
           registry-url: https://npm.pkg.github.com
 
       - name: 'Install and run tests'
-        working-directory: 'client'
         run: |
           npm install
           npm run test
@@ -30,7 +33,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: 'Generate static site'
-        working-directory: 'client'
         run: |
           npm run generate
         env:
@@ -46,7 +48,7 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} -d '$web' -s ./client
+            az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} -d '$web' -s ./dist
 
       - name: 'Purge CDN endpoint'
         uses: 'azure/CLI@v1'
