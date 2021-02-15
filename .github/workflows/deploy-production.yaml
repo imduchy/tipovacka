@@ -22,9 +22,7 @@ jobs:
 
       - name: 'Run tests'
         working-directory: 'client'
-        run: |
-          'ls -l'
-          'npm run test'
+        run: npm run test
 
       - name: 'Generate static site'
         working-directory: 'client'
