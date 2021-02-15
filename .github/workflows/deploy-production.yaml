@@ -55,7 +55,7 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az cdn endpoint purge --content-paths  "/*" --profile-name ${{ secrets.CDN_PROFILE_NAME }} --name ${{ secrets.CDN_ENDPOINT }} --resource-group onlinetipovacka
+            az cdn endpoint purge --content-paths  "/*" --profile-name ${{ secrets.CDN_PROFILE_NAME }} --name ${{ secrets.CDN_ENDPOINT }} --resource-group tipovacka
 
       - name: 'Azure Logout'
         run: |
