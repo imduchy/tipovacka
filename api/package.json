@@ -1,0 +1,37 @@
+{
+  "name": "tipovacka-api",
+  "version": "1.0.0",
+  "description": "Express API for Tipovacka application",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "test",
+    "start": "node dist/index.js",
+    "dev": "tsnd --respawn -r dotenv/config index.ts"
+  },
+  "author": "Jakub Duchon",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/passport-local": "^1.0.33",
+    "dotenv": "^8.2.0",
+    "ts-node-dev": "^1.1.1",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.9",
+    "@types/express-session": "^1.17.3"
+  },
+  "dependencies": {
+    "typescript": "^4.1.4",
+    "@duchynko/tipovacka-models": "0.0.3",
+    "axios": "^0.21.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "connect-mongo": "^3.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "mongoose": "^5.11.15",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "winston": "^3.3.3"
+  }
+}
