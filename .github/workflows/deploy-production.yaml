@@ -4,6 +4,10 @@ on:
   push:
     brances:
       - 'master'
+      # delete this
+      - 'standalone-api'
+    changes:
+      - client/**
 
 jobs:
   deploy:
