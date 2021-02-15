@@ -12,6 +12,11 @@ test('displays teams names', () => {
     },
     mocks: {
       $auth: mockAuth,
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
     },
   })
   const homeTeamName = getByText(mockUpcomingGame().homeTeam.name)
@@ -30,6 +35,11 @@ test('shows loading bar when upcomingGame is undefined', () => {
     },
     mocks: {
       $auth: mockAuth,
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
     },
   })
   const progressBar = getByTestId('progress-circular')
@@ -46,6 +56,11 @@ test('hides loading bar when upcomingGame is not undefined', () => {
     },
     mocks: {
       $auth: mockAuth,
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
     },
   })
 
@@ -61,13 +76,18 @@ test('displays upcoming-game component when upcomingGame is not undefined', () =
     },
     mocks: {
       $auth: mockAuth,
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
     },
   })
 
   expect(getByTestId('upcoming-game')).not.toBeNull()
 })
 
-test("displays bet-input component if user haven't placed a bet yet", () => {
+test("displays bet-input component if user hasn't placed a bet yet", () => {
   const { getByTestId, queryByTestId } = renderWithVuetify(IndexPage, {
     store: {
       getters: {
@@ -76,6 +96,11 @@ test("displays bet-input component if user haven't placed a bet yet", () => {
     },
     mocks: {
       $auth: { user: { bets: [] } },
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
     },
   })
 
@@ -83,7 +108,7 @@ test("displays bet-input component if user haven't placed a bet yet", () => {
   expect(queryByTestId('current-bet')).toBeNull()
 })
 
-test("displays bet-input component if user haven't placed a bet yet", () => {
+test("displays bet-input component if user hasn't placed a bet yet", () => {
   const { getByTestId, queryByTestId } = renderWithVuetify(IndexPage, {
     store: {
       getters: {
@@ -92,6 +117,11 @@ test("displays bet-input component if user haven't placed a bet yet", () => {
     },
     mocks: {
       $auth: mockAuth,
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
     },
   })
 
@@ -108,6 +138,11 @@ test('displays 3 user-bet components if user has 3 or more evaluated bets', () =
     },
     mocks: {
       $auth: mockAuth,
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
     },
   })
 

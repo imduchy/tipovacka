@@ -9,16 +9,15 @@ on:
     paths:
       - 'client/**'
 
+defaults:
+  run:
+    working-directory: 'client'
+
 jobs:
   deploy:
     runs-on: 'ubuntu-latest'
-    defaults:
-      run:
-        working-directory: 'client'
     steps:
       - uses: 'actions/checkout@v2'
-        with:
-          path: 'client'
 
       - name: 'Run tests'
         run: |

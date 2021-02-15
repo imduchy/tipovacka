@@ -10,6 +10,13 @@ test('score input form has default values', () => {
     props: {
       upcomingGame: mockUpcomingGame,
     },
+    mocks: {
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
+    },
   })
   const homeTeamInpt = getByLabelText(mockUpcomingGame.homeTeam.name + ' skóre')
   const awayTeamInpt = getByLabelText(mockUpcomingGame.awayTeam.name + ' skóre')
@@ -22,6 +29,13 @@ test('submit button is disabled for negative value inputs', async () => {
   const { getByLabelText, getByRole } = renderWithVuetify(BetInput, {
     props: {
       upcomingGame: mockUpcomingGame,
+    },
+    mocks: {
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
     },
   })
   const homeTeamInpt = getByLabelText(mockUpcomingGame.homeTeam.name + ' skóre')
@@ -40,6 +54,13 @@ test('submit button is disabled for non-number inputs', async () => {
     props: {
       upcomingGame: mockUpcomingGame,
     },
+    mocks: {
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
+    },
   })
   const awayTeamInpt = getByLabelText(mockUpcomingGame.awayTeam.name + ' skóre')
   const submitBtn = getByRole('button', { name: 'Odoslať tip' })
@@ -56,6 +77,13 @@ test('submit button is enabled for valid number inputs', async () => {
   const { getByLabelText, getByRole } = renderWithVuetify(BetInput, {
     props: {
       upcomingGame: mockUpcomingGame,
+    },
+    mocks: {
+      $nuxt: {
+        $loading: {
+          show: false,
+        },
+      },
     },
   })
   const homeTeamInpt = getByLabelText(mockUpcomingGame.homeTeam.name + ' skóre')
@@ -101,6 +129,13 @@ describe('alreadyStarted', () => {
     const localVue = createLocalVue()
     const wrapper = shallowMount(BetInput, {
       localVue,
+      mocks: {
+        $nuxt: {
+          $loading: {
+            show: false,
+          },
+        },
+      },
       propsData: {
         upcomingGame: mockUpcomingGame,
       },
