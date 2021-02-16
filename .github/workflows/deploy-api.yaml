@@ -42,3 +42,4 @@ jobs:
         with:
           app-name: 'onlinetipovacka-api'
           publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILE }}
+          startu-script: 'npm run start'
