@@ -2,10 +2,8 @@ name: 'Deploy client to Storage Blob'
 
 on:
   push:
-    brances:
+    branches:
       - 'master'
-      # delete this
-      - 'standalone-api'
     paths:
       - 'client/**'
 

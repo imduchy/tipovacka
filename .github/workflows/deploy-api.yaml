@@ -2,9 +2,8 @@ name: 'Deploy API to Azure Web App'
 
 on:
   push:
-    brances:
+    branches:
       - 'master'
-      - 'standalone-api'
     paths:
       - 'api/**'
 
