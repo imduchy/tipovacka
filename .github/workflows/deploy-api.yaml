@@ -1,0 +1,44 @@
+name: 'Deploy API to Azure Web App'
+
+on:
+  push:
+    brances:
+      - 'master'
+    paths:
+      - 'api/**'
+
+defaults:
+  run:
+    working-directory: 'api'
+
+jobs:
+  deploy:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+          registry-url: https://npm.pkg.github.com
+
+      - name: 'Install and run tests'
+        run: |
+          npm install
+          npm run test
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: 'Build application'
+        run: |
+          npm run build
+        env:
+          NODE_ENV: 'production'
+
+      - name: 'Deploy to Web App'
+        uses: 'azure/webapps-deploy@v2'
+        with:
+          app-name: 'onlinetipovacka-api'
+          publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILE }}
+          startup-command: 'npm run start'

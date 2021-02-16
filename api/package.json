@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "test": "test",
+    "test": "",
     "start": "node dist/index.js",
     "dev": "tsnd --respawn -r dotenv/config index.ts"
   },
@@ -17,7 +17,8 @@
     "ts-node-dev": "^1.1.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/cors": "^2.8.9",
-    "@types/express-session": "^1.17.3"
+    "@types/express-session": "^1.17.3",
+    "jest": "26.6.3"
   },
   "dependencies": {
     "typescript": "^4.1.4",
