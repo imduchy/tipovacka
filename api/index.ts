@@ -52,7 +52,7 @@ app.use(
     },
     resave: true,
     saveUninitialized: true,
-    // Use MongoStore only in production. In development, use MemoryStore instead
+    // Use MongoStore only in production. In development, use MemoryStore instead.
     store:
       process.env.NODE_ENV === 'production'
         ? new MongoStore({
