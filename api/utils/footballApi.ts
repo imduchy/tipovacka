@@ -1,6 +1,6 @@
-import { FixtureResponse } from '@duchynko/tipovacka-models'
-import axios, { AxiosResponse } from 'axios'
-import logger from './logger'
+import { FixtureResponse } from '@duchynko/tipovacka-models';
+import axios, { AxiosResponse } from 'axios';
+import logger from './logger';
 
 export function getFixture(
   params: any
@@ -12,9 +12,9 @@ export function getFixture(
         'x-rapidapi-host': process.env.API_FOOTBALL_HOST,
         'x-rapidapi-key': process.env.API_FOOTBALL_KEY,
       },
-    })
+    });
   } catch (error) {
-    logger.error(`Error while fetching fixtures from the API. Error: ${error}`)
-    throw error
+    logger.error(`Error while fetching fixtures from the API. Error: ${error}`);
+    throw error;
   }
 }

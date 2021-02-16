@@ -1,13 +1,13 @@
-import { IUser, User } from "@duchynko/tipovacka-models";
-import bcrypt from "bcryptjs";
-import { PassportStatic } from "passport";
-import { Strategy } from "passport-local";
-import logger from "./logger";
+import { IUser, User } from '@duchynko/tipovacka-models';
+import bcrypt from 'bcryptjs';
+import { PassportStatic } from 'passport';
+import { Strategy } from 'passport-local';
+import logger from './logger';
 
 export default (passport: PassportStatic) => {
   passport.use(
     new Strategy(
-      { usernameField: "username", passwordField: "password" },
+      { usernameField: 'username', passwordField: 'password' },
       (username: string, password: string, done: any) => {
         User.findOne({ username })
           .then((user) => {
@@ -23,7 +23,7 @@ export default (passport: PassportStatic) => {
               if (isMatch) {
                 return done(null, user);
               } else {
-                return done(null, false, { message: "Password incorrect" });
+                return done(null, false, { message: 'Password incorrect' });
               }
             });
           })
@@ -45,9 +45,9 @@ export default (passport: PassportStatic) => {
     User.findById(id, {}, {}, (err, user) => {
       done(err, user);
     }).populate({
-      path: "bets",
-      model: "bet",
-      populate: { path: "game", model: "game" },
+      path: 'bets',
+      model: 'bet',
+      populate: { path: 'game', model: 'game' },
     });
   });
 };

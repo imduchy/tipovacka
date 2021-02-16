@@ -1,4 +1,4 @@
-import winston, { format } from 'winston'
+import winston, { format } from 'winston';
 
 const logger = winston.createLogger({
   level: 'info',
@@ -13,6 +13,6 @@ const logger = winston.createLogger({
       ),
     }),
   ],
-})
+});
 
-export default logger
+export default logger;
