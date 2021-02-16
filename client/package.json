@@ -14,11 +14,14 @@
     "test": "jest"
   },
   "lint-staged": {
-    "*.{js, ts, vue}": "eslint"
+    "*.{js, ts, vue}": [
+      "eslint",
+      "npm run test"
+    ]
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged & npm run test"
+      "pre-commit": "lint-staged"
     }
   },
   "dependencies": {
