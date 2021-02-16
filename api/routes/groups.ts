@@ -1,8 +1,8 @@
-import { Group, IUser } from "@duchynko/tipovacka-models";
-import { NextFunction, Request, Response, Router } from "express";
-import { Types } from "mongoose";
-import { isAdmin, isLoggedIn } from "../utils/authMiddleware";
-import logger from "../utils/logger";
+import { Group, IUser } from '@duchynko/tipovacka-models';
+import { NextFunction, Request, Response, Router } from 'express';
+import { Types } from 'mongoose';
+import { isAdmin, isLoggedIn } from '../utils/authMiddleware';
+import logger from '../utils/logger';
 
 const router = Router();
 
@@ -27,16 +27,16 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
       req.user && (req.user as IUser & { _id: Types.ObjectId })._id
     } from IP: ${req.ip}.`
   );
-  res.status(401).send("Unauthorized request");
+  res.status(401).send('Unauthorized request');
 };
 
 /**
  * Get users of a group by group's _id
  * Access: External function
  */
-router.get("/:groupId/users", authMiddleware, async (req, res) => {
+router.get('/:groupId/users', authMiddleware, async (req, res) => {
   try {
-    const group = await Group.findById(req.params.groupId).populate("users");
+    const group = await Group.findById(req.params.groupId).populate('users');
     if (group) {
       res.status(200).json(group.users);
     } else {
@@ -52,11 +52,9 @@ router.get("/:groupId/users", authMiddleware, async (req, res) => {
  * Get a group by _id
  * Access: Private
  */
-router.get("/:groupId", authMiddleware, async (req, res) => {
+router.get('/:groupId', authMiddleware, async (req, res) => {
   try {
-    const group = await Group.findById(req.params.groupId).populate(
-      "upcomingGame"
-    );
+    const group = await Group.findById(req.params.groupId).populate('upcomingGame');
     if (!group) {
       logger.warn(`Group with _id ${req.params.groupId} doesn't exist.`);
       res.status(404).json("Group doesn't exist");
@@ -64,10 +62,8 @@ router.get("/:groupId", authMiddleware, async (req, res) => {
     }
     res.status(200).json(group);
   } catch (error) {
-    logger.error(
-      `Couldn't fetch a group ${req.params.groupId}. Error: ${error}`
-    );
-    res.status(500).json("Internal server error");
+    logger.error(`Couldn't fetch a group ${req.params.groupId}. Error: ${error}`);
+    res.status(500).json('Internal server error');
   }
 });
 

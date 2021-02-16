@@ -1,14 +1,8 @@
-import { NextFunction, Request, Response, Router } from "express";
-import {
-  User,
-  IUser,
-  Group,
-  IGroupCompetition,
-  Game,
-} from "@duchynko/tipovacka-models";
-import logger from "../utils/logger";
-import { findUpcomingGame } from "../utils/games";
-import { isAdmin } from "../utils/authMiddleware";
+import { NextFunction, Request, Response, Router } from 'express';
+import { User, IUser, Group, IGroupCompetition, Game } from '@duchynko/tipovacka-models';
+import logger from '../utils/logger';
+import { findUpcomingGame } from '../utils/games';
+import { isAdmin } from '../utils/authMiddleware';
 
 const router = Router();
 
@@ -23,16 +17,16 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     `[${req.originalUrl}] Unauthorized request was made by user ${
       req.user && (req.user as IUser & { _id: string })._id
     } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${JSON.stringify(
-      req.header("tipovacka-auth-token")
+      req.header('tipovacka-auth-token')
     )}`
   );
-  res.status(401).send("Unauthorized request");
+  res.status(401).send('Unauthorized request');
 };
 
 /**
  * Intended for testing the adminAuth middleware
  */
-router.get("/test", (req, res) => {
+router.get('/test', (req, res) => {
   res.status(200).send(req.originalUrl);
 });
 
@@ -40,11 +34,9 @@ router.get("/test", (req, res) => {
  * Get upcoming game
  * Access: ADMIN
  */
-router.get("/:groupId/upcomingGame", authMiddleware, async (req, res) => {
+router.get('/:groupId/upcomingGame', authMiddleware, async (req, res) => {
   try {
-    const group = await Group.findById(req.params.groupId).populate(
-      "upcomingGame"
-    );
+    const group = await Group.findById(req.params.groupId).populate('upcomingGame');
 
     if (!group) {
       throw new Error(`Group with id ${req.params.groupId} doesn't exist.`);
@@ -62,9 +54,7 @@ router.get("/:groupId/upcomingGame", authMiddleware, async (req, res) => {
     }
 
     if (newUpcomingGame.gameId === group.upcomingGame?.gameId) {
-      res
-        .status(304)
-        .json("The current upcoming game is correct. No changes needed.");
+      res.status(304).json('The current upcoming game is correct. No changes needed.');
       return;
     }
     newUpcomingGame.groupId = group._id;
@@ -87,7 +77,7 @@ router.get("/:groupId/upcomingGame", authMiddleware, async (req, res) => {
  * Create a user
  * Access: ADMIN
  */
-router.post("/users", authMiddleware, async ({ body }, res) => {
+router.post('/users', authMiddleware, async ({ body }, res) => {
   try {
     const group = await Group.findById(body.groupId);
     if (!group) {
@@ -111,16 +101,12 @@ router.post("/users", authMiddleware, async ({ body }, res) => {
 
     group.users.addToSet(user._id);
     await group.save();
-    logger.info(
-      `User ${user._id} added to the group ${group.name} (${group._id}).`
-    );
+    logger.info(`User ${user._id} added to the group ${group.name} (${group._id}).`);
 
     res.status(200).json(user);
   } catch (error) {
-    logger.error(
-      `Couldn't create a user in a group ${body.groupId}. Error: ${error}.`
-    );
-    res.status(500).json("Internal server error");
+    logger.error(`Couldn't create a user in a group ${body.groupId}. Error: ${error}.`);
+    res.status(500).json('Internal server error');
   }
 });
 
@@ -128,7 +114,7 @@ router.post("/users", authMiddleware, async ({ body }, res) => {
  * Create game
  * Access: ADMIN
  */
-router.post("/games", authMiddleware, async ({ body }, res) => {
+router.post('/games', authMiddleware, async ({ body }, res) => {
   try {
     const game = await Game.create({
       gameId: body.gameId,
@@ -147,7 +133,7 @@ router.post("/games", authMiddleware, async ({ body }, res) => {
     res.status(200).json(game);
   } catch (error) {
     logger.error(`Couldn't create a new game. Error: ${error}`);
-    res.status(500).json("Internal server error");
+    res.status(500).json('Internal server error');
   }
 });
 
@@ -155,7 +141,7 @@ router.post("/games", authMiddleware, async ({ body }, res) => {
  * Create a group
  * Access: ADMIN
  */
-router.post("/groups", authMiddleware, async ({ body }, res) => {
+router.post('/groups', authMiddleware, async ({ body }, res) => {
   try {
     const group = await Group.create({
       name: body.name,
@@ -181,7 +167,7 @@ router.post("/groups", authMiddleware, async ({ body }, res) => {
     res.status(200).json(group);
   } catch (error) {
     logger.error(`Couldn't create a new group. Error: ${error}`);
-    res.status(500).json("Internal server error");
+    res.status(500).json('Internal server error');
   }
 });
 
@@ -189,16 +175,14 @@ router.post("/groups", authMiddleware, async ({ body }, res) => {
  * Delete a group
  * Access: ADMIN
  */
-router.delete("/users", authMiddleware, async (req, res) => {
+router.delete('/users', authMiddleware, async (req, res) => {
   try {
     const user = await User.findOneAndDelete({ _id: req.body.userId });
     logger.info(`A user with id ${req.body.userId} successfully removed.`);
     res.status(200).json(user);
   } catch (error) {
-    logger.error(
-      `Couldn't remove a user with id ${req.body.userId}. Error: ${error}`
-    );
-    res.status(500).json("Internal server error");
+    logger.error(`Couldn't remove a user with id ${req.body.userId}. Error: ${error}`);
+    res.status(500).json('Internal server error');
   }
 });
 

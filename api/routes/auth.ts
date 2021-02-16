@@ -1,11 +1,11 @@
-import express, { Request, Response, NextFunction } from "express";
-import bcrypt from "bcryptjs";
-import passport from "passport";
-import mongoose from "mongoose";
-import { User, IUser, IUserDocument } from "@duchynko/tipovacka-models";
-import logger from "../utils/logger";
-import { PropertyRequiredError, ValidationError } from "../utils/exceptions";
-import { validateInput, isLoggedIn } from "../utils/authMiddleware";
+import express, { Request, Response, NextFunction } from 'express';
+import bcrypt from 'bcryptjs';
+import passport from 'passport';
+import mongoose from 'mongoose';
+import { User, IUser, IUserDocument } from '@duchynko/tipovacka-models';
+import logger from '../utils/logger';
+import { PropertyRequiredError, ValidationError } from '../utils/exceptions';
+import { validateInput, isLoggedIn } from '../utils/authMiddleware';
 
 const router = express.Router();
 
@@ -19,15 +19,15 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         req.user && (req.user as IUser & { _id: string })._id
       } from IP: ${req.ip}.`
     );
-    res.status(401).send("Unauthorized request");
+    res.status(401).send('Unauthorized request');
   }
 };
 
-router.get("/user", (req, res) => {
+router.get('/user', (req, res) => {
   res.status(200).send(req.user);
 });
 
-router.get("/logout", (req, res) => {
+router.get('/logout', (req, res) => {
   req.session?.destroy(async (err) => {
     if (err) {
       logger.info(
@@ -35,7 +35,7 @@ router.get("/logout", (req, res) => {
       );
     }
 
-    const Sessions = mongoose.connection.collection("sessions");
+    const Sessions = mongoose.connection.collection('sessions');
     await Sessions.findOneAndDelete({ _id: req.sessionID }).catch((err) => {
       logger.warn(
         `Couldn't delete sessions ${req.sessionID} from the database. Error: ${err}`
@@ -46,13 +46,13 @@ router.get("/logout", (req, res) => {
   res.status(200).send();
 });
 
-router.post("/login", passport.authenticate("local"), function (req, res) {
+router.post('/login', passport.authenticate('local'), function (req, res) {
   // If this function gets called, authentication was successful.
   // `req.user` contains the authenticated user.
   res.status(200).send(req.user);
 });
 
-router.post("/register", async (req, res) => {
+router.post('/register', async (req, res) => {
   const { username, email, password, groupId } = req.body;
 
   try {
@@ -60,7 +60,7 @@ router.post("/register", async (req, res) => {
 
     const user = await User.findOne({ email });
     if (user) {
-      res.status(400).send("User with this email already exists");
+      res.status(400).send('User with this email already exists');
       return;
     }
 
@@ -85,16 +85,16 @@ router.post("/register", async (req, res) => {
     } else {
       logger.error(`Error while registering a user.`);
       logger.error(`Error: ${error}.`);
-      res.status(500).send("Internal error");
+      res.status(500).send('Internal error');
     }
   }
 });
 
-router.post("/password", authMiddleware, async (req, res) => {
+router.post('/password', authMiddleware, async (req, res) => {
   const { oldPassword, newPassword, confirmedPassword } = req.body;
 
   if (!oldPassword || !newPassword || !confirmedPassword) {
-    res.status(400).send("Not all values were provided.");
+    res.status(400).send('Not all values were provided.');
     return;
   }
 
@@ -110,7 +110,7 @@ router.post("/password", authMiddleware, async (req, res) => {
 
     const passwordsMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordsMatch) {
-      res.status(400).send("Wrong password");
+      res.status(400).send('Wrong password');
       return;
     }
 
@@ -123,7 +123,7 @@ router.post("/password", authMiddleware, async (req, res) => {
 
     res.status(200).send();
   } catch (error) {
-    res.status(500).send("Internal error");
+    res.status(500).send('Internal error');
   }
 });
 

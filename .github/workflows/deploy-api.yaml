@@ -4,6 +4,7 @@ on:
   push:
     brances:
       - 'master'
+      - 'standalone-api'
     paths:
       - 'api/**'
 
