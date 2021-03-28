@@ -1,8 +1,10 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { User, IUser, Group, IGroupCompetition, Game } from '@duchynko/tipovacka-models';
+import { User, IUser, Group, Game, IGroup } from '@duchynko/tipovacka-models';
 import logger from '../utils/logger';
 import { findUpcomingGame } from '../utils/games';
 import { isAdmin } from '../utils/authMiddleware';
+import * as FootballApi from '../utils/footballApi';
+import { mapStandings, mapTeamStatistics } from '../utils/groups';
 
 const router = Router();
 
@@ -174,13 +176,30 @@ router.post('/groups', authMiddleware, async ({ body, route, method, ip }, res) 
       league: body.league,
       season: body.season,
     });
-    // TODO: Check if all above calls fetched data successfully
+
+    const responses = [
+      teamInformationResponse,
+      teamStatisticsResponse,
+      competitionInformationResponse,
+    ];
+
+    if (responses.some((r) => r.data.errors !== [])) {
+      const errors = responses.filter((r) => r.data.errors !== []);
+
+      logger.error(
+        `Required data were not fetched successfully from the API.` +
+          `Errors: ${JSON.stringify(errors)}`
+      );
+      res.status(500).json('Internal server error');
+    }
 
     const { team, venue } = teamInformationResponse.data.response[0];
     const competition = competitionInformationResponse.data.response[0];
     const teamStatistics = teamStatisticsResponse.data.response;
 
-    logger.info('Creating a new group document.');
+    logger.info(
+      'Data fetched successfully. Creating a new group document in the database.'
+    );
     const group = await Group.create<IGroup>({
       name: body.name,
       email: body.email,
