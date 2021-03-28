@@ -138,29 +138,99 @@ router.post('/games', authMiddleware, async ({ body }, res) => {
 });
 
 /**
- * Create a group
+ * Create a new group, populate a specified competition object
+ * with standings and team statistics fetched from the Football API.
+ *
  * Access: ADMIN
+ *
+ * @param name name of the new group
+ * @param email email of the new group
+ * @param website website of the new group
+ * @param team API id of the team that will be initialized as the followedTeam
+ * @param league API id of the league for which standings and team statistics will be fetched
+ * @param season year of the season for which competition standings and team statistics will be fetched
+ *
  */
-router.post('/groups', authMiddleware, async ({ body }, res) => {
+router.post('/groups', authMiddleware, async ({ body, route, method, ip }, res) => {
+  logger.info(`${Date.now()} [${method}] ${route} from ${ip}.`);
+  logger.info(`Request body: ${JSON.stringify(body)}.`);
   try {
-    const group = await Group.create({
-      name: body.name,
-      email: body.email,
-      users: [],
-      website: body.website,
-      teamId: body.teamId,
-      competitions: body.competitions,
-      games: [],
+    logger.info('Fetching team information from the API.');
+    const teamInformationResponse = await FootballApi.getTeam({
+      id: body.team,
+      league: body.league,
+      season: body.season,
     });
 
-    const competitionIds: number[] = body.competitions.map(
-      (c: IGroupCompetition) => c.competitionId
-    );
-    const upcomingGame = await findUpcomingGame(body.teamId, competitionIds);
-    upcomingGame.groupId = group._id;
-    const game = await Game.create(upcomingGame);
+    logger.info('Fetching team statistics from the API.');
+    const teamStatisticsResponse = await FootballApi.getTeamStatistics({
+      team: body.team,
+      season: body.season,
+      league: body.league,
+    });
 
-    group.upcomingGame = game._id;
+    logger.info('Fetching competition standings from the API.');
+    const competitionInformationResponse = await FootballApi.getStandings({
+      league: body.league,
+      season: body.season,
+    });
+    // TODO: Check if all above calls fetched data successfully
+
+    const { team, venue } = teamInformationResponse.data.response[0];
+    const competition = competitionInformationResponse.data.response[0];
+    const teamStatistics = teamStatisticsResponse.data.response;
+
+    logger.info('Creating a new group document.');
+    const group = await Group.create<IGroup>({
+      name: body.name,
+      email: body.email,
+      website: body.website,
+      upcomingGames: [],
+      users: [],
+      followedTeams: [
+        {
+          apiId: team.id,
+          name: team.name,
+          logo: team.logo,
+          seasons: [
+            {
+              season: body.season,
+              competitions: [
+                {
+                  apiId: body.league,
+                  games: [],
+                  logo: competition.league.logo,
+                  name: competition.league.name,
+                  players: [],
+                  standings: mapStandings(competition),
+                  teamStatistics: mapTeamStatistics(teamStatistics),
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    try {
+      logger.info('Fetching an upcoming game for the group.');
+      const upcomingGame = await findUpcomingGame(body.team, [body.league]);
+      // Group _id needs to be set manually, as that's not known from the API call
+      upcomingGame.groupId = group._id;
+
+      // Save the game in the database, push it into the upcomingGames array,
+      // and save the group object with updated information.
+      const game = await Game.create(upcomingGame);
+      group.upcomingGames.push(game._id);
+    } catch (error) {
+      logger.error(
+        `An error occured while fetching an upcoming game for the group. ` +
+          `Error: ${error}`
+      );
+      throw error;
+    }
+
+    console.log(group.upcomingGames);
     await group.save();
 
     logger.info(`A new group ${group.name} (${group._id}) was created.`);
