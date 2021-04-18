@@ -3,7 +3,16 @@ import {
   StandingsResponse,
   TeamStatisticsResponse,
 } from '@duchynko/tipovacka-models';
-import { ICompetitionStandingRecord } from '@duchynko/tipovacka-models/lib/models/Team';
+import {
+  ICompetitionStandingRecord,
+  IFollowedTeam,
+  ISeason,
+} from '@duchynko/tipovacka-models/lib/models/Team';
+
+export function getLatestSeason(followedTeam: IFollowedTeam): ISeason {
+  const sortedSeasons = [...followedTeam.seasons].sort((a, b) => b.season - a.season);
+  return sortedSeasons[0];
+}
 
 export function mapTeamStatistics(
   response: TeamStatisticsResponse.Response
