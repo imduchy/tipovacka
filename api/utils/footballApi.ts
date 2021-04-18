@@ -5,82 +5,160 @@ import {
   TeamStatisticsResponse,
 } from '@duchynko/tipovacka-models';
 import axios, { AxiosResponse } from 'axios';
+import { FootballApiResponseError } from './exceptions';
 import logger from './logger';
 
-export function getFixture(
+function logApiCall(endpoint: string, params: any) {
+  logger.info(
+    `[FootballApi] Get request to ${endpoint} endpoint with parameters %o`,
+    params
+  );
+}
+
+export async function getFixture(
   params: any
 ): Promise<AxiosResponse<FixtureResponse.RootObject>> {
   try {
-    return axios.get(process.env.API_FOOTBALL_URL + '/fixtures', {
-      params,
-      headers: {
-        'x-rapidapi-host': process.env.API_FOOTBALL_HOST,
-        'x-rapidapi-key': process.env.API_FOOTBALL_KEY,
-      },
-    });
-  } catch (error) {
-    logger.error(
-      `Error while fetching fixtures from the API. ` +
-        `Passed in params: ${params}. Error: ${error}`
+    logApiCall('/fixtures', params);
+
+    const response = await axios.get<FixtureResponse.RootObject>(
+      process.env.API_FOOTBALL_URL + '/fixtures',
+      {
+        params,
+        headers: {
+          'x-rapidapi-host': process.env.API_FOOTBALL_HOST,
+          'x-rapidapi-key': process.env.API_FOOTBALL_KEY,
+        },
+      }
     );
+
+    if (response.data.errors.length) {
+      throw new FootballApiResponseError(
+        'The response contains error objects: ' + response.data.errors
+      );
+    }
+
+    return response;
+  } catch (error) {
+    if (error instanceof FootballApiResponseError) {
+      logger.error(
+        `A ${error.name} error occured while fetching fixtures from the API. Error: %s`,
+        error.message
+      );
+    } else {
+      logger.error(
+        `A general error occured while fetching fixtures from the API. Error: ${error}`
+      );
+    }
+
     throw error;
   }
 }
 
-export function getTeam(params: any): Promise<AxiosResponse<TeamResponse.RootObject>> {
+export async function getTeam(
+  params: any
+): Promise<AxiosResponse<TeamResponse.RootObject>> {
   try {
-    return axios.get(process.env.API_FOOTBALL_URL + '/teams', {
+    logApiCall('/teams', params);
+
+    const response = await axios.get(process.env.API_FOOTBALL_URL + '/teams', {
       params,
       headers: {
         'x-rapidapi-host': process.env.API_FOOTBALL_HOST,
         'x-rapidapi-key': process.env.API_FOOTBALL_KEY,
       },
     });
+
+    if (response.data.errors.length) {
+      throw new FootballApiResponseError(
+        'The response contains error objects: ' + response.data.errors
+      );
+    }
+
+    return response;
   } catch (error) {
-    logger.error(
-      `Error while fetching team information from the API. ` +
-        `Passed in params: ${params}. Error: ${error}`
-    );
+    if (error instanceof FootballApiResponseError) {
+      logger.error(
+        `A ${error.name} error occured while fetching team from the API. Error: %s`,
+        error.message
+      );
+    } else {
+      logger.error(
+        `A general error occured while fetching team from the API. Error: ${error}`
+      );
+    }
     throw error;
   }
 }
 
-export function getStandings(
+export async function getStandings(
   params: any
 ): Promise<AxiosResponse<StandingsResponse.RootObject>> {
   try {
-    return axios.get(process.env.API_FOOTBALL_URL + '/standings', {
+    logApiCall('/standings', params);
+
+    const response = await axios.get(process.env.API_FOOTBALL_URL + '/standings', {
       params,
       headers: {
         'x-rapidapi-host': process.env.API_FOOTBALL_HOST,
         'x-rapidapi-key': process.env.API_FOOTBALL_KEY,
       },
     });
+
+    if (response.data.errors.length) {
+      throw new FootballApiResponseError(
+        'The response contains error objects: ' + response.data.errors
+      );
+    }
+
+    return response;
   } catch (error) {
-    logger.error(
-      `Error while fetching standings information from the API. ` +
-        `Passed in params: ${params}. Error: ${error}`
-    );
+    if (error instanceof FootballApiResponseError) {
+      logger.error(
+        `A ${error.name} error occured while fetching standings from the API. Error: %s`,
+        error.message
+      );
+    } else {
+      logger.error(
+        `A general error occured while fetching standings from the API. Error: ${error}`
+      );
+    }
     throw error;
   }
 }
 
-export function getTeamStatistics(
+export async function getTeamStatistics(
   params: any
 ): Promise<AxiosResponse<TeamStatisticsResponse.RootObject>> {
   try {
-    return axios.get(process.env.API_FOOTBALL_URL + '/teams/statistics', {
+    logApiCall('/teams/statistics', params);
+
+    const response = await axios.get(process.env.API_FOOTBALL_URL + '/teams/statistics', {
       params,
       headers: {
         'x-rapidapi-host': process.env.API_FOOTBALL_HOST,
         'x-rapidapi-key': process.env.API_FOOTBALL_KEY,
       },
     });
+
+    if (response.data.errors.length) {
+      throw new FootballApiResponseError(
+        'The response contains error objects: ' + response.data.errors
+      );
+    }
+
+    return response;
   } catch (error) {
-    logger.error(
-      `Error while fetching team statistics from the API. ` +
-        `Passed in params: ${params}. Error: ${error}`
-    );
+    if (error instanceof FootballApiResponseError) {
+      logger.error(
+        `A ${error.name} error occured while fetching team statistics from the API. Error: %s`,
+        error.message
+      );
+    } else {
+      logger.error(
+        `A general error occured while fetching team statistics from the API. Error: ${error}`
+      );
+    }
     throw error;
   }
 }
