@@ -9,6 +9,7 @@ import { getFixture } from './footballApi';
  *
  * @param teamId teamId (id returned from API) of a team
  * @param leagueIds list of leagueIds (ids returned from API)
+ * @param amountOfGames number of upcoming games to fetch from the API
  * @returns an upcoming game for a specified team
  */
 export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
@@ -36,10 +37,8 @@ export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
-  logger.info(`
-    Sorted upcoming games in selected leagues for team ${teamId}.
-    The upcoming game is ${upcomingGames[0].gameId}.
-  `);
+  logger.info(`Sorted upcoming games in the selected leagues for team ${teamId}.`);
+  logger.info(`The upcoming game is ${upcomingGames[0].gameId}.`);
 
   return upcomingGames[0];
 };
