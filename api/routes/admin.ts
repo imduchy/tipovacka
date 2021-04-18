@@ -1,14 +1,16 @@
+import { Game, Group, IGame, IGroup, IUser, User } from '@duchynko/tipovacka-models';
 import { NextFunction, Request, Response, Router } from 'express';
-import { User, IUser, Group, Game, IGroup } from '@duchynko/tipovacka-models';
-import logger from '../utils/logger';
-import { findUpcomingGame } from '../utils/games';
 import { isAdmin } from '../utils/authMiddleware';
 import * as FootballApi from '../utils/footballApi';
-import { mapStandings, mapTeamStatistics } from '../utils/groups';
+import { findUpcomingGame } from '../utils/games';
+import { getLatestSeason, mapStandings, mapTeamStatistics } from '../utils/groups';
+import logger from '../utils/logger';
 
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+
   // If req.headers contains the admin key, continue
   if (isAdmin(req)) {
     next();
@@ -18,123 +20,91 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.warn(
     `[${req.originalUrl}] Unauthorized request was made by user ${
       req.user && (req.user as IUser & { _id: string })._id
-    } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${JSON.stringify(
-      req.header('tipovacka-auth-token')
+    } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${req.header(
+      'tipovacka-auth-token'
     )}`
   );
   res.status(401).send('Unauthorized request');
 };
 
 /**
- * Intended for testing the adminAuth middleware
- */
-router.get('/test', (req, res) => {
-  res.status(200).send(req.originalUrl);
-});
-
-/**
- * Get upcoming game
+ * @warning This endpoint is not fully implemented!
+ * @note This endpoint should be used only for testing!
+ *
+ * Manually fetch upcoming games for a specified group.
+ *
  * Access: ADMIN
+ *
+ * @param group an ObjectId of the group for which upcoming games should be fetched
+ * @param team an API ID of the followed team for which upcoming games should be fetched
+ * @param amount number of upcoming games that should be fetched (e.g., next 3 games of the team)
  */
-router.get('/:groupId/upcomingGame', authMiddleware, async (req, res) => {
+router.get('/groups/team/upcoming', authMiddleware, async (req, res) => {
+  const groupId: string = req.body.group;
+  const teamId: number = req.body.team;
+  const amountOfGames: number = req.body.amount;
+
   try {
-    const group = await Group.findById(req.params.groupId).populate('upcomingGame');
-
+    const group = await Group.findById(groupId).populate('upcomingGames');
     if (!group) {
-      throw new Error(`Group with id ${req.params.groupId} doesn't exist.`);
+      throw new Error(`Group with id ${groupId} doesn't exist.`);
     }
 
-    const competitions = group.competitions.map((c) => c.competitionId);
-    const newUpcomingGame = await findUpcomingGame(group.teamId, competitions);
-
-    if (!newUpcomingGame) {
-      logger.warn(
-        `Didn't find an upcoming game for the team ${group.teamId} ` +
-          `in the following competitions ${competitions}.`
+    const team = group.followedTeams.find((t) => t.apiId === teamId);
+    if (!team) {
+      throw new Error(
+        `The group ${group.name} doesn't follow a team with the API id ${teamId}.`
       );
-      return res.status(200).json("Didn't find any upcoming games.");
     }
 
-    if (newUpcomingGame.gameId === group.upcomingGame?.gameId) {
-      res.status(304).json('The current upcoming game is correct. No changes needed.');
-      return;
-    }
-    newUpcomingGame.groupId = group._id;
-    const game = await Game.create(newUpcomingGame);
+    const latestSeason = getLatestSeason(team);
+    const competitionIds = latestSeason.competitions.map((c) => c.apiId);
 
-    const response = await Group.findByIdAndUpdate(
-      group._id,
-      {
-        upcomingGame: game._id,
-      },
-      { new: true }
-    );
-    res.status(200).json(response);
+    // TODO: Update findUpcomingGame to fetch specific number of upcoming games.
+    const newUpcomingGame = await findUpcomingGame(teamId, competitionIds);
+
+    res.status(500).json('Endpoint not implemented.');
   } catch (error) {
     res.status(400).json(error.message);
   }
 });
 
 /**
- * Create a user
+ * Create a new user in a specified group.
+ *
  * Access: ADMIN
+ *
+ * @param username username of the newly created user
+ * @param email email of the newly created user
+ * @param password password of the newly created user
+ * @param group ObjectId of the group the user will be part of
  */
-router.post('/users', authMiddleware, async ({ body }, res) => {
+router.post('/users', authMiddleware, async (req, res) => {
+  const { username, email, password } = req.body;
+  const groupId = req.body.group;
+
   try {
-    const group = await Group.findById(body.groupId);
+    logger.info(`Fetching the group ${groupId}.`);
+    const group = await Group.findById(groupId);
     if (!group) {
-      logger.warn(`Group with _id ${body.groupId} doesn't exist.`);
-      res.status(404).json("We couldn't find this group");
+      logger.warn(`Group with _id ${groupId} doesn't exist.`);
+      res.status(404).json("Selected group doesn't exist.");
       return;
     }
 
-    const user = await User.create({
-      username: body.username,
-      email: body.email,
-      password: body.password,
-      groupId: body.groupId,
-      totalScore: Array.from(group.competitions, (competition) => ({
-        competitionId: competition.competitionId,
-        season: competition.season,
-        score: 0,
-      })),
+    logger.info('Creating a new user.');
+    const user = await User.create<IUser>({
+      username: username,
+      email: email,
+      password: password,
+      groupId: groupId,
     });
-    logger.info(`User ${user._id} created.`);
-
-    group.users.addToSet(user._id);
-    await group.save();
-    logger.info(`User ${user._id} added to the group ${group.name} (${group._id}).`);
+    logger.info('New user created successfully.');
+    logger.info(JSON.stringify(user));
 
     res.status(200).json(user);
   } catch (error) {
-    logger.error(`Couldn't create a user in a group ${body.groupId}. Error: ${error}.`);
-    res.status(500).json('Internal server error');
-  }
-});
-
-/**
- * Create game
- * Access: ADMIN
- */
-router.post('/games', authMiddleware, async ({ body }, res) => {
-  try {
-    const game = await Game.create({
-      gameId: body.gameId,
-      groupId: body.groupId,
-      date: body.date,
-      venue: body.venue,
-      awayTeam: body.awayTeam,
-      homeTeam: body.homeTeam,
-      competitionId: body.competition,
-      competitionName: body.competitionName,
-      season: body.season,
-      status: body.status,
-    });
-    logger.info(`Game ${game.gameId} (${game._id}) created.`);
-
-    res.status(200).json(game);
-  } catch (error) {
-    logger.error(`Couldn't create a new game. Error: ${error}`);
+    logger.error(`There was an error creting the user. Error: ${error}.`);
     res.status(500).json('Internal server error');
   }
 });
@@ -153,49 +123,70 @@ router.post('/games', authMiddleware, async ({ body }, res) => {
  * @param season year of the season for which competition standings and team statistics will be fetched
  *
  */
-router.post('/groups', authMiddleware, async ({ body, route, method, ip }, res) => {
-  logger.info(`${Date.now()} [${method}] ${route} from ${ip}.`);
-  logger.info(`Request body: ${JSON.stringify(body)}.`);
+router.post('/groups', authMiddleware, async ({ body }, res) => {
   try {
     logger.info('Fetching team information from the API.');
-    const teamInformationResponse = await FootballApi.getTeam({
+    const teamResponse = await FootballApi.getTeam({
       id: body.team,
       league: body.league,
       season: body.season,
     });
+    logger.info(JSON.stringify(teamResponse.data));
+
+    if (teamResponse.data.results === 0) {
+      logger.error(
+        'The team response object contains 0 results. Make sure that the request ' +
+          'body contains correct values.'
+      );
+      return res
+        .status(404)
+        .json(
+          'Team information not found. Make sure the request body contains correct values.'
+        );
+    }
 
     logger.info('Fetching team statistics from the API.');
-    const teamStatisticsResponse = await FootballApi.getTeamStatistics({
+    const statisticsResponse = await FootballApi.getTeamStatistics({
       team: body.team,
       season: body.season,
       league: body.league,
     });
+    logger.info(JSON.stringify(statisticsResponse.data));
+
+    if (statisticsResponse.data.results === 0) {
+      logger.error(
+        'The team statistics response object contains 0 results. Make sure that the ' +
+          'request body contains correct values.'
+      );
+      return res
+        .status(404)
+        .json(
+          'Team statistics not found. Make sure the request body contains correct values.'
+        );
+    }
 
     logger.info('Fetching competition standings from the API.');
-    const competitionInformationResponse = await FootballApi.getStandings({
+    const competitionResponse = await FootballApi.getStandings({
       league: body.league,
       season: body.season,
     });
+    logger.info(JSON.stringify(competitionResponse.data));
 
-    const responses = [
-      teamInformationResponse,
-      teamStatisticsResponse,
-      competitionInformationResponse,
-    ];
-
-    if (responses.some((r) => r.data.errors !== [])) {
-      const errors = responses.filter((r) => r.data.errors !== []);
-
+    if (competitionResponse.data.results === 0) {
       logger.error(
-        `Required data were not fetched successfully from the API.` +
-          `Errors: ${JSON.stringify(errors)}`
+        'The competition standings response object contains 0 results. Make sure that the ' +
+          'request body contains correct values.'
       );
-      res.status(500).json('Internal server error');
+      return res
+        .status(404)
+        .json(
+          'Team competition standings not found. Make sure the request body contains correct values.'
+        );
     }
 
-    const { team, venue } = teamInformationResponse.data.response[0];
-    const competition = competitionInformationResponse.data.response[0];
-    const teamStatistics = teamStatisticsResponse.data.response;
+    const { team, venue } = teamResponse.data.response[0];
+    const competition = competitionResponse.data.response[0];
+    const teamStatistics = statisticsResponse.data.response;
 
     logger.info(
       'Data fetched successfully. Creating a new group document in the database.'
@@ -249,28 +240,12 @@ router.post('/groups', authMiddleware, async ({ body, route, method, ip }, res) 
       throw error;
     }
 
-    console.log(group.upcomingGames);
     await group.save();
 
     logger.info(`A new group ${group.name} (${group._id}) was created.`);
     res.status(200).json(group);
   } catch (error) {
     logger.error(`Couldn't create a new group. Error: ${error}`);
-    res.status(500).json('Internal server error');
-  }
-});
-
-/**
- * Delete a group
- * Access: ADMIN
- */
-router.delete('/users', authMiddleware, async (req, res) => {
-  try {
-    const user = await User.findOneAndDelete({ _id: req.body.userId });
-    logger.info(`A user with id ${req.body.userId} successfully removed.`);
-    res.status(200).json(user);
-  } catch (error) {
-    logger.error(`Couldn't remove a user with id ${req.body.userId}. Error: ${error}`);
     res.status(500).json('Internal server error');
   }
 });
