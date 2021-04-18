@@ -45,23 +45,23 @@ router.get('/groups/team/upcoming', authMiddleware, async (req, res) => {
   const amountOfGames: number = req.body.amount;
 
   try {
-    const group = await Group.findById(groupId).populate('upcomingGames');
-    if (!group) {
-      throw new Error(`Group with id ${groupId} doesn't exist.`);
-    }
+    // const group = await Group.findById(groupId).populate('upcomingGames');
+    // if (!group) {
+    //   throw new Error(`Group with id ${groupId} doesn't exist.`);
+    // }
 
-    const team = group.followedTeams.find((t) => t.apiId === teamId);
-    if (!team) {
-      throw new Error(
-        `The group ${group.name} doesn't follow a team with the API id ${teamId}.`
-      );
-    }
+    // const team = group.followedTeams.find((t) => t.apiId === teamId);
+    // if (!team) {
+    //   throw new Error(
+    //     `The group ${group.name} doesn't follow a team with the API id ${teamId}.`
+    //   );
+    // }
 
-    const latestSeason = getLatestSeason(team);
-    const competitionIds = latestSeason.competitions.map((c) => c.apiId);
+    // const latestSeason = getLatestSeason(team);
+    // const competitionIds = latestSeason.competitions.map((c) => c.apiId);
 
-    // TODO: Update findUpcomingGame to fetch specific number of upcoming games.
-    const newUpcomingGame = await findUpcomingGame(teamId, competitionIds);
+    // // TODO: Update findUpcomingGame to fetch specific number of upcoming games.
+    // const newUpcomingGame = await findUpcomingGame(teamId, competitionIds);
 
     res.status(500).json('Endpoint not implemented.');
   } catch (error) {
