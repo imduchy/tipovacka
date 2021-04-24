@@ -33,6 +33,33 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 };
 
 /**
+ * Get a group without the competition array
+ *
+ * Access: Protected (Logged-in & Part of the group)
+ *
+ * @param group ObjectId of the group to fetch
+ */
+router.get('/', authMiddleware, async (req, res) => {
+  const groupId = req.query.group;
+
+  try {
+    const group = await Group.findById(groupId)
+      .populate('upcomingGames')
+      .select('-followedTeams.seasons.competitions');
+
+    if (!group) {
+      logger.warn(`Group with _id ${groupId} doesn't exist.`);
+      return res.status(404).json("The provided group doesn't exist");
+    }
+
+    res.status(200).json(group);
+  } catch (error) {
+    logger.error(`Couldn't fetch a group ${groupId}. Error: ${error}`);
+    res.status(500).json('Internal server error');
+  }
+});
+
+/**
  * Get a group's users.
  *
  * Access: Protected (Logged-in & Part of the group)
@@ -42,41 +69,26 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  * @param password password of the newly created user
  * @param group ObjectId of the group the user will be part of
  */
-router.get('/:groupId/users', authMiddleware, async (req, res) => {
+router.get('/users', authMiddleware, async (req, res) => {
+  const groupId = req.query.group;
+
   try {
-    const group = await Group.findById(req.params.groupId).populate('users');
+    const group = await Group.findById(groupId).populate('users');
     if (group) {
       res.status(200).json(group.users);
     } else {
-      res.status(404);
+      res.status(404).send("The specified group doesn't exist.");
     }
   } catch (error) {
-    logger.error(error); // TODO: Update this
-    res.status(404);
+    logger.error(
+      `An error occured while fetching the group ${groupId}. Error: ${error}.`
+    );
+    res.status(500).send('Internal server error.');
   }
 });
 
 /**
- * Get a group by _id
- * Access: Private
- */
-router.get('/:groupId', authMiddleware, async (req, res) => {
-  try {
-    const group = await Group.findById(req.params.groupId).populate('upcomingGame');
-    if (!group) {
-      logger.warn(`Group with _id ${req.params.groupId} doesn't exist.`);
-      res.status(404).json("Group doesn't exist");
-      return;
-    }
-    res.status(200).json(group);
-  } catch (error) {
-    logger.error(`Couldn't fetch a group ${groupId}. Error: ${error}`);
-    res.status(500).json('Internal server error');
-  }
-});
-
-/**
- * Get a competition.
+ * Get a specified competition
  *
  * Access: Protected (Logged-in & Part of the group)
  *
