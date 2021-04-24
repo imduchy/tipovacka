@@ -33,7 +33,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  *
  * Manually fetch upcoming games for a specified group.
  *
- * Access: ADMIN
+ * Access: Admin
  *
  * @param group an ObjectId of the group for which upcoming games should be fetched
  * @param team an API ID of the followed team for which upcoming games should be fetched
@@ -72,7 +72,7 @@ router.get('/groups/team/upcoming', authMiddleware, async (req, res) => {
 /**
  * Create a new user in a specified group.
  *
- * Access: ADMIN
+ * Access: Admin
  *
  * @param username username of the newly created user
  * @param email email of the newly created user
@@ -113,7 +113,7 @@ router.post('/users', authMiddleware, async (req, res) => {
  * Create a new group, populate a specified competition object
  * with standings and team statistics fetched from the Football API.
  *
- * Access: ADMIN
+ * Access: Admin
  *
  * @param name name of the new group
  * @param email email of the new group
