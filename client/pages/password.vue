@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 export default Vue.extend({
   data() {
     return {
@@ -71,11 +71,11 @@ export default Vue.extend({
         notEmpty: (value: string) => value.length >= 8 || 'Zadajte minimálne 8 znakov',
       },
       validPasswordInput: false,
-    }
+    };
   },
   computed: {
     passwordsMatch(): boolean | string {
-      return this.newPassword === this.confirmedPassword || 'Heslá sa musia zhodovať'
+      return this.newPassword === this.confirmedPassword || 'Heslá sa musia zhodovať';
     },
   },
   methods: {
@@ -88,18 +88,18 @@ export default Vue.extend({
         })
         .then(async (response) => {
           if (response.status === 200) {
-            this.$showAlert('Heslo úspešne zmenené', 'success')
-            await this.$auth.logout()
+            this.$showAlert('Heslo úspešne zmenené', 'success');
+            await this.$auth.logout();
           }
         })
         .catch((err) => {
           if (err.response.data === 'Wrong password') {
-            this.$showAlert('Nesprávne heslo', 'warning')
+            this.$showAlert('Nesprávne heslo', 'warning');
           } else {
-            this.$showAlert('Niekde sa stala chyba. Skúste to prosím neskôr.', 'error')
+            this.$showAlert('Niekde sa stala chyba. Skúste to prosím neskôr.', 'error');
           }
-        })
+        });
     },
   },
-})
+});
 </script>

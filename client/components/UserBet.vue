@@ -36,8 +36,8 @@
 </template>
 
 <script lang="ts">
-import { IBet, IGame, ITeam } from '@duchynko/tipovacka-models'
-import Vue, { PropType } from 'vue'
+import { IBet, IGame, ITeam } from '@duchynko/tipovacka-models';
+import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
     bet: {
@@ -50,32 +50,32 @@ export default Vue.extend({
       return new Date((this.bet.game as IGame).date).toLocaleDateString('sk-SK', {
         month: 'long',
         day: 'numeric',
-      })
+      });
     },
     formatedTime(): string {
       return new Date((this.bet.game as IGame).date).toLocaleTimeString('sk-SK', {
         hour: '2-digit',
         minute: '2-digit',
-      })
+      });
     },
     homeTeam(): ITeam {
-      return (this.bet.game as IGame).homeTeam
+      return (this.bet.game as IGame).homeTeam;
     },
     awayTeam(): ITeam {
-      return (this.bet.game as IGame).awayTeam
+      return (this.bet.game as IGame).awayTeam;
     },
     resultColor(): string {
-      return this.getResultColor(this.bet)
+      return this.getResultColor(this.bet);
     },
   },
   methods: {
     getResultColor(bet: IBet) {
-      const game = bet.game as IGame
+      const game = bet.game as IGame;
       if (
         bet.homeTeamScore === game.homeTeamScore &&
         bet.awayTeamScore === game.awayTeamScore
       ) {
-        return 'success'
+        return 'success';
       } else if (
         (bet.homeTeamScore > bet.awayTeamScore &&
           game.homeTeamScore! > game.awayTeamScore!) ||
@@ -84,11 +84,11 @@ export default Vue.extend({
         (bet.homeTeamScore === bet.awayTeamScore &&
           game.homeTeamScore === game.awayTeamScore)
       ) {
-        return 'info'
+        return 'info';
       } else {
-        return 'error'
+        return 'error';
       }
     },
   },
-})
+});
 </script>

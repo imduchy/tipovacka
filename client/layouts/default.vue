@@ -25,14 +25,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Alert from '../components/Alert.vue'
-import Navbar from '../components/Navbar.vue'
+import Vue from 'vue';
+import Alert from '../components/Alert.vue';
+import Navbar from '../components/Navbar.vue';
 export default Vue.extend({
   components: { Alert, Navbar },
   data: () => ({
     systemBar: true,
     systemBar2: true,
   }),
-})
+});
 </script>

@@ -43,8 +43,8 @@
 </template>
 
 <script lang="ts">
-import { IGame } from '@duchynko/tipovacka-models'
-import Vue, { PropType } from 'vue'
+import { IGame } from '@duchynko/tipovacka-models';
+import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
     upcomingGame: {
@@ -67,7 +67,7 @@ export default Vue.extend({
   }),
   computed: {
     alreadyStarted(): boolean {
-      return new Date().getTime() > new Date(this.upcomingGame.date).getTime()
+      return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
     },
   },
   methods: {
@@ -82,20 +82,20 @@ export default Vue.extend({
           })
           .then(async (response) => {
             if (response.status === 200) {
-              this.$showAlert('Tip úspešne odoslaný', 'success')
-              await this.$auth.fetchUser()
+              this.$showAlert('Tip úspešne odoslaný', 'success');
+              await this.$auth.fetchUser();
             }
           })
           .catch((err) => {
-            this.$showAlert(err.response.data, 'warning')
-          })
+            this.$showAlert(err.response.data, 'warning');
+          });
       } catch (error) {
         if (error === 'You already placed a bet on this game') {
           // TODO: Change this!
-          console.log('Already bet')
+          console.log('Already bet');
         }
       }
     },
   },
-})
+});
 </script>

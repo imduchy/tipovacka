@@ -90,7 +90,7 @@
   </span>
 </template>
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 export default Vue.extend({
   data: () => ({
     items: [
@@ -110,8 +110,8 @@ export default Vue.extend({
   }),
   methods: {
     async logout() {
-      await this.$auth.logout()
+      await this.$auth.logout();
     },
   },
-})
+});
 </script>

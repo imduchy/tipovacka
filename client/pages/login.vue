@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 export default Vue.extend({
   data() {
     return {
@@ -44,7 +44,7 @@ export default Vue.extend({
         username: '',
         password: '',
       },
-    }
+    };
   },
   methods: {
     async userLogin() {
@@ -55,12 +55,12 @@ export default Vue.extend({
             username: this.login.username,
             password: this.login.password,
           },
-        })
+        });
       } catch (err) {
-        this.$showAlert('Wrong credentials', 'error')
-        console.log(err)
+        this.$showAlert('Wrong credentials', 'error');
+        console.log(err);
       }
     },
   },
-})
+});
 </script>

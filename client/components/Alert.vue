@@ -10,29 +10,29 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 export default Vue.extend({
   data() {
     return {
       show: false,
       message: '',
       color: '',
-    }
+    };
   },
 
   created() {
     this.$store.subscribe(async (mutation, state) => {
       if (mutation.type === 'SHOW_ALERT') {
-        this.message = state.alert.message
-        this.color = state.alert.color
-        this.show = true
+        this.message = state.alert.message;
+        this.color = state.alert.color;
+        this.show = true;
         await setTimeout(() => {
-          this.show = false
-        }, 3000)
+          this.show = false;
+        }, 3000);
       }
-    })
+    });
   },
-})
+});
 </script>
 
 <style>
