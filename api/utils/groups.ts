@@ -57,7 +57,6 @@ export function mapTeamStatistics(
 export function mapStandings(
   response: StandingsResponse.Response
 ): ICompetitionStandingRecord[] {
-  console.log(response.league.standings);
   return response.league.standings[0].map((s) => ({
     teamApiId: s.team.id,
     teamName: s.team.name,
