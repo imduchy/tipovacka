@@ -33,6 +33,10 @@ export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
     throw error;
   }
 
+  if (upcomingGames.length === 0) {
+    return undefined;
+  }
+
   upcomingGames.sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });

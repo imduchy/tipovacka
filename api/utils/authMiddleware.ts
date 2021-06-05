@@ -15,20 +15,20 @@ export const validateInput = ({
   email,
   password,
   password2,
-  groupId,
+  group,
 }: {
   username: string;
   email: string;
   password: string;
   password2: string;
-  groupId: string;
+  group: string;
 }) => {
   if (
     !username === undefined ||
     !email === undefined ||
     !password === undefined ||
     !password2 === undefined ||
-    !groupId === undefined
+    !group === undefined
   ) {
     logger.error(
       `Not all required variables were provided in the request. ` +
