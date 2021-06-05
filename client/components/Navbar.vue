@@ -30,8 +30,10 @@
     <!-- App bar -->
     <v-app-bar app color="primary">
       <v-toolbar-title>
-        <router-link to="/" tag="span" style="cursor: pointer">
-          {{ title }}
+        <router-link v-slot="{ navigate }" to="/" custom style="cursor: pointer">
+          <span role="link" @click="navigate" @keypress.enter="navigate">
+            {{ title }}
+          </span>
         </router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
