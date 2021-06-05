@@ -43,7 +43,6 @@ router.post('/', authMiddleware, async ({ body }, res) => {
 
   const { user: userId, game: gameId, homeTeamScore, awayTeamScore, scorer } = body;
 
-  console.log('REQ', gameId, userId, homeTeamScore, awayTeamScore, scorer);
   if (
     gameId === undefined ||
     userId === undefined ||

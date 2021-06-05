@@ -9,18 +9,22 @@ const router = Router();
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
 
+  const group = req.query.group;
+  if (!group) {
+    logger.warn("The query parameter 'group' wasn't specified.");
+    return res.status(400).send('Bad request');
+  }
+
   // If req.headers contains the admin key, continue
   if (isAdmin(req)) {
-    next();
-    return;
+    return next();
   }
 
   if (isLoggedIn(req)) {
     const user = req.user as IUser;
     // Only allow users to access Group document of a group they're part of
-    if (user.groupId!.equals(req.params.groupId)) {
-      next();
-      return;
+    if (user.groupId!.equals(group.toString())) {
+      return next();
     }
   }
 
