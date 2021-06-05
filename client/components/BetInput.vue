@@ -31,7 +31,7 @@
           color="primary"
           large
           block
-          :disabled="alreadyStarted || !validScoreInput || this.$nuxt.$loading.show"
+          :disabled="alreadyStarted || !validScoreInput || submited"
           nuxt
           @click="createBet"
         >
@@ -64,6 +64,7 @@ export default Vue.extend({
     homeTeamScore: 0,
     awayTeamScore: 0,
     validScoreInput: true,
+    submited: false,
   }),
   computed: {
     alreadyStarted(): boolean {
@@ -72,6 +73,10 @@ export default Vue.extend({
   },
   methods: {
     createBet() {
+      // Set submited to true, to disable the Submit button and prevent
+      // users from doing multiple clicks and making multiple API calls.
+      this.submited = true;
+
       try {
         this.$axios
           .post('/bets', {
@@ -87,13 +92,12 @@ export default Vue.extend({
               await this.$auth.fetchUser();
             }
           })
-          .catch((err) => {
-            this.$showAlert(err.response.data, 'warning');
+          .catch((error) => {
+            this.$showAlert(error.response.data, 'warning');
           });
       } catch (error) {
         if (error === 'You already placed a bet on this game') {
-          // TODO: Change this!
-          console.log('Already bet');
+          this.$showAlert(error.response.data, 'error');
         }
       }
     },
