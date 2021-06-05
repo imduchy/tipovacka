@@ -1,9 +1,10 @@
-import { Game, Group, IGame, IGroup, IUser, User } from '@duchynko/tipovacka-models';
+import { Game, Group, IGroup, IUser, User } from '@duchynko/tipovacka-models';
+import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
-import { isAdmin } from '../utils/authMiddleware';
+import { isAdmin, validateInput } from '../utils/authMiddleware';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
-import { getLatestSeason, mapStandings, mapTeamStatistics } from '../utils/groups';
+import { mapStandings, mapTeamStatistics } from '../utils/groups';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -13,8 +14,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   // If req.headers contains the admin key, continue
   if (isAdmin(req)) {
-    next();
-    return;
+    return next();
   }
 
   logger.warn(
@@ -80,29 +80,48 @@ router.get('/groups/team/upcoming', authMiddleware, async (req, res) => {
  * @param group ObjectId of the group the user will be part of
  */
 router.post('/users', authMiddleware, async (req, res) => {
-  const { username, email, password } = req.body;
-  const groupId = req.body.group;
+  const { group: groupId, username, email, password } = req.body;
 
   try {
-    logger.info(`Fetching the group ${groupId}.`);
-    const group = await Group.findById(groupId);
-    if (!group) {
-      logger.warn(`Group with _id ${groupId} doesn't exist.`);
-      res.status(404).json("Selected group doesn't exist.");
-      return;
+    logger.info('Validating content of the request body.');
+    // Check if data sent in the request body are valid
+    validateInput(req.body);
+
+    // Check if a user with this email already exist before proceeding
+    const user = await User.findOne({ email });
+    if (user) {
+      logger.warn('User with specified email already exists in the database.');
+      return res.status(400).send('Bad request');
     }
 
-    logger.info('Creating a new user.');
-    const user = await User.create<IUser>({
+    logger.info(`Fetching group with id ${groupId}.`);
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      logger.warn(`The specified group with id ${groupId} doesn't exist.`);
+      return res.status(404).json("The specified resource doesn't exist");
+    }
+
+    logger.info('Hashing the password prior saving it to the database.');
+    const salt = await bcrypt.genSalt();
+    const encryptedPassword = await bcrypt.hash(password, salt);
+
+    logger.info('The group was fetched successfully. Starting to create the new user.');
+    const newUser = await User.create<IUser>({
       username: username,
       email: email,
-      password: password,
+      password: encryptedPassword,
       groupId: groupId,
+    }).then((res) => {
+      // Remove password from the object before returning it in the response
+      const { password, ...user } = res.toObject();
+      return user;
     });
-    logger.info('New user created successfully.');
-    logger.info(JSON.stringify(user));
 
-    res.status(200).json(user);
+    logger.info('The new user was created created successfully.');
+    logger.info(JSON.stringify(newUser));
+
+    res.status(200).json(newUser);
   } catch (error) {
     logger.error(`There was an error creting the user. Error: ${error}.`);
     res.status(500).json('Internal server error');
@@ -184,7 +203,7 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
         );
     }
 
-    const { team, venue } = teamResponse.data.response[0];
+    const { team } = teamResponse.data.response[0];
     const competition = competitionResponse.data.response[0];
     const teamStatistics = statisticsResponse.data.response;
 
@@ -225,13 +244,18 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
     try {
       logger.info('Fetching an upcoming game for the group.');
       const upcomingGame = await findUpcomingGame(body.team, [body.league]);
-      // Group _id needs to be set manually, as that's not known from the API call
-      upcomingGame.groupId = group._id;
 
-      // Save the game in the database, push it into the upcomingGames array,
-      // and save the group object with updated information.
-      const game = await Game.create(upcomingGame);
-      group.upcomingGames.push(game._id);
+      if (upcomingGame) {
+        // Group _id needs to be set manually, as that's not known from the API call
+        upcomingGame.groupId = group._id;
+
+        // Save the game in the database, push it into the upcomingGames array,
+        // and save the group object with updated information.
+        const game = await Game.create(upcomingGame);
+        group.upcomingGames.push(game._id);
+
+        await group.save();
+      }
     } catch (error) {
       logger.error(
         `An error occured while fetching an upcoming game for the group. ` +
@@ -239,8 +263,6 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
       );
       throw error;
     }
-
-    await group.save();
 
     logger.info(`A new group ${group.name} (${group._id}) was created.`);
     res.status(200).json(group);
