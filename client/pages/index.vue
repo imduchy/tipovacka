@@ -65,13 +65,8 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import { BetStatus, IBet, IGame } from '@duchynko/tipovacka-models';
-import BetInput from '../components/BetInput.vue';
-import CurrentBet from '../components/CurrentBet.vue';
-import UpcomingGame from '../components/UpcomingGame.vue';
-import UserBet from '../components/UserBet.vue';
 
 export default Vue.extend({
-  components: { UpcomingGame, BetInput, CurrentBet, UserBet },
   data() {
     return {
       homeTeamScore: 0,
