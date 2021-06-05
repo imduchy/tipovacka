@@ -75,10 +75,11 @@ export default Vue.extend({
       try {
         this.$axios
           .post('/bets', {
-            gameId: this.upcomingGame!._id,
+            game: this.upcomingGame!._id,
             homeTeamScore: this.homeTeamScore,
             awayTeamScore: this.awayTeamScore,
-            userId: this.$auth.user._id,
+            user: this.$auth.user._id,
+            scorer: '', // TODO: Update this!
           })
           .then(async (response) => {
             if (response.status === 200) {

@@ -28,7 +28,7 @@ export default Vue.extend({
       const users = this.$store.state.users as IUser[];
       return users.map((u) => ({
         username: u.username,
-        points: u.totalScore![0].score,
+        points: u.competitionScore![0].score || 0,
         bets: u.bets?.length || 0,
       }));
     },
