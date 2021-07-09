@@ -6,9 +6,6 @@ export default {
    ** See https://nuxtjs.org/api/configuration-target
    */
   target: 'static',
-  server: {
-    port: process.env.PORT || 3000, // default: 3000
-  },
   /*
    ** Headers of the page
    ** See https://nuxtjs.org/api/configuration-head

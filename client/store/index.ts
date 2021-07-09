@@ -1,5 +1,5 @@
 import { IGroup, IUser } from '@duchynko/tipovacka-models';
-import { GetterTree, ActionTree, MutationTree } from 'vuex';
+import { ActionTree, GetterTree, MutationTree } from 'vuex';
 
 export const state = () => ({
   group: {} as IGroup,
