@@ -1,4 +1,4 @@
-import { Group, IUser } from '@duchynko/tipovacka-models';
+import { Group, ICompetition, IUser } from '@duchynko/tipovacka-models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
 import { isAdmin, isLoggedIn } from '../utils/authMiddleware';
@@ -122,7 +122,9 @@ router.get('/competition', authMiddleware, async (req, res) => {
       return res.status(403).json('Invalid value for the group parameter.');
     }
 
-    const aggrResult = await Group.aggregate()
+    // Result of the aggregation pipeline returns a competition object matching
+    // the provided query details
+    const aggrResult = await Group.aggregate<ICompetition>()
       .match({ _id: Types.ObjectId(groupId) })
       .unwind('followedTeams')
       .unwind('followedTeams.seasons')

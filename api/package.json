@@ -21,7 +21,7 @@
     "ts-node-dev": "^1.1.1"
   },
   "dependencies": {
-    "@duchynko/tipovacka-models": "github:Duchynko/tipovacka-models#models-v2",
+    "@duchynko/tipovacka-models": "github:Duchynko/tipovacka-models",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
