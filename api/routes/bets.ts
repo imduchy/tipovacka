@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { IBet, Game, User, IUser } from '@duchynko/tipovacka-models';
+import { IBet, Game, User, IUser, Bet } from '@duchynko/tipovacka-models';
 import { Types } from 'mongoose';
 import { isAdmin, isLoggedIn } from '../utils/authMiddleware';
 import { alreadyBet } from '../utils/bets';
@@ -8,18 +8,18 @@ import logger from '../utils/logger';
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+
   // If req.headers contains the admin key, continue
   if (isAdmin(req)) {
-    next();
-    return;
+    return next();
   }
 
   if (isLoggedIn(req)) {
     const user = req.user as IUser & { _id: Types.ObjectId };
     // Only allow user to create bet if user ids match
-    if (user._id!.equals(req.body.userId)) {
-      next();
-      return;
+    if (user._id.equals(req.body.user)) {
+      return next();
     }
   }
 
@@ -33,48 +33,71 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
 /**
  * Create a bet
- * Access: Authenticated
+ *
+ * Access: Protected (Logged-in & User ids match)
+ *
+ * @param game ObjectId of the game to fetch
  */
 router.post('/', authMiddleware, async ({ body }, res) => {
+  logger.info('Data received in the request body: ' + JSON.stringify(body));
+
+  const { user: userId, game: gameId, homeTeamScore, awayTeamScore, scorer } = body;
+
+  if (
+    gameId === undefined ||
+    userId === undefined ||
+    homeTeamScore === undefined ||
+    awayTeamScore === undefined ||
+    scorer === undefined
+  ) {
+    logger.warn(
+      "The request doesn't contain required request body. The bet won't be submitted."
+    );
+    return res.status(400).send('Bad request');
+  }
+
   try {
-    const user = await User.findById(body.userId);
+    const user = await User.findById(userId);
     if (!user) {
-      logger.warn(`User with _id ${body.userId} doesn't exist.`);
-      res.status(404).json('Something went wrong.');
-      return;
+      logger.warn("The specified user doesn't exist. The bet won't be submitted.");
+      return res.status(404).json("The specified resource doesn't exist");
     }
 
-    if (alreadyBet(user, body.gameId)) {
+    if (alreadyBet(user, gameId)) {
       logger.warn(
-        `User ${body.userId} has already placed a bet on the game ${body.gameId}`
+        "The specified user has already placed a bet on this game. The bet won't be submitted."
       );
-      res.status(400).json('You already placed a bet on this game');
-      return;
+      return res.status(400).json('Bad request');
     }
 
-    const game = await Game.findById(body.gameId);
+    const game = await Game.findById(gameId);
     if (!game) {
-      res.status(404).json('Game not found');
-      return;
+      logger.warn("The specified game doesn't exist. The bet won't be submitted.");
+      return res.status(404).json("The specified resource doesn't exist");
     }
 
+    // Don't submit the bet if the game already started.
     if (new Date().getTime() > game.date.getTime()) {
-      res.status(400).json('Game already started');
-      return;
+      logger.warn("The specified game has already started. The bet won't be submitted.");
+      return res.status(400).json('Bad request');
     }
 
-    user.bets!.addToSet({
-      game: body.gameId,
+    const bet: IBet = {
+      game: gameId,
+      user: userId,
       homeTeamScore: body.homeTeamScore,
       awayTeamScore: body.awayTeamScore,
-    } as IBet);
+      scorer: body.scorer,
+    };
+
+    user.bets.addToSet(bet);
     await user.save();
-    logger.info(`A user ${user._id} submitted a bet on a game ${body.gameId}.`);
+    logger.info(`A user ${user._id} submitted a bet on a game ${gameId}.`);
 
     res.status(200).json(user.bets);
   } catch (error) {
     logger.error(`Couldn't create a bet. Error: ${error}.`);
-    res.status(500).json('An internal error occured');
+    res.status(500).json('Internal error occured');
   }
 });
 

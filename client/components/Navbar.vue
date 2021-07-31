@@ -30,8 +30,10 @@
     <!-- App bar -->
     <v-app-bar app color="primary">
       <v-toolbar-title>
-        <router-link to="/" tag="span" style="cursor: pointer">
-          {{ title }}
+        <router-link v-slot="{ navigate }" to="/" custom style="cursor: pointer">
+          <span role="link" @click="navigate" @keypress.enter="navigate">
+            {{ title }}
+          </span>
         </router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
@@ -90,7 +92,7 @@
   </span>
 </template>
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 export default Vue.extend({
   data: () => ({
     items: [
@@ -110,8 +112,8 @@ export default Vue.extend({
   }),
   methods: {
     async logout() {
-      await this.$auth.logout()
+      await this.$auth.logout();
     },
   },
-})
+});
 </script>

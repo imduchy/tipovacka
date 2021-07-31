@@ -7,6 +7,8 @@ import logger from '../utils/logger';
 const router = express.Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+
   // If req.headers contains the admin key, continue
   if (isAdmin(req)) {
     next();
@@ -15,7 +17,8 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   if (isLoggedIn(req)) {
     const user = req.user as IUser & { _id: Types.ObjectId };
-    // Only allow user to access his own User object
+    // Allow users to only access their own User document.
+    // E.g., Alice can't fetch Bob's User document
     if (user._id!.equals(req.params.userId)) {
       next();
       return;
@@ -32,24 +35,30 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
 /**
  * Get a user
- * Access: Protected
+ *
+ * Access: Protected (Logged-in & Requests its own user object)
+ *
+ * @param user ObjectId of the user to fetch
  */
-router.get('/:userId', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
+  const userId = req.query.user;
+
   try {
-    const user = await User.findById(req.params.userId).populate({
+    const user = await User.findById(userId).populate({
       path: 'bets',
       model: 'bet',
       populate: { path: 'game', model: 'game' },
     });
+
     if (!user) {
-      logger.warn(`User with _id ${req.params.userId} doesn't exist.`);
-      res.status(404).json("We couldn't find this user");
+      logger.warn(`User with _id ${userId} doesn't exist.`);
+      res.status(404).json("The specified user doesn't exist.");
       return;
     }
 
     res.status(200).json(user);
   } catch (error) {
-    logger.error(`Couldn't fetch a user ${req.params.userId}. Error: ${error}.`);
+    logger.error(`Couldn't fetch a user with id ${userId}. Error: ${error}.`);
     res.status(500).json('Internal server error');
   }
 });

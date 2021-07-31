@@ -7,6 +7,8 @@ import logger from '../utils/logger';
 const router = express.Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+
   // If req.headers contains the admin key, continue
   if (isAdmin(req) || isLoggedIn(req)) {
     next();
@@ -22,21 +24,26 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 };
 
 /**
- * Get game by id
- * Access: Private
+ * Get a game
+ *
+ * Access: Protected (Logged-in)
+ *
+ * @param game ObjectId of the game to fetch
  */
-router.get('/:gameId', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
+  const gameId = req.query.game;
+
   try {
-    const game = await Game.findById(req.params.gameId);
+    const game = await Game.findById(gameId);
     if (!game) {
-      logger.warn(`Game with _id ${req.params.gameId} doesn't exist.`);
-      res.status(404).json("We couldn't find this game");
+      logger.warn(`Game with _id ${gameId} doesn't exist.`);
+      res.status(404).json("The specified game doesn't exist.");
       return;
     }
 
     res.status(200).json(game);
   } catch (error) {
-    logger.error(`Couldn't fetch a game ${req.params.gameId}. Error: ${error}`);
+    logger.error(`Couldn't fetch a game with id ${gameId}. Error: ${error}`);
     res.status(500).json('Internal server error');
   }
 });

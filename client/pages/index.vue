@@ -62,50 +62,45 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapGetters } from 'vuex'
-import { BetStatus, IBet, IGame } from '@duchynko/tipovacka-models'
-import BetInput from '../components/BetInput.vue'
-import CurrentBet from '../components/CurrentBet.vue'
-import UpcomingGame from '../components/UpcomingGame.vue'
-import UserBet from '../components/UserBet.vue'
+import Vue from 'vue';
+import { mapGetters } from 'vuex';
+import { BetStatus, IBet, IGame } from '@duchynko/tipovacka-models';
 
 export default Vue.extend({
-  components: { UpcomingGame, BetInput, CurrentBet, UserBet },
   data() {
     return {
       homeTeamScore: 0,
       awayTeamScore: 0,
       validScoreInput: true,
-    }
+    };
   },
   computed: {
     ...mapGetters({
       upcomingGame: 'upcomingGame',
     }),
     alreadyStarted(): boolean {
-      return new Date().getTime() > new Date(this.upcomingGame.date).getTime()
+      return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
     },
     usersBets(): IBet[] {
-      return this.$auth.user.bets
+      return this.$auth.user.bets;
     },
     alreadyBet(): boolean {
-      const upcomingGame = this.upcomingGame._id
+      const upcomingGame = this.upcomingGame._id;
       if (this.usersBets !== undefined) {
         return this.usersBets.some(
           (bet: IBet) => (bet.game as IGame & { _id: string })._id === upcomingGame
-        )
+        );
       }
-      return false
+      return false;
     },
     evaluatedBets(): IBet[] {
-      const bets: IBet[] = this.$auth.user.bets
+      const bets: IBet[] = this.$auth.user.bets;
       if (bets) {
         // TODO: Optimize to shortcut after finding first (last) 3 items
-        return bets.filter((b) => b.status === BetStatus.EVALUATED).reverse()
+        return bets.filter((b) => b.status === BetStatus.EVALUATED).reverse();
       }
-      return []
+      return [];
     },
   },
-})
+});
 </script>

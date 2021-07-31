@@ -20,18 +20,18 @@
   </v-row>
 </template>
 <script lang="ts">
-import { IUser } from '@duchynko/tipovacka-models'
-import Vue from 'vue'
+import { IUser } from '@duchynko/tipovacka-models';
+import Vue from 'vue';
 export default Vue.extend({
   computed: {
     users() {
-      const users = this.$store.state.users as IUser[]
+      const users = this.$store.state.users as IUser[];
       return users.map((u) => ({
         username: u.username,
-        points: u.totalScore![0].score,
+        points: u.competitionScore![0].score || 0,
         bets: u.bets?.length || 0,
-      }))
+      }));
     },
   },
-})
+});
 </script>

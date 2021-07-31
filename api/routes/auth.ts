@@ -10,6 +10,8 @@ import { validateInput, isLoggedIn } from '../utils/authMiddleware';
 const router = express.Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+
   // If req.headers contains the admin key, continue
   if (isLoggedIn(req)) {
     next();
@@ -52,43 +54,43 @@ router.post('/login', passport.authenticate('local'), function (req, res) {
   res.status(200).send(req.user);
 });
 
-router.post('/register', async (req, res) => {
-  const { username, email, password, groupId } = req.body;
+// router.post('/register', async (req, res) => {
+//   const { username, email, password, groupId } = req.body;
 
-  try {
-    validateInput(req.body);
+//   try {
+//     validateInput(req.body);
 
-    const user = await User.findOne({ email });
-    if (user) {
-      res.status(400).send('User with this email already exists');
-      return;
-    }
+//     const user = await User.findOne({ email });
+//     if (user) {
+//       res.status(400).send('User with this email already exists');
+//       return;
+//     }
 
-    const salt = await bcrypt.genSalt();
-    const encryptedPassword = await bcrypt.hash(password, salt);
+//     const salt = await bcrypt.genSalt();
+//     const encryptedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = await User.create({
-      email,
-      username,
-      groupId,
-      password: encryptedPassword,
-    });
-    logger.info(
-      `A new user ${newUser.email} (${newUser._id}) has been created in group ${newUser.groupId}`
-    );
+//     const newUser = await User.create({
+//       email,
+//       username,
+//       groupId,
+//       password: encryptedPassword,
+//     });
+//     logger.info(
+//       `A new user ${newUser.email} (${newUser._id}) has been created in group ${newUser.groupId}`
+//     );
 
-    res.status(200).send(newUser);
-  } catch (error) {
-    if (error instanceof (ValidationError || PropertyRequiredError)) {
-      // Logging handled in validateInput
-      res.status(400).send(error.message);
-    } else {
-      logger.error(`Error while registering a user.`);
-      logger.error(`Error: ${error}.`);
-      res.status(500).send('Internal error');
-    }
-  }
-});
+//     res.status(200).send(newUser);
+//   } catch (error) {
+//     if (error instanceof (ValidationError || PropertyRequiredError)) {
+//       // Logging handled in validateInput
+//       res.status(400).send(error.message);
+//     } else {
+//       logger.error(`Error while registering a user.`);
+//       logger.error(`Error: ${error}.`);
+//       res.status(500).send('Internal error');
+//     }
+//   }
+// });
 
 router.post('/password', authMiddleware, async (req, res) => {
   const { oldPassword, newPassword, confirmedPassword } = req.body;

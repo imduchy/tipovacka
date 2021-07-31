@@ -9,6 +9,7 @@ import { getFixture } from './footballApi';
  *
  * @param teamId teamId (id returned from API) of a team
  * @param leagueIds list of leagueIds (ids returned from API)
+ * @param amountOfGames number of upcoming games to fetch from the API
  * @returns an upcoming game for a specified team
  */
 export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
@@ -32,14 +33,16 @@ export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
     throw error;
   }
 
+  if (upcomingGames.length === 0) {
+    return undefined;
+  }
+
   upcomingGames.sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
-  logger.info(`
-    Sorted upcoming games in selected leagues for team ${teamId}.
-    The upcoming game is ${upcomingGames[0].gameId}.
-  `);
+  logger.info(`Sorted upcoming games in the selected leagues for team ${teamId}.`);
+  logger.info(`The upcoming game is ${upcomingGames[0].gameId}.`);
 
   return upcomingGames[0];
 };
@@ -89,7 +92,6 @@ const responseMapping = (response: FixtureResponse.Response): IGame => {
   return {
     date: new Date(fixture.date),
     gameId: fixture.id,
-    groupId: Types.ObjectId(''), // This is just a placeholder
     competitionId: league.id,
     competitionName: league.name,
     awayTeam: {

@@ -1,7 +1,6 @@
 import { exportModels } from '@duchynko/tipovacka-models';
-import bodyParser from 'body-parser';
 import connectMongo from 'connect-mongo';
-import express from 'express';
+import express, { json, urlencoded } from 'express';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import passport from 'passport';
@@ -65,8 +64,8 @@ app.use(
   })
 );
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(urlencoded({ extended: false }));
+app.use(json());
 
 app.use(passport.initialize());
 app.use(passport.session());

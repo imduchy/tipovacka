@@ -11,3 +11,18 @@ export class PropertyRequiredError extends Error {
     this.name = 'PropertyRequiredError';
   }
 }
+
+export class FootballApiResponseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'FootballApiResponseError';
+  }
+}
+
+export class NoResultsInApiResponseError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    Object.setPrototypeOf(this, NoResultsInApiResponseError.prototype);
+  }
+}

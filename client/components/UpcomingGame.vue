@@ -58,8 +58,8 @@
 </template>
 
 <script lang="ts">
-import { IGame } from '@duchynko/tipovacka-models'
-import Vue, { PropType } from 'vue'
+import { IGame } from '@duchynko/tipovacka-models';
+import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
     upcomingGame: {
@@ -73,14 +73,14 @@ export default Vue.extend({
       return new Date(this.upcomingGame.date).toLocaleDateString('sk-SK', {
         month: 'long',
         day: 'numeric',
-      })
+      });
     },
     formatedTime(): string {
       return new Date(this.upcomingGame.date).toLocaleTimeString('sk-SK', {
         hour: '2-digit',
         minute: '2-digit',
-      })
+      });
     },
   },
-})
+});
 </script>
