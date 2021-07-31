@@ -18,3 +18,11 @@ export class FootballApiResponseError extends Error {
     this.name = 'FootballApiResponseError';
   }
 }
+
+export class NoResultsInApiResponseError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    Object.setPrototypeOf(this, NoResultsInApiResponseError.prototype);
+  }
+}

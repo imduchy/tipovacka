@@ -4,7 +4,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { isAdmin, validateInput } from '../utils/authMiddleware';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
-import { mapStandings, mapTeamStatistics } from '../utils/groups';
+import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -28,10 +28,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 };
 
 /**
- * @warning This endpoint is not fully implemented!
- * @note This endpoint should be used only for testing!
- *
- * Manually fetch upcoming games for a specified group.
+ * Enroll a group in a competition
  *
  * Access: Admin
  *
@@ -39,32 +36,70 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  * @param team an API ID of the followed team for which upcoming games should be fetched
  * @param amount number of upcoming games that should be fetched (e.g., next 3 games of the team)
  */
-router.get('/groups/team/upcoming', authMiddleware, async (req, res) => {
+router.post('/groups/competition', authMiddleware, async (req, res) => {
   const groupId: string = req.body.group;
   const teamId: number = req.body.team;
-  const amountOfGames: number = req.body.amount;
+  const season: number = req.body.season;
+  const competitionId: number = req.body.competition;
 
   try {
-    // const group = await Group.findById(groupId).populate('upcomingGames');
-    // if (!group) {
-    //   throw new Error(`Group with id ${groupId} doesn't exist.`);
-    // }
+    logger.info('Fetching the group with id ' + groupId);
+    const group = await Group.findById(groupId);
+    if (!group) {
+      throw new Error(`Group with id ${groupId} doesn't exist.`);
+    }
 
-    // const team = group.followedTeams.find((t) => t.apiId === teamId);
-    // if (!team) {
-    //   throw new Error(
-    //     `The group ${group.name} doesn't follow a team with the API id ${teamId}.`
-    //   );
-    // }
+    logger.info('Finding the team with id ' + teamId + 'in the group record.');
+    const team = group.followedTeams.find((t) => t.apiId === teamId);
+    if (!team) {
+      throw new Error(
+        `The group ${group.name} doesn't follow a team with the API id ${teamId}.`
+      );
+    }
 
-    // const latestSeason = getLatestSeason(team);
-    // const competitionIds = latestSeason.competitions.map((c) => c.apiId);
+    // The API doesn't track competition standings before the season starts.
+    // Therefore, we don't fetch that information and initialize the standings
+    // field as an empty array. To get information about the leage, we fetch
+    // information from the /league endpoint.
+    logger.info('Fetching the league information from the API.');
+    const leagueResponse = await FootballApi.getLeagues({
+      id: competitionId,
+      season: season,
+    });
 
-    // // TODO: Update findUpcomingGame to fetch specific number of upcoming games.
-    // const newUpcomingGame = await findUpcomingGame(teamId, competitionIds);
+    logger.info('Fetching the players information from the API.');
+    const playersResponse = await FootballApi.getPlayers({
+      league: competitionId,
+      season: season,
+      team: teamId,
+    });
 
-    res.status(500).json('Endpoint not implemented.');
+    const league = leagueResponse.data.response[0].league;
+    const seasonObj = {
+      season: season,
+      competitions: [
+        {
+          apiId: league.id,
+          name: league.name,
+          logo: league.logo,
+          standings: [],
+          teamStatistics: undefined,
+          players: mapPlayers(playersResponse.data.response),
+        },
+      ],
+    };
+
+    logger.info('Pushing the new season and competition object to the group record.');
+    team.seasons.push(seasonObj);
+
+    logger.info('Saving the updated group object to the database.');
+    await group.save();
+
+    res.status(200).json(seasonObj);
   } catch (error) {
+    logger.error(
+      `An error occured while enrolling a group in a new competition. Error: ${error.message}`
+    );
     res.status(400).json(error.message);
   }
 });
@@ -227,9 +262,9 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
               competitions: [
                 {
                   apiId: body.league,
-                  games: [],
                   logo: competition.league.logo,
                   name: competition.league.name,
+                  games: [],
                   players: [],
                   standings: mapStandings(competition),
                   teamStatistics: mapTeamStatistics(teamStatistics),
@@ -246,9 +281,6 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
       const upcomingGame = await findUpcomingGame(body.team, [body.league]);
 
       if (upcomingGame) {
-        // Group _id needs to be set manually, as that's not known from the API call
-        upcomingGame.groupId = group._id;
-
         // Save the game in the database, push it into the upcomingGames array,
         // and save the group object with updated information.
         const game = await Game.create(upcomingGame);

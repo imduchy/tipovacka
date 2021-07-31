@@ -1,5 +1,7 @@
 import {
+  IPlayer,
   ITeamStatistics,
+  PlayersResponse,
   StandingsResponse,
   TeamStatisticsResponse,
 } from '@duchynko/tipovacka-models';
@@ -71,5 +73,45 @@ export function mapStandings(
     rank: s.rank,
     goalsAgainst: s.all.goals.against,
     goalsFor: s.all.goals.for,
+  }));
+}
+
+export function mapPlayers(response: PlayersResponse.Response[]): IPlayer[] {
+  return response.map((r) => ({
+    name: r.player.name,
+    firstName: r.player.firstname,
+    lastName: r.player.lastname,
+    age: r.player.age,
+    injured: r.player.injured,
+    photo: r.player.photo,
+    statistics: {
+      games: {
+        captain: r.statistics[0].games.captain,
+        appearences: r.statistics[0].games.appearences
+          ? r.statistics[0].games.appearences
+          : undefined,
+        lineups: r.statistics[0].games.lineups
+          ? r.statistics[0].games.lineups
+          : undefined,
+        minutes: r.statistics[0].games.minutes
+          ? r.statistics[0].games.minutes
+          : undefined,
+        number: r.statistics[0].games.number ? r.statistics[0].games.number : undefined,
+        position: r.statistics[0].games.position,
+        rating: r.statistics[0].games.rating
+          ? Number.parseFloat(r.statistics[0].games.rating)
+          : undefined,
+      },
+      goals: {
+        assists: r.statistics[0].goals.assists
+          ? r.statistics[0].goals.assists
+          : undefined,
+        conceded: r.statistics[0].goals.conceded
+          ? r.statistics[0].goals.conceded
+          : undefined,
+        saves: r.statistics[0].goals.saves ? r.statistics[0].goals.saves : undefined,
+        total: r.statistics[0].goals.total ? r.statistics[0].goals.total : undefined,
+      },
+    },
   }));
 }
