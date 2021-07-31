@@ -34,7 +34,7 @@
           outlined
           label="Strelec gólu"
         >
-          <template v-slot:item="{ item, on, attrs }">
+          <template #item="{ item, on, attrs }">
             <v-list-item v-bind="attrs" v-on="on">
               <v-list-item-avatar>
                 <v-img :src="item.photo"></v-img>
@@ -78,16 +78,6 @@ export default Vue.extend({
       default: {} as IGame & { _id: string },
     },
   },
-  async fetch() {
-    this.competition = await this.$axios.$get('/groups/competition', {
-      params: {
-        group: this.upcomingGame.groupId,
-        team: this.followedTeam.apiId,
-        season: this.upcomingGame.season,
-        competition: this.upcomingGame.competitionId,
-      },
-    });
-  },
   data() {
     return {
       inputRules: {
@@ -107,6 +97,16 @@ export default Vue.extend({
       submited: false,
     };
   },
+  async fetch() {
+    this.competition = await this.$axios.$get('/groups/competition', {
+      params: {
+        group: this.upcomingGame.groupId,
+        team: this.followedTeam.apiId,
+        season: this.upcomingGame.season,
+        competition: this.upcomingGame.competitionId,
+      },
+    });
+  },
   computed: {
     alreadyStarted(): boolean {
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
@@ -115,7 +115,9 @@ export default Vue.extend({
       return this.competition.players
         ? this.competition.players
             .filter((p) => p.statistics.games.position !== 'Goalkeeper')
-            .sort((a, b) => b.statistics.goals.total - a.statistics.goals.total)
+            .sort(
+              (a, b) => (b.statistics.goals.total || 0) - (a.statistics.goals.total || 0)
+            )
         : [];
     },
   },
