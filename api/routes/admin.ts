@@ -238,9 +238,30 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
         );
     }
 
+    logger.info("Fetching team's players from the API.");
+    const playersResponse = await FootballApi.getPlayers({
+      league: body.league,
+      team: body.team,
+      season: body.season,
+    });
+    logger.info(JSON.stringify(playersResponse.data));
+
+    if (playersResponse.data.results === 0) {
+      logger.error(
+        'The players response object contains 0 results. Make sure that the ' +
+          'request body contains correct values.'
+      );
+      return res
+        .status(404)
+        .json(
+          "Team's players not found. Make sure the request body contains correct values."
+        );
+    }
+
     const { team } = teamResponse.data.response[0];
     const competition = competitionResponse.data.response[0];
     const teamStatistics = statisticsResponse.data.response;
+    const players = playersResponse.data.response;
 
     logger.info(
       'Data fetched successfully. Creating a new group document in the database.'
@@ -265,7 +286,7 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
                   logo: competition.league.logo,
                   name: competition.league.name,
                   games: [],
-                  players: [],
+                  players: mapPlayers(players),
                   standings: mapStandings(competition),
                   teamStatistics: mapTeamStatistics(teamStatistics),
                 },
