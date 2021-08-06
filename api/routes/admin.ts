@@ -303,7 +303,7 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
 
       if (upcomingGame) {
         // Save the game in the database, push it into the upcomingGames array,
-        // and save the group object with updated information.
+        // and save the group object with updated information .
         const game = await Game.create(upcomingGame);
         group.upcomingGames.push(game._id);
 
