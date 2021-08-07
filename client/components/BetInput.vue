@@ -100,7 +100,7 @@ export default Vue.extend({
   async fetch() {
     this.competition = await this.$axios.$get('/groups/competition', {
       params: {
-        group: this.upcomingGame.groupId,
+        group: this.$store.state.group._id,
         team: this.followedTeam.apiId,
         season: this.upcomingGame.season,
         competition: this.upcomingGame.competitionId,
