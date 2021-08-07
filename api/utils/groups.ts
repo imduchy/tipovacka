@@ -64,7 +64,7 @@ export function mapStandings(
     teamName: s.team.name,
     teamLogo: s.team.logo,
     description: s.description != null ? s.description : '',
-    form: s.form,
+    form: s.form != null ? s.form : '',
     played: s.all.played,
     won: s.all.win,
     lost: s.all.lose,
