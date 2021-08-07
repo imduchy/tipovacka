@@ -1,6 +1,6 @@
-import CurrentBet from '../../components/CurrentBet'
-import { renderWithVuetify } from '../setup'
-import '@testing-library/jest-dom'
+import CurrentBet from '../../components/CurrentBet';
+import { renderWithVuetify } from '../setup';
+import '@testing-library/jest-dom';
 
 test('input fields display scores from a bet', () => {
   const { getByLabelText } = renderWithVuetify(CurrentBet, {
@@ -10,13 +10,13 @@ test('input fields display scores from a bet', () => {
     mocks: {
       $auth: mockAuth,
     },
-  })
-  const homeTeamInpt = getByLabelText(mockUpcomingGame.homeTeam.name + ' skóre')
-  const awayTeamInpt = getByLabelText(mockUpcomingGame.awayTeam.name + ' skóre')
+  });
+  const homeTeamInpt = getByLabelText(mockUpcomingGame.homeTeam.name + ' skóre');
+  const awayTeamInpt = getByLabelText(mockUpcomingGame.awayTeam.name + ' skóre');
 
-  expect(homeTeamInpt).toHaveDisplayValue('2')
-  expect(awayTeamInpt).toHaveDisplayValue('1')
-})
+  expect(homeTeamInpt).toHaveDisplayValue('2');
+  expect(awayTeamInpt).toHaveDisplayValue('1');
+});
 
 test('input fields should be disabled', () => {
   const { getByLabelText } = renderWithVuetify(CurrentBet, {
@@ -26,15 +26,15 @@ test('input fields should be disabled', () => {
     mocks: {
       $auth: mockAuth,
     },
-  })
-  const homeTeamInpt = getByLabelText(mockUpcomingGame.homeTeam.name + ' skóre')
-  const awayTeamInpt = getByLabelText(mockUpcomingGame.awayTeam.name + ' skóre')
+  });
+  const homeTeamInpt = getByLabelText(mockUpcomingGame.homeTeam.name + ' skóre');
+  const awayTeamInpt = getByLabelText(mockUpcomingGame.awayTeam.name + ' skóre');
 
-  expect(homeTeamInpt).toBeDisabled()
-  expect(awayTeamInpt).toBeDisabled()
-})
+  expect(homeTeamInpt).toBeDisabled();
+  expect(awayTeamInpt).toBeDisabled();
+});
 
-const date = new Date('February 19, 2050 12:10:00')
+const date = new Date('February 19, 2050 12:10:00');
 
 const mockUpcomingGame = {
   _id: '5f00000000000000000000',
@@ -43,7 +43,7 @@ const mockUpcomingGame = {
   awayTeamScore: 0,
   homeTeam: { name: 'Real Madrid' },
   awayTeam: { name: 'Barcelona' },
-}
+};
 
 const mockAuth = {
   user: {
@@ -61,4 +61,4 @@ const mockAuth = {
       { game: { _id: '5f00000000000000000004' } },
     ],
   },
-}
+};
