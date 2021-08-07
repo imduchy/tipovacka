@@ -20,7 +20,7 @@ export function mapTeamStatistics(
   response: TeamStatisticsResponse.Response
 ): ITeamStatistics {
   return {
-    form: response.form,
+    form: response.form != null ? response.form : '',
     cleanSheet: response.clean_sheet,
     draws: response.fixtures.draws,
     played: response.fixtures.played,
