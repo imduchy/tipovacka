@@ -30,12 +30,13 @@
               </v-card>
             </v-col>
           </v-row>
+
           <!-- Last bets -->
           <div class="mt-5 text-h5">
             Posledné tipy
 
             <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
                   mdi-information-outline
                 </v-icon>
@@ -44,7 +45,7 @@
             </v-tooltip>
           </div>
 
-          <v-row>
+          <v-row class="mt-0">
             <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
               <user-bet :bet="evaluatedBets[0]"></user-bet>
             </v-col>

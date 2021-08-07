@@ -1,11 +1,11 @@
 <template>
   <v-card data-testid="user-bet">
-    <v-row align="center">
-      <v-col cols="4" align="center">
+    <v-row align="center" class="no-gutters">
+      <v-col cols="4" align="center" class="py-5">
         <v-img alt="home team logo" :src="homeTeam.logo" width="70px"></v-img
       ></v-col>
-      <v-col cols="4" align="center">
-        <v-row justify="center">
+      <v-col cols="4" align="center" justify="center">
+        <v-row justify="center" class="no-gutters">
           <div class="text-h6 font-weight-light grey--text pr-2">
             ({{ bet.homeTeamScore }})
           </div>
@@ -16,22 +16,26 @@
             ({{ bet.awayTeamScore }})
           </div>
         </v-row>
-        <v-row justify="center" align="center" class="pa-3">
-          <v-col cols="12" class="pa-0">
+        <v-row class="no-gutters">
+          <v-col cols="12">
             <div class="text-caption font-weight-light">
               {{ formatedDate }}
             </div>
           </v-col>
-          <v-col cols="12" class="pa-0">
+          <v-col cols="12">
             <div class="text-caption font-weight-bold">{{ formatedTime }}</div>
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="4" align="center">
+      <v-col cols="4" align="center" class="py-5">
         <v-img alt="away team logo" :src="awayTeam.logo" width="70px"></v-img
       ></v-col>
     </v-row>
-    <v-progress-linear :color="resultColor" value="100"></v-progress-linear>
+    <v-row class="no-gutters">
+      <v-col>
+        <v-progress-linear :color="resultColor" value="100"></v-progress-linear>
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 
