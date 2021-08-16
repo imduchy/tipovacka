@@ -14,6 +14,7 @@
         mobile-breakpoint="0"
         class="elevation-1"
         :footer-props="{
+          itemsPerPageOptions: [10, 20, 30, -1],
           itemsPerPageAllText: 'Všetky',
           itemsPerPageText: 'Riadky na stranu',
         }"
