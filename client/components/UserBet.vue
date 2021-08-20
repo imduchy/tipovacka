@@ -17,6 +17,16 @@
           </div>
         </v-row>
         <v-row class="no-gutters">
+          <v-col
+            cols="12"
+            :class="[
+              'font-weight-light',
+              'grey--text',
+              guessedRightScorer ? '' : 'text-decoration-line-through',
+            ]"
+          >
+            ({{ bet.scorer }})
+          </v-col>
           <v-col cols="12">
             <div class="text-caption font-weight-light">
               {{ formatedDate }}
@@ -41,6 +51,10 @@
 
 <script lang="ts">
 import { IBet, IGame, ITeam } from '@duchynko/tipovacka-models';
+import {
+  FixtureEventDetail,
+  FixtureEventType,
+} from '@duchynko/tipovacka-models/lib/models/Enums';
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
@@ -73,6 +87,15 @@ export default Vue.extend({
     },
   },
   methods: {
+    guessedRightScorer(bet: IBet): boolean {
+      const game = bet.game as IGame;
+      const goals = game.events?.filter(
+        (g) =>
+          g.type === FixtureEventType.GOAL && g.detail === FixtureEventDetail.NORMAL_GOAL
+      );
+
+      return goals?.some((g) => g.playerName === bet.scorer) || false;
+    },
     getResultColor(bet: IBet) {
       const game = bet.game as IGame;
       if (
