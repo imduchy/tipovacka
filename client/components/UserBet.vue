@@ -22,7 +22,7 @@
             :class="[
               'font-weight-light',
               'grey--text',
-              guessedRightScorer ? '' : 'text-decoration-line-through',
+              correctScorer ? '' : 'text-decoration-line-through',
             ]"
           >
             ({{ bet.scorer }})
@@ -51,10 +51,7 @@
 
 <script lang="ts">
 import { IBet, IGame, ITeam } from '@duchynko/tipovacka-models';
-import {
-  FixtureEventDetail,
-  FixtureEventType,
-} from '@duchynko/tipovacka-models/lib/models/Enums';
+import { FixtureEventDetail } from '@duchynko/tipovacka-models/lib/models/Enums';
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
@@ -85,17 +82,16 @@ export default Vue.extend({
     resultColor(): string {
       return this.getResultColor(this.bet);
     },
+    correctScorer(): boolean {
+      const game = this.bet.game as IGame;
+      return (
+        game.events
+          ?.filter((event) => event.detail === FixtureEventDetail.NORMAL_GOAL)
+          .some((goal) => goal.playerName === this.bet.scorer) || false
+      );
+    },
   },
   methods: {
-    guessedRightScorer(bet: IBet): boolean {
-      const game = bet.game as IGame;
-      const goals = game.events?.filter(
-        (g) =>
-          g.type === FixtureEventType.GOAL && g.detail === FixtureEventDetail.NORMAL_GOAL
-      );
-
-      return goals?.some((g) => g.playerName === bet.scorer) || false;
-    },
     getResultColor(bet: IBet) {
       const game = bet.game as IGame;
       if (
