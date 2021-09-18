@@ -1,0 +1,11 @@
+{
+  "name": "@duchynko/tipovacka-utilities",
+  "version": "1.0.0",
+  "description": "Utilities and shared logic for the project",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Jakub Duchon",
+  "license": "ISC"
+}

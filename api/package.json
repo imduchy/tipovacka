@@ -1,5 +1,5 @@
 {
-  "name": "tipovacka-api",
+  "name": "@duchynko/tipovacka-api",
   "version": "1.0.0",
   "description": "Express API for Tipovacka application",
   "main": "index.js",
@@ -21,8 +21,6 @@
     "ts-node-dev": "^1.1.1"
   },
   "dependencies": {
-    "@duchynko/tipovacka-models": "^1.6.0",
-    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "connect-mongo": "^3.2.0",
