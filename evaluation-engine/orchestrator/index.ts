@@ -15,6 +15,7 @@ interface EvaluateBetsResult {
 }
 
 const orchestrator = df.orchestrator(function* (context) {
+  // groups = yield JSON.parse(context.df.callActivity(get-groups))
   const updateGameResult: UpdateGameResult = JSON.parse(
     yield context.df.callActivity('update-game')
   );
@@ -26,9 +27,18 @@ const orchestrator = df.orchestrator(function* (context) {
         game: updateGameResult.game,
       })
     );
+
+    const upcomingGameResult = JSON.parse(
+      yield context.df.callActivity('get-uppcoming-game', {
+        groupId: evaluateBetsResult.groupId,
+      })
+    );
   } else if (updateGameResult.returnCode === ReturnCodes.POSTPONED_AND_UPDATED) {
-    // yield context.df.callActivity('get-uppcoming-game', {
-    // })
+    const upcomingGameResult = JSON.parse(
+      yield context.df.callActivity('get-uppcoming-game', {
+        groupId: updateGameResult.groupId,
+      })
+    );
   }
 
   return updateGameResult;
