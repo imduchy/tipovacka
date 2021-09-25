@@ -25,8 +25,16 @@
             <v-col cols="12" class="pt-0">
               <v-card class="pt-8 px-8">
                 <!-- Input field / Current bet -->
-                <bet-input v-if="!alreadyBet" :upcoming-game="upcomingGame"></bet-input>
-                <current-bet v-else :upcoming-game="upcomingGame"></current-bet>
+                <bet-input
+                  v-if="!alreadyBet"
+                  :upcoming-game="upcomingGame"
+                  :players="players"
+                ></bet-input>
+                <current-bet
+                  v-else
+                  :upcoming-game="upcomingGame"
+                  :players="players"
+                ></current-bet>
               </v-card>
             </v-col>
           </v-row>
@@ -65,7 +73,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
-import { BetStatus, IBet, IGame } from '@duchynko/tipovacka-models';
+import {
+  BetStatus,
+  IBet,
+  ICompetition,
+  IGame,
+  IPlayer,
+} from '@duchynko/tipovacka-models';
 
 export default Vue.extend({
   data() {
@@ -73,12 +87,33 @@ export default Vue.extend({
       homeTeamScore: 0,
       awayTeamScore: 0,
       validScoreInput: true,
+      competition: {} as ICompetition,
+      followedTeam: this.$store.state.group.followedTeams[0],
     };
+  },
+  async fetch() {
+    this.competition = await this.$axios.$get('/groups/competition', {
+      params: {
+        group: this.$store.state.group._id,
+        team: this.followedTeam.apiId,
+        season: this.upcomingGame.season,
+        competition: this.upcomingGame.competitionId,
+      },
+    });
   },
   computed: {
     ...mapGetters({
       upcomingGame: 'upcomingGame',
     }),
+    players(): IPlayer[] {
+      return this.competition.players
+        ? (this.competition.players as IPlayer[])
+            .filter((p) => p.statistics.games.position !== 'Goalkeeper')
+            .sort(
+              (a, b) => (b.statistics.goals.total || 0) - (a.statistics.goals.total || 0)
+            )
+        : [];
+    },
     alreadyStarted(): boolean {
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
     },
@@ -102,6 +137,11 @@ export default Vue.extend({
       }
       return [];
     },
+  },
+  activated() {
+    if (this.$fetchState.timestamp <= Date.now() - 30000) {
+      this.$fetch();
+    }
   },
 });
 </script>

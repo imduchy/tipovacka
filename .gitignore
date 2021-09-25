@@ -1,8 +1,9 @@
 # Dependency directories
 node_modules/
 
-# dotenv environment variables file
+# environment variables file
 .env
+local.settings.json
 
 # nuxt.js build output
 .nuxt

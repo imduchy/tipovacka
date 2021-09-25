@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" v-model="validScoreInput" data-testid="bet-input">
+  <v-form ref="form" v-model="validInput" data-testid="bet-input">
     <v-row>
       <v-col cols="6">
         <v-text-field
@@ -30,8 +30,10 @@
           v-model="scorer"
           :items="players"
           item-text="name"
+          item-value="apiId"
           :menu-props="{ top: true, offsetY: true }"
           outlined
+          return-object
           label="Strelec gólu"
         >
           <template #item="{ item, on, attrs }">
@@ -57,9 +59,8 @@
           color="primary"
           large
           block
-          :disabled="alreadyStarted || !validScoreInput || submited"
-          nuxt
-          @click="createBet"
+          :disabled="alreadyStarted || !validInput || submited"
+          @click="submitBet"
         >
           Odoslať tip
         </v-btn>
@@ -69,13 +70,17 @@
 </template>
 
 <script lang="ts">
-import { ICompetition, IGame, IPlayer } from '@duchynko/tipovacka-models';
+import { IGame, IPlayer } from '@duchynko/tipovacka-models';
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
     upcomingGame: {
       type: Object as PropType<IGame & { _id: string }>,
       default: {} as IGame & { _id: string },
+    },
+    players: {
+      type: Array as PropType<IPlayer[]>,
+      default: [] as IPlayer[],
     },
   },
   data() {
@@ -88,41 +93,20 @@ export default Vue.extend({
           (Number.isInteger(parseInt(value)) && parseInt(value) < 100) ||
           'Skóre môže byť v rozsahu od 0 do 99',
       },
-      validScoreInput: true,
-      followedTeam: this.$store.state.group.followedTeams[0],
-      competition: {} as ICompetition,
+      validInput: true,
       homeTeamScore: 0,
       awayTeamScore: 0,
-      scorer: '',
+      scorer: {} as IPlayer,
       submited: false,
     };
-  },
-  async fetch() {
-    this.competition = await this.$axios.$get('/groups/competition', {
-      params: {
-        group: this.$store.state.group._id,
-        team: this.followedTeam.apiId,
-        season: this.upcomingGame.season,
-        competition: this.upcomingGame.competitionId,
-      },
-    });
   },
   computed: {
     alreadyStarted(): boolean {
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
     },
-    players(): IPlayer[] {
-      return this.competition.players
-        ? this.competition.players
-            .filter((p) => p.statistics.games.position !== 'Goalkeeper')
-            .sort(
-              (a, b) => (b.statistics.goals.total || 0) - (a.statistics.goals.total || 0)
-            )
-        : [];
-    },
   },
   methods: {
-    createBet() {
+    submitBet() {
       // Set submited to true, to disable the Submit button and prevent
       // users from doing multiple clicks and making multiple API calls.
       this.submited = true;
@@ -134,7 +118,7 @@ export default Vue.extend({
             homeTeamScore: this.homeTeamScore,
             awayTeamScore: this.awayTeamScore,
             user: this.$auth.user._id,
-            scorer: this.scorer,
+            scorer: this.scorer.apiId,
           })
           .then(async (response) => {
             if (response.status === 200) {
@@ -146,7 +130,7 @@ export default Vue.extend({
             this.$showAlert(error.response.data, 'warning');
           });
       } catch (error) {
-        if (error === 'You already placed a bet on this game') {
+        if (error === 'Tip na tento zápas si už podal.') {
           this.$showAlert(error.response.data, 'error');
         }
       }
