@@ -2,12 +2,8 @@
   <v-app dark>
     <navbar></navbar>
     <v-main>
-      <v-container>
-        <v-row column justify-center align-text>
-          <v-col class="xs12 sm8 md6">
-            <alert></alert>
-          </v-col>
-        </v-row>
+      <v-container fill-height align-start justify-center>
+        <alert id="alert"></alert>
         <nuxt keep-alive />
       </v-container>
     </v-main>
@@ -27,9 +23,19 @@
 <script lang="ts">
 import Vue from 'vue';
 export default Vue.extend({
-  data: () => ({
-    systemBar: true,
-    systemBar2: true,
-  }),
+  data: () => ({}),
 });
 </script>
+
+<style scoped>
+#alert {
+  position: absolute;
+  width: 70%;
+  top: 10px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 9999;
+}
+</style>

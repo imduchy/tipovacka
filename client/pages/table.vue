@@ -1,6 +1,15 @@
 <template>
-  <v-row>
-    <v-col cols="12">
+  <v-row :class="{ 'align-self-center': $fetchState.pending }">
+    <v-col v-if="$fetchState.pending" class="text-center" cols="12">
+      <v-progress-circular
+        :size="70"
+        :width="7"
+        color="accent"
+        indeterminate
+      ></v-progress-circular>
+      <div class="text-overline ma-3">Načítam dáta...</div>
+    </v-col>
+    <v-col v-else cols="12">
       <v-data-table
         :headers="[
           { text: 'Meno', value: 'username' },

@@ -1,73 +1,76 @@
 <template>
-  <v-container>
+  <v-row :class="{ 'align-self-center': !upcomingGame }">
     <!-- Loading bar -->
-    <template v-if="!upcomingGame">
-      <v-row data-testid="progress-circular" column justify-center align-center>
-        <v-col cols="12">
-          <div class="text-center">
-            <v-progress-circular
-              indeterminate
-              :size="50"
-              color="amber"
-            ></v-progress-circular>
-          </div>
+    <v-col
+      v-if="!upcomingGame"
+      cols="12"
+      class="text-center"
+      data-testid="progress-circular"
+    >
+      <v-progress-circular
+        indeterminate
+        :size="70"
+        :width="7"
+        color="amber"
+      ></v-progress-circular>
+      <div class="text-overline ma-3">Načítam dáta...</div>
+    </v-col>
+    <!-- Loading bar -->
+    <v-col
+      v-else
+      cols="12"
+      class="align-self-start"
+      align-self="start"
+      justify-self="start"
+    >
+      <!-- Upcoming game -->
+      <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
+
+      <v-row class="mb-5">
+        <v-col cols="12" class="pt-0">
+          <v-card class="pt-8 px-8">
+            <!-- Input field / Current bet -->
+            <bet-input
+              v-if="!alreadyBet"
+              :upcoming-game="upcomingGame"
+              :players="players"
+            ></bet-input>
+            <current-bet
+              v-else
+              :upcoming-game="upcomingGame"
+              :players="players"
+            ></current-bet>
+          </v-card>
         </v-col>
       </v-row>
-    </template>
-    <!-- Loading bar -->
-    <template v-else>
-      <v-row>
-        <v-col cols="12">
-          <!-- Upcoming game -->
-          <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
 
-          <v-row class="mb-5">
-            <v-col cols="12" class="pt-0">
-              <v-card class="pt-8 px-8">
-                <!-- Input field / Current bet -->
-                <bet-input
-                  v-if="!alreadyBet"
-                  :upcoming-game="upcomingGame"
-                  :players="players"
-                ></bet-input>
-                <current-bet
-                  v-else
-                  :upcoming-game="upcomingGame"
-                  :players="players"
-                ></current-bet>
-              </v-card>
-            </v-col>
-          </v-row>
+      <!-- Last bets -->
+      <div class="mt-5 text-h5">
+        Posledné tipy
 
-          <!-- Last bets -->
-          <div class="mt-5 text-h5">
-            Posledné tipy
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
+              mdi-information-outline
+            </v-icon>
+          </template>
+          <span>Tvoj tip je v zátvorkách vedľa výsledku zápasu</span>
+        </v-tooltip>
+      </div>
 
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
-                <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
-                  mdi-information-outline
-                </v-icon>
-              </template>
-              <span>Tvoj tip je v zátvorkách vedľa výsledku zápasu</span>
-            </v-tooltip>
-          </div>
-
-          <v-row class="mt-0">
-            <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
-              <user-bet :bet="evaluatedBets[0]"></user-bet>
-            </v-col>
-            <v-col v-if="evaluatedBets[1]" cols="12" lg="4">
-              <user-bet :bet="evaluatedBets[1]"></user-bet>
-            </v-col>
-            <v-col v-if="evaluatedBets[2]" cols="12" lg="4">
-              <user-bet :bet="evaluatedBets[2]"></user-bet>
-            </v-col>
-          </v-row>
+      <v-row class="mt-0">
+        <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
+          <user-bet :bet="evaluatedBets[0]"></user-bet>
+        </v-col>
+        <v-col v-if="evaluatedBets[1]" cols="12" lg="4">
+          <user-bet :bet="evaluatedBets[1]"></user-bet>
+        </v-col>
+        <v-col v-if="evaluatedBets[2]" cols="12" lg="4">
+          <user-bet :bet="evaluatedBets[2]"></user-bet>
         </v-col>
       </v-row>
-    </template>
-  </v-container>
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">
