@@ -27,10 +27,17 @@
 import { IUser } from '@duchynko/tipovacka-models';
 import Vue from 'vue';
 export default Vue.extend({
+  data: () => ({
+    rawUsers: [] as IUser[],
+  }),
+  async fetch() {
+    this.rawUsers = await this.$axios.$get('/groups/users', {
+      params: { group: this.$store.state.group._id },
+    });
+  },
   computed: {
     users() {
-      const users = this.$store.state.users as IUser[];
-      return users.map((u) => ({
+      return this.rawUsers.map((u) => ({
         username: u.username,
         points: u.competitionScore![0].score || 0,
         bets: u.bets?.length || 0,

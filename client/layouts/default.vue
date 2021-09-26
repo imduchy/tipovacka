@@ -8,7 +8,7 @@
             <alert></alert>
           </v-col>
         </v-row>
-        <nuxt />
+        <nuxt keep-alive />
       </v-container>
     </v-main>
 
