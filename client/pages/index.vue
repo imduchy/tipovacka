@@ -60,13 +60,13 @@
 
       <v-row class="mt-0">
         <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
-          <user-bet :bet="evaluatedBets[0]"></user-bet>
+          <user-bet :bet="evaluatedBets[0]" :players="players"></user-bet>
         </v-col>
         <v-col v-if="evaluatedBets[1]" cols="12" lg="4">
-          <user-bet :bet="evaluatedBets[1]"></user-bet>
+          <user-bet :bet="evaluatedBets[1]" :players="players"></user-bet>
         </v-col>
         <v-col v-if="evaluatedBets[2]" cols="12" lg="4">
-          <user-bet :bet="evaluatedBets[2]"></user-bet>
+          <user-bet :bet="evaluatedBets[2]" :players="players"></user-bet>
         </v-col>
       </v-row>
     </v-col>

@@ -25,7 +25,7 @@
               correctScorer ? '' : 'text-decoration-line-through',
             ]"
           >
-            ({{ bet.scorer }})
+            ({{ scorerName }})
           </v-col>
           <v-col cols="12">
             <div class="text-caption font-weight-light">
@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { IBet, IGame, ITeam } from '@duchynko/tipovacka-models';
+import { IBet, IGame, IPlayer, ITeam } from '@duchynko/tipovacka-models';
 import { FixtureEventDetail } from '@duchynko/tipovacka-models/lib/models/Enums';
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
@@ -59,8 +59,22 @@ export default Vue.extend({
       type: Object as PropType<IBet>,
       default: {} as IBet,
     },
+    players: {
+      type: Array as PropType<IPlayer[]>,
+      default: [] as IPlayer[],
+    },
   },
   computed: {
+    scorerName(): string {
+      if (!this.bet) {
+        return '';
+      } else {
+        const playerId = this.bet.scorer;
+
+        const scorer = this.players.find((p: IPlayer) => p.apiId === playerId);
+        return scorer ? scorer.name : '';
+      }
+    },
     formatedDate(): string {
       return new Date((this.bet.game as IGame).date).toLocaleDateString('sk-SK', {
         month: 'long',
