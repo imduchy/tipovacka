@@ -78,6 +78,7 @@ export function mapStandings(
 
 export function mapPlayers(response: PlayersResponse.Response[]): IPlayer[] {
   return response.map((r) => ({
+    apiId: r.player.id,
     name: r.player.name,
     firstName: r.player.firstname,
     lastName: r.player.lastname,

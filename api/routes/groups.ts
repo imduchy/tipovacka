@@ -125,7 +125,7 @@ router.get('/competition', authMiddleware, async (req, res) => {
     // Result of the aggregation pipeline returns a competition object matching
     // the provided query details
     const aggrResult = await Group.aggregate<ICompetition>()
-      .match({ _id: Types.ObjectId(groupId) })
+      .match({ _id: new Types.ObjectId(groupId) })
       .unwind('followedTeams')
       .unwind('followedTeams.seasons')
       .unwind('followedTeams.seasons.competitions')
