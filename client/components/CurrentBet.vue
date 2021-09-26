@@ -49,16 +49,20 @@ export default Vue.extend({
     betsOfUser(): IBet[] {
       return this.$auth.user.bets;
     },
-    currentBet(): IBet {
+    currentBet(): IBet | undefined {
       return this.betsOfUser.find(
         (b: IBet) => (b.game as IGame).gameId === this.upcomingGame.gameId
       );
     },
     scorerName(): string {
-      const scorer = this.players.find(
-        (p: IPlayer) => p.apiId === parseInt(this.currentBet.scorer)
-      );
-      return scorer ? scorer.name : '';
+      if (!this.currentBet) {
+        return '';
+      } else {
+        const playerId = this.currentBet.scorer;
+
+        const scorer = this.players.find((p: IPlayer) => p.apiId === playerId);
+        return scorer ? scorer.name : '';
+      }
     },
   },
 });
