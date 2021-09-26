@@ -57,8 +57,11 @@ export default Vue.extend({
           },
         });
       } catch (err) {
-        this.$showAlert('Wrong credentials', 'error');
-        console.log(err);
+        if (err.response.status === 401) {
+          this.$showAlert('Nesprávne meno alebo heslo', 'error');
+        } else {
+          this.$showAlert('Stala sa chyba. Skús to opäť neskôr', 'error');
+        }
       }
     },
   },
