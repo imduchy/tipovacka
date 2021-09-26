@@ -101,13 +101,7 @@ export default Vue.extend({
       return (
         game.events
           ?.filter((event) => event.detail === FixtureEventDetail.NORMAL_GOAL)
-          .some(
-            (goal) =>
-              // The first part of the expression is to support old bets, where scorer
-              // was string (player's name)
-              goal.playerName === (this.bet.scorer as unknown) ||
-              goal.playerId === this.bet.scorer
-          ) || false
+          .some((goal) => goal.playerId === parseInt(this.bet.scorer)) || false
       );
     },
   },

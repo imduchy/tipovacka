@@ -127,7 +127,7 @@ export default Vue.extend({
             }
           })
           .catch((error) => {
-            this.$showAlert(error.response.data, 'warning');
+            this.$showAlert(error.response.data, 'error');
           });
       } catch (error) {
         if (error === 'Tip na tento zápas si už podal.') {
