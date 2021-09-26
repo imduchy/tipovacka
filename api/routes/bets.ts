@@ -87,10 +87,10 @@ router.post('/', authMiddleware, async ({ body }, res) => {
       user: userId,
       homeTeamScore: body.homeTeamScore,
       awayTeamScore: body.awayTeamScore,
-      scorer: body.scorer,
+      scorer: parseInt(body.scorer),
     };
 
-    user.bets.addToSet(bet);
+    user.bets.push(bet);
     await user.save();
     logger.info(`A user ${user._id} submitted a bet on a game ${gameId}.`);
 

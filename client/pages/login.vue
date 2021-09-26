@@ -57,7 +57,7 @@ export default Vue.extend({
           },
         });
       } catch (err) {
-        if (err.response.status === 401) {
+        if (err.response && err.response.status === 401) {
           this.$showAlert('Nesprávne meno alebo heslo', 'error');
         } else {
           this.$showAlert('Stala sa chyba. Skús to opäť neskôr', 'error');
