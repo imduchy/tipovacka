@@ -101,9 +101,7 @@ export default Vue.extend({
       return (
         game.events
           ?.filter((event) => event.detail === FixtureEventDetail.NORMAL_GOAL)
-          .some(
-            (goal) => goal.playerId === parseInt(this.bet.scorer as unknown as string)
-          ) || false
+          .some((goal) => goal.playerId === this.bet.scorer) || false
       );
     },
   },
