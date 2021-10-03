@@ -87,8 +87,10 @@ router.post('/', authMiddleware, async ({ body }, res) => {
       user: userId,
       homeTeamScore: body.homeTeamScore,
       awayTeamScore: body.awayTeamScore,
-      scorer: parseInt(body.scorer),
+      scorer: body.scorer,
     };
+
+    console.log('The scorer field is of type ' + typeof body.scorer);
 
     user.bets.push(bet);
     await user.save();

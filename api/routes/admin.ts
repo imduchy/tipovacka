@@ -96,7 +96,7 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
     await group.save();
 
     res.status(200).json(seasonObj);
-  } catch (error) {
+  } catch (error: any) {
     logger.error(
       `An error occured while enrolling a group in a new competition. Error: ${error.message}`
     );
@@ -144,6 +144,7 @@ router.post('/users', authMiddleware, async (req, res) => {
     logger.info('The group was fetched successfully. Starting to create the new user.');
     const newUser = await User.create<IUser>({
       username: username,
+      bets: [],
       email: email,
       password: encryptedPassword,
       groupId: groupId,

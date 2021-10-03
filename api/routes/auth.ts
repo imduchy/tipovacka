@@ -2,10 +2,9 @@ import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import passport from 'passport';
 import mongoose from 'mongoose';
-import { User, IUser, IUserDocument } from '@duchynko/tipovacka-models';
+import { User, IUser } from '@duchynko/tipovacka-models';
 import logger from '../utils/logger';
-import { PropertyRequiredError, ValidationError } from '../utils/exceptions';
-import { validateInput, isLoggedIn } from '../utils/authMiddleware';
+import { isLoggedIn } from '../utils/authMiddleware';
 
 const router = express.Router();
 
@@ -26,10 +25,28 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 };
 
 router.get('/user', (req, res) => {
-  res.status(200).send(req.user);
+  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+  let user = req.user;
+
+  // For some reason, when submiting a bet in production, the requests arrive
+  // with the scorer field as a string. E.g., instead 256, the value is "256".
+  // This is a quick workaround to make sure we always return back scorers
+  // as numbers, until the root problem is fixed.
+  if (user) {
+    let user = req.user as IUser;
+    user.bets = user.bets!.map((bet) => {
+      if (typeof bet.scorer === 'string') {
+        bet.scorer = parseInt(bet.scorer);
+      }
+      return bet;
+    });
+  }
+
+  res.status(200).send(user);
 });
 
 router.get('/logout', (req, res) => {
+  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
   req.session?.destroy(async (err) => {
     if (err) {
       logger.info(
@@ -49,9 +66,10 @@ router.get('/logout', (req, res) => {
 });
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
+  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
   // If this function gets called, authentication was successful.
   // `req.user` contains the authenticated user.
-  res.status(200).send(req.user);
+  res.status(200).send('Login successfull.');
 });
 
 // router.post('/register', async (req, res) => {
@@ -106,9 +124,11 @@ router.post('/password', authMiddleware, async (req, res) => {
   }
 
   try {
-    const user = (await User.findOne({
-      _id: (req.user as any)._id,
-    })) as IUserDocument;
+    const user = await User.findById((req.user as any)._id);
+
+    if (!user) {
+      return res.status(404).send("User doesn't exist");
+    }
 
     const passwordsMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordsMatch) {

@@ -44,11 +44,13 @@ router.get('/', authMiddleware, async (req, res) => {
   const userId = req.query.user;
 
   try {
-    const user = await User.findById(userId).populate({
-      path: 'bets',
-      model: 'bet',
-      populate: { path: 'game', model: 'game' },
-    });
+    const user = await User.findById(userId)
+      .populate({
+        path: 'bets',
+        model: 'bet',
+        populate: { path: 'game', model: 'game' },
+      })
+      .lean();
 
     if (!user) {
       logger.warn(`User with _id ${userId} doesn't exist.`);
