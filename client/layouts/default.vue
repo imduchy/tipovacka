@@ -2,14 +2,14 @@
   <v-app dark>
     <navbar></navbar>
     <v-main>
-      <v-system-bar height="30" color="warning">
+      <!-- <v-system-bar height="30" color="warning">
         <v-spacer></v-spacer>
         <span class="font-weight-bold">
           Momentálne nie je možné vidieť mená strelcov vo vašich tipoch. Pracujeme na
           odstránení tejto chyby.
         </span>
         <v-spacer></v-spacer>
-      </v-system-bar>
+      </v-system-bar> -->
       <v-container fill-height align-start justify-center>
         <alert id="alert"></alert>
         <nuxt keep-alive />
