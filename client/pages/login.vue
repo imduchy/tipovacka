@@ -1,11 +1,11 @@
 <template>
-  <v-row align="center" justify="center">
-    <v-col cols="12" md="6" class="pa-12 text-center">
+  <v-row align="center" justify="center" height="800px">
+    <v-col cols="12" md="6" class="text-center">
       <h4 class="text-h4 mb-5">Vitajte na Tipovačke</h4>
       <p class="text-subtitle-1">
         Prihlasovacia stránka pre členov fanklubu La Peňa Madridista de Eslovaquia
       </p>
-      <v-card color="secondary" class="pa-5" elevation="12">
+      <v-card color="secondary" max-width="600px" class="mx-auto pa-5" elevation="12">
         <v-form>
           <v-text-field
             v-model="login.username"
@@ -30,7 +30,9 @@
       </v-card>
     </v-col>
     <v-col cols="12" md="6" class="text-center">
-      <v-img src="/halamadrid-logo.png" class="mx-auto mb-3" width="300px"></v-img>
+      <div>
+        <v-img src="/halamadrid-logo.png" class="mx-auto my-5" width="300px"></v-img>
+      </div>
     </v-col>
   </v-row>
 </template>
