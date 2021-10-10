@@ -5,8 +5,8 @@
     "./common"
   ],
   "dependencies": {
-    "@duchynko/tipovacka-models": "^1.8.0",
+    "@duchynko/tipovacka-models": "1.10.1",
     "axios": "^0.21.1",
-    "mongoose": "^6.0.6"
+    "mongoose": "^6.0.8"
   }
 }

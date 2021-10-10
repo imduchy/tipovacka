@@ -2,8 +2,8 @@
 import { BetStatus, Game, Group, IUserDocument, User } from '@duchynko/tipovacka-models';
 import { Types } from 'mongoose';
 import { getDatabase } from '../utils/database';
+import { assignPoints, evaluatePoints, placedBetOnGame } from '../utils/evaluation';
 import { ReturnCodes } from '../utils/returnCodes';
-import { assignPoints, evaluatePoints, placedBetOnGame } from './utils';
 
 const activityFunction: AzureFunction = async function (
   context: Context
