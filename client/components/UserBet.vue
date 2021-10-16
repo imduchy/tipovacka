@@ -1,10 +1,10 @@
 <template>
   <v-card data-testid="user-bet">
     <v-row align="center" class="no-gutters">
-      <v-col cols="4" align="center" class="py-5">
-        <v-img alt="home team logo" :src="homeTeam.logo" width="70px"></v-img
+      <v-col cols="3" align="center" class="py-5">
+        <v-img alt="home team logo" :src="homeTeam.logo" width="50px"></v-img
       ></v-col>
-      <v-col cols="4" align="center" justify="center">
+      <v-col cols="6" align="center" justify="center">
         <v-row justify="center" class="no-gutters">
           <div class="text-h6 font-weight-light grey--text pr-2">
             ({{ bet.homeTeamScore }})
@@ -20,6 +20,7 @@
           <v-col
             cols="12"
             :class="[
+              'text-subtitle-2',
               'font-weight-light',
               'grey--text',
               correctScorer ? '' : 'text-decoration-line-through',
@@ -37,8 +38,8 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="4" align="center" class="py-5">
-        <v-img alt="away team logo" :src="awayTeam.logo" width="70px"></v-img
+      <v-col cols="3" align="center" class="py-5">
+        <v-img alt="away team logo" :src="awayTeam.logo" width="50px"></v-img
       ></v-col>
     </v-row>
     <v-row class="no-gutters">

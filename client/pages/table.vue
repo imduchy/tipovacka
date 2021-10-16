@@ -9,25 +9,34 @@
       ></v-progress-circular>
       <div class="text-overline ma-3">Načítam dáta...</div>
     </v-col>
-    <v-col v-else cols="12">
+    <v-col v-else offset="1" cols="10">
       <v-data-table
         :headers="[
+          { text: '#' },
           { text: 'Meno', value: 'username' },
           { text: 'Body', value: 'points' },
-          { text: '# tipov', value: 'bets' },
+          { text: 'Tipy', value: 'bets' },
         ]"
         :items="users"
         :sort-by="['points']"
         :sort-desc="[true]"
         :items-per-page="30"
         mobile-breakpoint="0"
-        class="elevation-1"
+        class="elevation-1 custom-header"
         :footer-props="{
           itemsPerPageOptions: [10, 20, 30, -1],
           itemsPerPageAllText: 'Všetky',
           itemsPerPageText: 'Riadky na stranu',
         }"
       >
+        <template #item="{ item, index }">
+          <tr>
+            <td>{{ rankIcon(index) + ' ' + (index + 1) }}</td>
+            <td>{{ item.username }}</td>
+            <td>{{ item.points }}</td>
+            <td>{{ item.bets }}</td>
+          </tr>
+        </template>
       </v-data-table>
     </v-col>
   </v-row>
@@ -53,5 +62,22 @@ export default Vue.extend({
       }));
     },
   },
+  methods: {
+    rankIcon(rank: number) {
+      if (rank === 0) {
+        return '🥇';
+      } else if (rank === 1) {
+        return '🥈';
+      } else if (rank === 2) {
+        return '🥉';
+      }
+    },
+  },
 });
 </script>
+
+<style>
+.custom-header div table thead {
+  background-color: #f5f5f5;
+}
+</style>

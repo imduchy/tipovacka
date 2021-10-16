@@ -1,7 +1,7 @@
 <template>
   <v-card
     data-testid="upcoming-game"
-    color="secondary"
+    color="#f5f5f5"
     class="pa-3 pa-sm-5"
     elevation="12"
     light

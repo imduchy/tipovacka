@@ -121,7 +121,7 @@ export default {
       options: {
         customProperties: true,
       },
-      dark: true,
+      dark: false,
       themes: {
         dark: {
           primary: colors.blue.darken4,
@@ -133,9 +133,9 @@ export default {
           success: colors.green,
         },
         light: {
-          primary: colors.blue.darken2,
-          accent: colors.grey.darken3,
-          secondary: colors.amber.darken3,
+          primary: colors.blue.darken4,
+          accent: colors.yellow.darken2,
+          secondary: colors.grey.lighten5,
           info: colors.blue,
           warning: colors.orange,
           error: colors.red,

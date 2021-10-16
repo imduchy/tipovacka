@@ -28,7 +28,7 @@
     </v-navigation-drawer>
     <!-- Navigation drawer -->
     <!-- App bar -->
-    <v-app-bar app color="primary">
+    <v-app-bar dark app color="primary">
       <v-toolbar-title>
         <router-link
           v-slot="{ navigate }"
@@ -63,7 +63,7 @@
               </v-avatar>
             </template>
 
-            <v-list dense color="grey darken-3" width="200px">
+            <v-list dense width="200px">
               <v-list-item-group>
                 <v-list-item to="password">
                   <v-list-item-icon>
