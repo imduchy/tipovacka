@@ -31,7 +31,7 @@
       >
         <template #item="{ item, index }">
           <tr>
-            <td>{{ rankIcon(index) + ' ' + (index + 1) }}</td>
+            <td>{{ (rankIcon(index) ? rankIcon(index) + ' ' : '') + (index + 1) }}</td>
             <td>{{ item.username }}</td>
             <td>{{ item.points }}</td>
             <td>{{ item.bets }}</td>
