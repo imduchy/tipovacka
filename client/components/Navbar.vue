@@ -30,7 +30,13 @@
     <!-- App bar -->
     <v-app-bar app color="primary">
       <v-toolbar-title>
-        <router-link v-slot="{ navigate }" to="/" custom style="cursor: pointer">
+        <router-link
+          v-slot="{ navigate }"
+          class="font-weight-bold"
+          to="/"
+          custom
+          style="cursor: pointer"
+        >
           <span role="link" @click="navigate" @keypress.enter="navigate">
             {{ title }}
           </span>
@@ -51,7 +57,7 @@
           </v-btn>
           <!-- Additional menu -->
           <v-menu bottom offset-y>
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-avatar v-bind="attrs" color="accent" size="38" class="mr-3" v-on="on">
                 <img alt="Avatar" src="/user-icon.png" />
               </v-avatar>

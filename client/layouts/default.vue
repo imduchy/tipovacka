@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app>
     <navbar></navbar>
     <v-main>
       <!-- <v-system-bar height="30" color="warning">
