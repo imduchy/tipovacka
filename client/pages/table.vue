@@ -4,7 +4,7 @@
       <v-progress-circular
         :size="70"
         :width="7"
-        color="accent"
+        color="secondary"
         indeterminate
       ></v-progress-circular>
       <div class="text-overline ma-3">Načítam dáta...</div>

@@ -62,7 +62,7 @@
               </v-col>
             </v-row> -->
 
-            <v-btn class="my-8" color="accent" large rounded block @click="userLogin">
+            <v-btn class="my-8" color="secondary" large rounded block @click="userLogin">
               Prihlásiť sa
             </v-btn>
           </v-form>

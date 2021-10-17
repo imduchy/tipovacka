@@ -7,7 +7,7 @@
           <div class="error-message">
             {{ error.statusCode === 404 ? pageNotFound : otherError }}
           </div>
-          <v-btn nuxt color="accent" x-large href="/">Domov</v-btn>
+          <v-btn nuxt color="secondary" x-large href="/">Domov</v-btn>
         </div>
       </v-col>
     </v-row>
