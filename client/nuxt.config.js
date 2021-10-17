@@ -123,19 +123,10 @@ export default {
       },
       dark: false,
       themes: {
-        dark: {
-          primary: colors.blue.darken4,
-          accent: colors.yellow.darken2,
-          secondary: colors.grey.lighten5,
-          info: colors.blue,
-          warning: colors.orange,
-          error: colors.red,
-          success: colors.green,
-        },
         light: {
-          primary: colors.blue.darken4,
-          accent: colors.yellow.darken2,
-          secondary: colors.grey.lighten5,
+          primary: '#00529F',
+          secondary: '#FEBE10',
+          accent: colors.grey.lighten5,
           info: colors.blue,
           warning: colors.orange,
           error: colors.red,

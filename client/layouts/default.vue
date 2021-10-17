@@ -16,7 +16,7 @@
       </v-container>
     </v-main>
 
-    <v-footer color="secondary" absolute light app>
+    <v-footer color="accent" absolute light app>
       <span class="text-caption"
         >&copy; {{ new Date().getFullYear() }}
         Vytvoril

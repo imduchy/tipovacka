@@ -56,7 +56,7 @@
       <v-col align="center" cols="12" class="pb-8 pt-0">
         <v-btn
           ref="submit-btn"
-          color="primary"
+          color="secondary"
           large
           block
           :disabled="alreadyStarted || !validInput || submited"
