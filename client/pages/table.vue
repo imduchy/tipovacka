@@ -9,7 +9,7 @@
       ></v-progress-circular>
       <div class="text-overline ma-3">Načítam dáta...</div>
     </v-col>
-    <v-col v-else offset="1" cols="10">
+    <v-col v-else cols="12">
       <v-data-table
         :headers="[
           { text: '#' },
