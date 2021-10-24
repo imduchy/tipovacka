@@ -90,8 +90,6 @@ router.post('/', authMiddleware, async ({ body }, res) => {
       scorer: body.scorer,
     };
 
-    console.log('The scorer field is of type ' + typeof body.scorer);
-
     user.bets.push(bet);
     await user.save();
     logger.info(`A user ${user._id} submitted a bet on a game ${gameId}.`);
