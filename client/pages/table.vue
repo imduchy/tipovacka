@@ -41,6 +41,7 @@
     </v-col>
   </v-row>
 </template>
+
 <script lang="ts">
 import { IUser } from '@duchynko/tipovacka-models';
 import Vue from 'vue';

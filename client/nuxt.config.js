@@ -64,6 +64,7 @@ export default {
         maxAge: 432000, // 5 days
       },
     },
+    middleware: ['authenticatorMiddleware'],
     redirect: {
       login: '/login',
       logout: '/login',

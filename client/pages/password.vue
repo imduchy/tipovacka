@@ -5,7 +5,7 @@
       <p class="text-subtitle-1">
         Tu si môžete zmeniť svoje heslo. Po zmene hesla budete odhlásený.
       </p>
-      <v-card color="secondary" class="pa-5" elevation="12">
+      <v-card color="white" class="pa-5" elevation="12">
         <v-form v-model="validPasswordInput">
           <v-text-field
             v-model="oldPassword"
