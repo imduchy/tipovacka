@@ -16,6 +16,12 @@
           </v-list-item-icon>
           <v-list-item-content>{{ item.title }}</v-list-item-content>
         </v-list-item>
+        <v-list-item to="password">
+          <v-list-item-icon>
+            <v-icon>mdi-lock</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>Zmeniť heslo</v-list-item-content>
+        </v-list-item>
         <v-list-item @click="logout">
           <v-list-item-icon>
             <v-icon>mdi-logout</v-icon>
@@ -65,6 +71,14 @@
 
             <v-list dense width="200px">
               <v-list-item-group>
+                <v-list-item v-if="$auth.hasScope('admin')" to="admin">
+                  <v-list-item-icon>
+                    <v-icon>mdi-shield-account</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Admin</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-list-item to="password">
                   <v-list-item-icon>
                     <v-icon>mdi-lock</v-icon>
