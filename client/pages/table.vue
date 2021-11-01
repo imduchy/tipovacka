@@ -12,7 +12,7 @@
     <v-col v-else cols="12">
       <v-data-table
         :headers="[
-          { text: '#' },
+          { text: 'Poradie', value: 'rank' },
           { text: 'Meno', value: 'username' },
           { text: 'Body', value: 'points' },
           { text: 'Tipy', value: 'bets' },
@@ -29,14 +29,6 @@
           itemsPerPageText: 'Riadky na stranu',
         }"
       >
-        <template #item="{ item, index }">
-          <tr>
-            <td>{{ (rankIcon(index) ? rankIcon(index) + ' ' : '') + (index + 1) }}</td>
-            <td>{{ item.username }}</td>
-            <td>{{ item.points }}</td>
-            <td>{{ item.bets }}</td>
-          </tr>
-        </template>
       </v-data-table>
     </v-col>
   </v-row>
@@ -56,22 +48,27 @@ export default Vue.extend({
   },
   computed: {
     users() {
-      return this.rawUsers.map((u) => ({
-        username: u.username,
-        points: u.competitionScore![0].score || 0,
-        bets: u.bets?.length || 0,
-      }));
-    },
-  },
-  methods: {
-    rankIcon(rank: number) {
-      if (rank === 0) {
-        return '🥇';
-      } else if (rank === 1) {
-        return '🥈';
-      } else if (rank === 2) {
-        return '🥉';
-      }
+      return this.rawUsers
+        .map((u) => ({
+          username: u.username,
+          points: u.competitionScore![0].score || 0,
+          bets: u.bets?.length || 0,
+          rank: '0',
+        }))
+        .sort((a, b) => b.points - a.points)
+        .map((user, index) => {
+          if (index === 0) {
+            user.rank = '🥇';
+          } else if (index === 1) {
+            user.rank = '🥈';
+          } else if (index === 2) {
+            user.rank = '🥉';
+          } else {
+            user.rank = index + 1 + '';
+          }
+
+          return user;
+        });
     },
   },
 });
