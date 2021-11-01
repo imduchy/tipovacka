@@ -12,7 +12,7 @@ export const state = () => ({
 export type RootState = ReturnType<typeof state>;
 
 export const getters: GetterTree<RootState, RootState> = {
-  upcomingGame: (state) => state.group.upcomingGames[0],
+  upcomingGame: (state) => state.group.upcomingGame,
 };
 
 export const mutations: MutationTree<RootState> = {

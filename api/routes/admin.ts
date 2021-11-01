@@ -1,6 +1,7 @@
 import { Game, Group, IGroup, IUser, User } from '@duchynko/tipovacka-models';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
+import { Types } from 'mongoose';
 import { isAdmin, validateInput } from '../utils/authMiddleware';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
@@ -115,7 +116,7 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
  * @param group ObjectId of the group the user will be part of
  */
 router.post('/users', authMiddleware, async (req, res) => {
-  const { group: groupId, username, email, password } = req.body;
+  const { group: groupId, username, email, password, scope } = req.body;
 
   try {
     logger.info('Validating content of the request body.');
@@ -148,6 +149,7 @@ router.post('/users', authMiddleware, async (req, res) => {
       email: email,
       password: encryptedPassword,
       groupId: groupId,
+      scope: scope,
     }).then((res) => {
       // Remove password from the object before returning it in the response
       const { password, ...user } = res.toObject();
@@ -267,11 +269,11 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
     logger.info(
       'Data fetched successfully. Creating a new group document in the database.'
     );
-    const group = await Group.create<IGroup>({
+    const group = await Group.create({
       name: body.name,
       email: body.email,
       website: body.website,
-      upcomingGames: [],
+      upcomingGame: undefined,
       users: [],
       followedTeams: [
         {
@@ -303,11 +305,9 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
       const upcomingGame = await findUpcomingGame(body.team, [body.league]);
 
       if (upcomingGame) {
-        // Save the game in the database, push it into the upcomingGames array,
-        // and save the group object with updated information .
+        // Save the game in the database, and update the upcomingGame of the group.
         const game = await Game.create(upcomingGame);
-        group.upcomingGames.push(game._id);
-
+        group.upcomingGame = game._id as Types.ObjectId;
         await group.save();
       }
     } catch (error) {

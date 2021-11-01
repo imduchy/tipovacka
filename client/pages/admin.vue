@@ -270,53 +270,84 @@ export default Vue.extend({
   },
   computed: {
     users() {
-      return this.rawUsers.map((user: IUser & { createdAt: string }) => {
+      return this.rawUsers.map((rawUser) => {
+        const user = rawUser as IUser & { createdAt: string };
         return {
           ...user,
           createdAt: new Date(user.createdAt).toLocaleDateString('sk-SK'),
           active: true,
+          admin: user.scope === 'admin',
         };
       });
     },
   },
   methods: {
     closeAddUserDialog() {
-      this.closeDialog('addUserDialog');
+      this.addUserDialog = false;
+      this.$nextTick(() => {
+        this.editedUser = Object.assign({}, this.emptyUser);
+        this.editedIndex = -1;
+      });
     },
     addUser() {
       console.log('Adding user', this.editedUser);
-      this.closeDialog('addUserDialog');
+      this.closeAddUserDialog();
     },
-    openEditUserDialog(item) {
+    openEditUserDialog(
+      item: IUser & { createdAt: string; active: boolean; admin: boolean }
+    ) {
       this.editedIndex = this.users.indexOf(item);
-      this.editedUser = Object.assign({}, item);
+      this.editedUser = Object.assign(
+        {},
+        {
+          username: item.username,
+          email: item.email,
+          password: '',
+          password2: '',
+          active: item.active,
+          admin: item.admin,
+        }
+      );
       this.editUserDialog = true;
     },
     closeEditUserDialog() {
-      this.closeDialog('editUserDialog');
+      this.editUserDialog = false;
+      this.$nextTick(() => {
+        this.editedUser = Object.assign({}, this.emptyUser);
+        this.editedIndex = -1;
+      });
     },
     editUser() {
       console.log('Editting user', this.editedUser);
-      this.closeDialog('editUserDialog');
+      this.closeEditUserDialog();
     },
-    openDeleteUserDialog(item) {
+    openDeleteUserDialog(
+      item: IUser & { createdAt: string; active: boolean; admin: boolean }
+    ) {
       this.editedIndex = this.users.indexOf(item);
-      this.editedUser = Object.assign({}, item);
+      this.editedUser = Object.assign(
+        {},
+        {
+          username: item.username,
+          email: item.email,
+          password: '',
+          password2: '',
+          active: item.active,
+          admin: item.admin,
+        }
+      );
       this.deleteUserDialog = true;
     },
     closeDeleteUserDialog() {
-      this.closeDialog('deleteUserDialog');
+      this.deleteUserDialog = false;
+      this.$nextTick(() => {
+        this.editedUser = Object.assign({}, this.emptyUser);
+        this.editedIndex = -1;
+      });
     },
     deleteUser() {
       console.log('Deleting the user', this.editedUser);
-      this.closeDialog('deleteUserDialog');
-    },
-    closeDialog(dialog) {
-      this[dialog] = false;
-      this.$nextTick(() => {
-        this.editedUser = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
+      this.closeDeleteUserDialog();
     },
   },
 });

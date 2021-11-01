@@ -1,5 +1,4 @@
 import { FixtureResponse, GameStatus, IGame } from '@duchynko/tipovacka-models';
-import { Types } from 'mongoose';
 import logger from './logger';
 import { getFixture } from './footballApi';
 

@@ -48,7 +48,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
   try {
     const group = await Group.findById(groupId)
-      .populate('upcomingGames')
+      .populate('upcomingGame')
       .select('-followedTeams.seasons.competitions');
 
     if (!group) {
