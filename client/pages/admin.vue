@@ -276,7 +276,7 @@ export default Vue.extend({
           ...user,
           createdAt: new Date(user.createdAt).toLocaleDateString('sk-SK'),
           active: true,
-          admin: user.scope === 'admin',
+          admin: user.scope.includes('admin'),
         };
       });
     },
