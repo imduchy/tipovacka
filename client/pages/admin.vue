@@ -264,9 +264,7 @@ export default Vue.extend({
     },
   }),
   async fetch() {
-    this.rawUsers = await this.$axios.$get('/groups/users', {
-      params: { group: this.$store.state.group._id },
-    });
+    this.rawUsers = await this.fetchUsers();
   },
   computed: {
     users() {
@@ -282,6 +280,17 @@ export default Vue.extend({
     },
   },
   methods: {
+    async fetchUsers(): Promise<IUser[]> {
+      try {
+        const response = await this.$axios.$get('/groups/users', {
+          params: { group: this.$store.state.group._id },
+        });
+        return response;
+      } catch (error) {
+        this.$showAlert('Niekde sa stala chyba.', 'error');
+        return [];
+      }
+    },
     closeAddUserDialog() {
       this.addUserDialog = false;
       this.$nextTick(() => {
@@ -289,9 +298,26 @@ export default Vue.extend({
         this.editedIndex = -1;
       });
     },
-    addUser() {
-      console.log('Adding user', this.editedUser);
-      this.closeAddUserDialog();
+    async addUser() {
+      try {
+        await this.$axios.$post('/admin/users', {
+          username: this.editedUser.username,
+          email: this.editedUser.email,
+          password: this.editedUser.password,
+          password2: this.editedUser.password2,
+          scopes: this.editedUser.admin ? ['admin'] : ['user'],
+          group: this.$store.state.group._id,
+        });
+
+        this.$showAlert('Užívateľ úspešne pridaný.', 'success');
+        const updatedUsers = await this.fetchUsers();
+        this.rawUsers = updatedUsers;
+      } catch (err) {
+        const code = err.response.data.code;
+        this.$showAlert('Niekde sa stala chyba. Kód chyby: ' + code, 'error');
+      } finally {
+        this.closeAddUserDialog();
+      }
     },
     openEditUserDialog(
       item: IUser & { createdAt: string; active: boolean; admin: boolean }

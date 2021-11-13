@@ -1,7 +1,7 @@
 import { Group, ICompetition, IUser } from '@duchynko/tipovacka-models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
-import { isAdmin, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -16,7 +16,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   // If req.headers contains the admin key, continue
-  if (isAdmin(req)) {
+  if (containsAdminKey(req)) {
     return next();
   }
 

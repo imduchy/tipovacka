@@ -1,8 +1,8 @@
-import { Game, Group, IGroup, IUser, User } from '@duchynko/tipovacka-models';
+import { Game, Group, IUser, User } from '@duchynko/tipovacka-models';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
-import { isAdmin, validateInput } from '../utils/authMiddleware';
+import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
 import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
@@ -13,8 +13,7 @@ const router = Router();
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
 
-  // If req.headers contains the admin key, continue
-  if (isAdmin(req)) {
+  if (containsAdminKey(req) || hasAdminRole(req.user as IUser | undefined)) {
     return next();
   }
 
@@ -110,39 +109,132 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
  *
  * Access: Admin
  *
- * @param username username of the newly created user
- * @param email email of the newly created user
- * @param password password of the newly created user
- * @param group ObjectId of the group the user will be part of
+ * @param username username of the new user
+ * @param email email of the new user
+ * @param password password of the new user
+ * @param group ID of the group that the user will be assiged to
+ * @param scope roles assigned to the user (e.g., [admin] or [user])
  */
 router.post('/users', authMiddleware, async (req, res) => {
-  const { group: groupId, username, email, password, scope } = req.body;
+  const { group: groupId, username, email, password, password2, scope } = req.body;
 
   try {
-    logger.info('Validating content of the request body.');
-    // Check if data sent in the request body are valid
-    validateInput(req.body);
+    logger.info('Starting to process the request.');
 
-    // Check if a user with this email already exist before proceeding
-    const user = await User.findOne({ email });
-    if (user) {
-      logger.warn('User with specified email already exists in the database.');
-      return res.status(400).send('Bad request');
+    if (password !== password2) {
+      logger.error('Passwords provided in the request do not match.');
+      return res.status(400).json({
+        message: 'Passwords provided in the request do not match.',
+        code: 'PASSWORDS_DONT_MATCH',
+      });
     }
 
-    logger.info(`Fetching group with id ${groupId}.`);
-    const group = await Group.findById(groupId);
-
-    if (!group) {
-      logger.warn(`The specified group with id ${groupId} doesn't exist.`);
-      return res.status(404).json("The specified resource doesn't exist");
+    if (password.length < 6) {
+      logger.error('Password provided in the request is shorther than 6 characters.');
+      return res.status(400).json({
+        message: 'Password provided in the request is shorther than 6 characters.',
+        code: 'PASSWORD_TOO_SHORT',
+      });
     }
 
-    logger.info('Hashing the password prior saving it to the database.');
+    // Check if a user with this email already exists
+    if (await User.findOne({ email })) {
+      logger.error('User with specified email already exists in the database.');
+      return res.status(400).json({
+        message: 'User with this email already exists',
+        code: 'USER_ALREADY_EXISTS',
+      });
+    }
+
+    // Check if a group with the provided ID exists
+    if (!(await Group.findById(groupId))) {
+      logger.error(`The specified group with id ${groupId} doesn't exist.`);
+      return res.status(404).json({
+        message: "Group with provided ID doesn't exist",
+        code: 'GROUP_DOESNT_EXIST',
+      });
+    }
+
+    logger.info('Hashing the password.');
     const salt = await bcrypt.genSalt();
     const encryptedPassword = await bcrypt.hash(password, salt);
 
-    logger.info('The group was fetched successfully. Starting to create the new user.');
+    logger.info('Creating the user in the database.');
+    const newUser = await User.create<IUser>({
+      username: username,
+      bets: [],
+      email: email,
+      password: encryptedPassword,
+      groupId: groupId,
+      scope: scope,
+    }).then((res) => {
+      // Remove password from the object before returning it in the response
+      const { password, ...user } = res.toObject();
+      return user;
+    });
+
+    logger.info('The new user was created created successfully.');
+    logger.info(JSON.stringify(newUser));
+
+    res.status(200).json({
+      response: newUser,
+      code: 'SUCCESS',
+    });
+  } catch (error) {
+    logger.error(`There was an error creting the user. Error: ${error}.`);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'INTERNAL_ERROR',
+    });
+  }
+});
+
+/**
+ * Create a new user in a specified group.
+ *
+ * Access: Admin
+ *
+ * @param username username of the new user
+ * @param email email of the new user
+ * @param password password of the new user
+ * @param group ID of the group that the user will be assiged to
+ * @param scope roles assigned to the user (e.g., [admin] or [user])
+ */
+router.delete('/users', authMiddleware, async (req, res) => {
+  const { group: groupId, username, email, password, password2, scope } = req.body;
+
+  try {
+    logger.info('Starting to process the request.');
+
+    if (password !== password2) {
+      logger.error('Passwords provided in the request do not match.');
+      return res.status(400).send('Passwords provided in the request do not match.');
+    }
+
+    if (password.length < 6) {
+      logger.error('Password provided in the request is shorther than 6 characters.');
+      return res
+        .status(400)
+        .send('Password provided in the request is shorther than 6 characters.');
+    }
+
+    // Check if a user with this email already exists
+    if (await User.findOne({ email })) {
+      logger.error('User with specified email already exists in the database.');
+      return res.status(400).send('User with this email already exists');
+    }
+
+    // Check if a group with the provided ID exists
+    if (!(await Group.findById(groupId))) {
+      logger.error(`The specified group with id ${groupId} doesn't exist.`);
+      return res.status(404).json("Group with provided ID doesn't exist");
+    }
+
+    logger.info('Hashing the password.');
+    const salt = await bcrypt.genSalt();
+    const encryptedPassword = await bcrypt.hash(password, salt);
+
+    logger.info('Creating the user in the database.');
     const newUser = await User.create<IUser>({
       username: username,
       bets: [],

@@ -1,7 +1,7 @@
 import { Game, IUser } from '@duchynko/tipovacka-models';
 import express, { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
-import { isAdmin, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import logger from '../utils/logger';
 
 const router = express.Router();
@@ -10,7 +10,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
 
   // If req.headers contains the admin key, continue
-  if (isAdmin(req) || isLoggedIn(req)) {
+  if (containsAdminKey(req) || isLoggedIn(req)) {
     next();
     return;
   }
