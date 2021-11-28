@@ -44,14 +44,14 @@ jobs:
       - name: 'Upload to blob storage'
         uses: 'azure/CLI@v1'
         with:
-          azcliversion: 2.0.72
+          azcliversion: 2.30.0
           inlineScript: |
             az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} -d '$web' -s ./client/dist/
 
       - name: 'Purge CDN endpoint'
         uses: 'azure/CLI@v1'
         with:
-          azcliversion: 2.0.72
+          azcliversion: 2.30.0
           # For some reason I have to specify path from the project root, despite setting working-directory to 'client'.
           # So instead of specifying only ./dist, I have to use ./client/dist/
           inlineScript: |
