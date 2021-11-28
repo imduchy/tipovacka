@@ -1,6 +1,6 @@
 <template>
   <v-row :class="{ 'align-self-center': !upcomingGame }">
-    <!-- Loading bar -->
+    <!-- Loading bar  -->
     <v-col
       v-if="!upcomingGame"
       cols="12"
