@@ -20,7 +20,7 @@
             @click:outside="closeAddUserDialog"
           >
             <template #activator="{ on, attrs }">
-              <v-btn color="secondary" dark class="mb-2" v-bind="attrs" v-on="on">
+              <v-btn color="secondary" dark class="ma-2" v-bind="attrs" v-on="on">
                 + Pridať
               </v-btn>
             </template>
@@ -96,6 +96,62 @@
                 <v-spacer></v-spacer>
                 <v-btn color="grey" dark @click="closeAddUserDialog">Zrušiť</v-btn>
                 <v-btn color="secondary" @click="addUser">Uložiť</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <v-dialog
+            v-model="importUsersDialog"
+            max-width="800px"
+            @click:outside="closeImportUsersDialog"
+          >
+            <template #activator="{ on, attrs }">
+              <v-btn color="grey" dark class="ma-2" v-bind="attrs" v-on="on">
+                + Importovať
+              </v-btn>
+            </template>
+            <v-card class="pa-4">
+              <v-card-title>
+                <span class="text-h5">Importovať užívateľov</span>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                  color="green"
+                  class="ma-2 white--text"
+                  download
+                  href="./import-template.xlsx"
+                >
+                  Stiahnuť šablónu
+                  <v-icon class="pl-1">mdi-file-download</v-icon>
+                </v-btn>
+              </v-card-title>
+
+              <v-card-text class="pa-4">
+                <v-row>
+                  <v-col cols="12">
+                    <p class="text-body">
+                      Pomocou šablóny je možné registrovať viacero užívateľov naraz. Na
+                      úspešné spracoavnie Excel súboru je však potrebné dodržať stanovený
+                      formát.
+                    </p>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="12">
+                    <v-file-input
+                      v-model="importFile"
+                      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                      show-size
+                      truncate-length="50"
+                      label="Excel súbor s užívatelmi"
+                    ></v-file-input>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="grey" dark @click="closeImportUsersDialog">Zrušiť</v-btn>
+                <v-btn color="secondary" @click="importUsers">Importovať</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -244,6 +300,8 @@ export default Vue.extend({
     editUserDialog: false,
     deleteUserDialog: false,
     addUserDialog: false,
+    importUsersDialog: false,
+    importFile: null as File | null,
     rawUsers: [] as IUser[],
     editedIndex: -1,
     editedUser: {
@@ -298,6 +356,29 @@ export default Vue.extend({
         this.editedIndex = -1;
       });
     },
+    async importUsers() {
+      try {
+        if (!this.importFile) {
+          return;
+        }
+        const fd = new FormData();
+        fd.append('importFile', this.importFile, this.importFile.name);
+
+        await this.$axios.$post('/admin/users/import', fd);
+        this.$showAlert('Užívatelia úspešne pridaný.', 'success');
+      } catch (error) {
+        const code = error.response.data.code;
+        this.$showAlert('Niekde sa stala chyba. Kód chyby: ' + code, 'error');
+      } finally {
+        this.closeImportUsersDialog();
+      }
+    },
+    closeImportUsersDialog() {
+      this.importUsersDialog = false;
+      this.$nextTick(() => {
+        this.importFile = null;
+      });
+    },
     async addUser() {
       try {
         await this.$axios.$post('/admin/users', {
@@ -344,7 +425,6 @@ export default Vue.extend({
       });
     },
     editUser() {
-      console.log('Editting user', this.editedUser);
       this.closeEditUserDialog();
     },
     openDeleteUserDialog(
@@ -372,7 +452,6 @@ export default Vue.extend({
       });
     },
     deleteUser() {
-      console.log('Deleting the user', this.editedUser);
       this.closeDeleteUserDialog();
     },
   },

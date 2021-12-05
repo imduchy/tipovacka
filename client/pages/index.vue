@@ -89,7 +89,6 @@ export default Vue.extend({
     return {
       homeTeamScore: 0,
       awayTeamScore: 0,
-      validScoreInput: true,
       competition: {} as ICompetition,
       followedTeam: this.$store.state.group.followedTeams[0],
     };

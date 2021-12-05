@@ -83,5 +83,5 @@ const PORT = process.env.PORT || 3003;
 const HOST = process.env.HOST || 'http://localhost';
 
 app.listen(PORT, () => {
-  console.log(`The API is listening at ${HOST}:${PORT}`);
+  logger.info(`The API is listening at ${HOST}:${PORT}`);
 });
