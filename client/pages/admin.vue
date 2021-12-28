@@ -345,7 +345,7 @@ export default Vue.extend({
         });
         return response;
       } catch (error) {
-        this.$showAlert('Niekde sa stala chyba.', 'error');
+        this.$showAlert('Niekde sa stala chyba', 'error');
         return [];
       }
     },
@@ -365,7 +365,7 @@ export default Vue.extend({
         fd.append('importFile', this.importFile, this.importFile.name);
 
         await this.$axios.$post('/admin/users/import', fd);
-        this.$showAlert('Užívatelia úspešne pridaný.', 'success');
+        this.$showAlert('Užívatelia úspešne pridaný', 'success');
       } catch (error) {
         const code = error.response.data.code;
         this.$showAlert('Niekde sa stala chyba. Kód chyby: ' + code, 'error');
@@ -390,7 +390,7 @@ export default Vue.extend({
           group: this.$store.state.group._id,
         });
 
-        this.$showAlert('Užívateľ úspešne pridaný.', 'success');
+        this.$showAlert('Užívateľ úspešne pridaný', 'success');
         const updatedUsers = await this.fetchUsers();
         this.rawUsers = updatedUsers;
       } catch (err) {
