@@ -2,13 +2,13 @@ import { Game, Group, IUser, User } from '@duchynko/tipovacka-models';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
+import multer from 'multer';
+import xlsx from 'node-xlsx';
 import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
 import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
 import logger from '../utils/logger';
-import multer from 'multer';
-import xlsx from 'node-xlsx';
 
 const router = Router();
 
