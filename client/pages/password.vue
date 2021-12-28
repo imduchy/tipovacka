@@ -96,7 +96,7 @@ export default Vue.extend({
           if (err.response.data === 'Wrong password') {
             this.$showAlert('Nesprávne heslo', 'warning');
           } else {
-            this.$showAlert('Niekde sa stala chyba. Skúste to prosím neskôr.', 'error');
+            this.$showAlert('Niekde sa stala chyba. Skúste to prosím neskôr', 'error');
           }
         });
     },
