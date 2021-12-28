@@ -11,7 +11,7 @@ const router = express.Router();
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
 
-  // If req.headers contains the admin key, continue
+  // If req.headers contains the admin key,continue
   if (isLoggedIn(req)) {
     next();
   } else {
