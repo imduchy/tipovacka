@@ -126,11 +126,11 @@ export default Vue.extend({
               await this.$auth.fetchUser();
             }
           })
-          .catch((error) => {
+          .catch((error: any) => {
             this.$showAlert(error.response.data, 'error');
           });
-      } catch (error) {
-        if (error === 'Tip na tento zápas si už podal.') {
+      } catch (error: any) {
+        if (error.response.data === 'Tip na tento zápas si už podal.') {
           this.$showAlert(error.response.data, 'error');
         }
       }

@@ -90,6 +90,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { AxiosError } from 'axios';
 export default Vue.extend({
   // @ts-ignore
   layout: 'full-width',
@@ -111,7 +112,7 @@ export default Vue.extend({
             password: this.login.password,
           },
         });
-      } catch (err) {
+      } catch (err: any) {
         if (err.response && err.response.status === 401) {
           this.$showAlert('Nesprávne meno alebo heslo', 'error');
         } else {
