@@ -11,12 +11,12 @@
     "strict": true,
     "noEmit": true,
     "experimentalDecorators": true,
-    "baseUrl": "../",
     "paths": {
       "~/*": ["./*"],
       "@/*": ["./*"]
     },
-    "types": ["@types/node", "@nuxt/types", "@nuxtjs/axios", "@types/nuxtjs__auth"]
+    "types": ["@types/node", "@nuxt/types", "@nuxtjs/axios", "@types/nuxtjs__auth"],
+    "typeRoots": ["../node_modules"]
   },
   "exclude": ["node_modules", ".nuxt", "dist"]
 }
