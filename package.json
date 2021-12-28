@@ -2,7 +2,9 @@
   "name": "@duchynko/tipovacka",
   "version": "1.0.0",
   "workspaces": [
-    "./common"
+    "./common",
+    "./api",
+    "./client"
   ],
   "dependencies": {
     "@duchynko/tipovacka-models": "1.11.1",

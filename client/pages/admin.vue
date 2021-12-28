@@ -365,7 +365,7 @@ export default Vue.extend({
         fd.append('importFile', this.importFile, this.importFile.name);
 
         await this.$axios.$post('/admin/users/import', fd);
-        this.$showAlert('Užívatelia úspešne pridaný.', 'success');
+        this.$showAlert('Užívatelia úspešne pridaný', 'success');
       } catch (error: any) {
         const code = error.response.data.code as string;
         this.$showAlert('Niekde sa stala chyba. Kód chyby: ' + code, 'error');

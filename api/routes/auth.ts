@@ -1,7 +1,7 @@
 import { IUser, User } from '@duchynko/tipovacka-models';
 import bcrypt from 'bcryptjs';
 import express, { NextFunction, Request, Response } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import passport from 'passport';
 import { isLoggedIn } from '../utils/authMiddleware';
 import logger from '../utils/logger';
@@ -55,11 +55,13 @@ router.get('/logout', (req, res) => {
     }
 
     const Sessions = mongoose.connection.collection('sessions');
-    await Sessions.findOneAndDelete({ _id: req.sessionID }).catch((err) => {
-      logger.warn(
-        `Couldn't delete sessions ${req.sessionID} from the database. Error: ${err}`
-      );
-    });
+    await Sessions.findOneAndDelete({ _id: new Types.ObjectId(req.sessionID) }).catch(
+      (err) => {
+        logger.warn(
+          `Couldn't delete sessions ${req.sessionID} from the database. Error: ${err}`
+        );
+      }
+    );
   });
   req.logout();
   res.status(200).send();
