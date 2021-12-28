@@ -1,5 +1,5 @@
+import { Game, IBet, IUser, User } from '@duchynko/tipovacka-models';
 import { NextFunction, Request, Response, Router } from 'express';
-import { IBet, Game, User, IUser, Bet } from '@duchynko/tipovacka-models';
 import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import { alreadyBet } from '../utils/bets';

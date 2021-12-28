@@ -26,10 +26,9 @@ jobs:
 
       - name: 'Install common packages'
         run: |
-          npm install
+          cd .. && npm install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-        working-directory: '../'
 
       - name: 'Install and run tests'
         run: |
