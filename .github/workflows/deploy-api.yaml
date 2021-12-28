@@ -29,7 +29,7 @@ jobs:
           npm install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-        working-directory: '/'
+        working-directory: '../'
 
       - name: 'Install and run tests'
         run: |
