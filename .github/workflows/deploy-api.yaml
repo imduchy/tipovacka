@@ -24,6 +24,13 @@ jobs:
           node-version: 12.x
           registry-url: https://npm.pkg.github.com
 
+      - name: 'Install common packages'
+        run: |
+          npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+        working-directory: '/'
+
       - name: 'Install and run tests'
         run: |
           npm install

@@ -76,7 +76,7 @@
             &copy; {{ new Date().getFullYear() }}
             Vytvoril
             <a href="https://www.linkedin.com/in/jakubduchon9/" target="_blank"
-              >Jakub Duchon</a
+              >Jakub Duchon.</a
             >
           </p>
         </v-col>
