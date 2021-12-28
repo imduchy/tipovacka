@@ -1,12 +1,7 @@
 <template>
-  <v-alert
-    id="alert"
-    v-model="show"
-    transition="fade-transition"
-    dismissible
-    :color="color"
-    >{{ message }}</v-alert
-  >
+  <v-alert v-model="show" transition="fade-transition" dismissible :color="color">{{
+    message
+  }}</v-alert>
 </template>
 
 <script lang="ts">
@@ -34,16 +29,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style>
-#alert {
-  position: absolute;
-  width: 50%;
-  top: 5;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  z-index: 9999;
-}
-</style>

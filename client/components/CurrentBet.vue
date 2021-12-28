@@ -3,7 +3,7 @@
     <v-row data-testid="current-bet">
       <v-col cols="6">
         <v-text-field
-          :value="getCurrentBet().homeTeamScore"
+          :value="currentBet.homeTeamScore"
           :label="`${upcomingGame.homeTeam.name} skóre`"
           outlined
           disabled
@@ -11,7 +11,7 @@
       </v-col>
       <v-col cols="6">
         <v-text-field
-          :value="getCurrentBet().awayTeamScore"
+          :value="currentBet.awayTeamScore"
           :label="`${upcomingGame.awayTeam.name} skóre`"
           outlined
           disabled
@@ -21,7 +21,7 @@
     <v-row>
       <v-col cols="12">
         <v-text-field
-          :value="getCurrentBet().scorer"
+          :value="scorerName"
           label="Strelec"
           outlined
           disabled
@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { IBet, IGame } from '@duchynko/tipovacka-models';
+import { IBet, IGame, IPlayer } from '@duchynko/tipovacka-models';
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
@@ -40,20 +40,29 @@ export default Vue.extend({
       type: Object as PropType<IGame & { _id: string }>,
       default: {} as IGame & { _id: string },
     },
-  },
-  computed: {
-    usersBets(): IBet[] {
-      return this.$auth.user.bets;
+    players: {
+      type: Array as PropType<IPlayer[]>,
+      default: [] as IPlayer[],
     },
   },
-  methods: {
-    getCurrentBet(): IBet | undefined {
-      if (!this.usersBets) return undefined;
-
-      const filteredGames: IBet[] = this.usersBets.filter(
-        (b: IBet) => (b.game as IGame & { _id: string })._id === this.upcomingGame._id
+  computed: {
+    betsOfUser(): IBet[] {
+      return this.$auth.user.bets;
+    },
+    currentBet(): IBet | undefined {
+      return this.betsOfUser.find(
+        (b: IBet) => (b.game as IGame).gameId === this.upcomingGame.gameId
       );
-      return filteredGames[0];
+    },
+    scorerName(): string {
+      if (!this.currentBet) {
+        return '';
+      } else {
+        const playerId = this.currentBet.scorer;
+
+        const scorer = this.players.find((p: IPlayer) => p.apiId === playerId);
+        return scorer ? scorer.name : '';
+      }
     },
   },
 });

@@ -16,6 +16,12 @@
           </v-list-item-icon>
           <v-list-item-content>{{ item.title }}</v-list-item-content>
         </v-list-item>
+        <v-list-item to="password">
+          <v-list-item-icon>
+            <v-icon>mdi-lock</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>Zmeniť heslo</v-list-item-content>
+        </v-list-item>
         <v-list-item @click="logout">
           <v-list-item-icon>
             <v-icon>mdi-logout</v-icon>
@@ -28,9 +34,15 @@
     </v-navigation-drawer>
     <!-- Navigation drawer -->
     <!-- App bar -->
-    <v-app-bar app color="primary">
+    <v-app-bar dark app color="primary">
       <v-toolbar-title>
-        <router-link v-slot="{ navigate }" to="/" custom style="cursor: pointer">
+        <router-link
+          v-slot="{ navigate }"
+          class="font-weight-bold"
+          to="/"
+          custom
+          style="cursor: pointer"
+        >
           <span role="link" @click="navigate" @keypress.enter="navigate">
             {{ title }}
           </span>
@@ -51,14 +63,22 @@
           </v-btn>
           <!-- Additional menu -->
           <v-menu bottom offset-y>
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-avatar v-bind="attrs" color="accent" size="38" class="mr-3" v-on="on">
                 <img alt="Avatar" src="/user-icon.png" />
               </v-avatar>
             </template>
 
-            <v-list dense color="grey darken-3" width="200px">
+            <v-list dense width="200px">
               <v-list-item-group>
+                <v-list-item v-if="isAdmin" to="admin">
+                  <v-list-item-icon>
+                    <v-icon>mdi-shield-account</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Admin</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-list-item to="password">
                   <v-list-item-icon>
                     <v-icon>mdi-lock</v-icon>
@@ -110,6 +130,11 @@ export default Vue.extend({
     title: 'Tipovačka',
     sidebar: false,
   }),
+  computed: {
+    isAdmin() {
+      return this.$auth.hasScope('admin');
+    },
+  },
   methods: {
     async logout() {
       await this.$auth.logout();

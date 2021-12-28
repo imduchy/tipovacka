@@ -1,19 +1,21 @@
-import { Game, Group, IGroup, IUser, User } from '@duchynko/tipovacka-models';
+import { Game, Group, IUser, User } from '@duchynko/tipovacka-models';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
-import { isAdmin, validateInput } from '../utils/authMiddleware';
+import { Types } from 'mongoose';
+import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
 import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
 import logger from '../utils/logger';
+import multer from 'multer';
+import xlsx from 'node-xlsx';
 
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
 
-  // If req.headers contains the admin key, continue
-  if (isAdmin(req)) {
+  if (containsAdminKey(req) || hasAdminRole(req.user as IUser | undefined)) {
     return next();
   }
 
@@ -96,7 +98,7 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
     await group.save();
 
     res.status(200).json(seasonObj);
-  } catch (error) {
+  } catch (error: any) {
     logger.error(
       `An error occured while enrolling a group in a new competition. Error: ${error.message}`
     );
@@ -109,44 +111,64 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
  *
  * Access: Admin
  *
- * @param username username of the newly created user
- * @param email email of the newly created user
- * @param password password of the newly created user
- * @param group ObjectId of the group the user will be part of
+ * @param username username of the new user
+ * @param email email of the new user
+ * @param password password of the new user
+ * @param group ID of the group that the user will be assiged to
+ * @param scope roles assigned to the user (e.g., [admin] or [user])
  */
 router.post('/users', authMiddleware, async (req, res) => {
-  const { group: groupId, username, email, password } = req.body;
+  const { group: groupId, username, email, password, password2, scope } = req.body;
 
   try {
-    logger.info('Validating content of the request body.');
-    // Check if data sent in the request body are valid
-    validateInput(req.body);
+    logger.info('Starting to process the request.');
 
-    // Check if a user with this email already exist before proceeding
-    const user = await User.findOne({ email });
-    if (user) {
-      logger.warn('User with specified email already exists in the database.');
-      return res.status(400).send('Bad request');
+    if (password !== password2) {
+      logger.error('Passwords provided in the request do not match.');
+      return res.status(400).json({
+        message: 'Passwords provided in the request do not match.',
+        code: 'PASSWORDS_DONT_MATCH',
+      });
     }
 
-    logger.info(`Fetching group with id ${groupId}.`);
-    const group = await Group.findById(groupId);
-
-    if (!group) {
-      logger.warn(`The specified group with id ${groupId} doesn't exist.`);
-      return res.status(404).json("The specified resource doesn't exist");
+    if (password.length < 6) {
+      logger.error('Password provided in the request is shorther than 6 characters.');
+      return res.status(400).json({
+        message: 'Password provided in the request is shorther than 6 characters.',
+        code: 'PASSWORD_TOO_SHORT',
+      });
     }
 
-    logger.info('Hashing the password prior saving it to the database.');
+    // Check if a user with this email already exists
+    if (await User.findOne({ email })) {
+      logger.error('User with specified email already exists in the database.');
+      return res.status(400).json({
+        message: 'User with this email already exists',
+        code: 'USER_ALREADY_EXISTS',
+      });
+    }
+
+    // Check if a group with the provided ID exists
+    if (!(await Group.findById(groupId))) {
+      logger.error(`The specified group with id ${groupId} doesn't exist.`);
+      return res.status(404).json({
+        message: "Group with provided ID doesn't exist",
+        code: 'GROUP_DOESNT_EXIST',
+      });
+    }
+
+    logger.info('Hashing the password.');
     const salt = await bcrypt.genSalt();
     const encryptedPassword = await bcrypt.hash(password, salt);
 
-    logger.info('The group was fetched successfully. Starting to create the new user.');
+    logger.info('Creating the user in the database.');
     const newUser = await User.create<IUser>({
       username: username,
+      bets: [],
       email: email,
       password: encryptedPassword,
       groupId: groupId,
+      scope: scope,
     }).then((res) => {
       // Remove password from the object before returning it in the response
       const { password, ...user } = res.toObject();
@@ -156,12 +178,143 @@ router.post('/users', authMiddleware, async (req, res) => {
     logger.info('The new user was created created successfully.');
     logger.info(JSON.stringify(newUser));
 
-    res.status(200).json(newUser);
+    res.status(200).json({
+      response: newUser,
+      code: 'SUCCESS',
+    });
   } catch (error) {
     logger.error(`There was an error creting the user. Error: ${error}.`);
-    res.status(500).json('Internal server error');
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'INTERNAL_ERROR',
+    });
   }
 });
+
+/**
+ * Create new users using an Excel sheet
+ *
+ * Access: Admin
+ *
+ * @param username username of the new user
+ * @param email email of the new user
+ * @param password password of the new user
+ * @param group ID of the group that the user will be assiged to
+ * @param scope roles assigned to the user (e.g., [admin] or [user])
+ */
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+router.post(
+  '/users/import',
+  authMiddleware,
+  upload.single('importFile'),
+  async (req, res) => {
+    if (!req.file) {
+      logger.error("The request doesn't contain an import file.");
+      return res.status(400).send("The request doesn't contain an import file.");
+    }
+
+    logger.info('Starting to process the request.');
+    try {
+      const groupId = (req.user as IUser).groupId;
+      const fileBuffer = req.file.buffer;
+      const workSheet = xlsx.parse(fileBuffer);
+      // Remove the "headers" row
+      const users = workSheet[0].data
+        .slice(1)
+        .filter((row) => row[0] != undefined && row[1] != undefined);
+
+      const results = [];
+
+      logger.info(`The excel sheet contains ${users.length} users.`);
+      for (const user of users) {
+        const email = user[0] as string;
+        const username = user[1] as string;
+
+        logger.info(`Adding user ${username} (${email}) to the database.`);
+
+        // Check if a user with this email already exists
+        if (await User.findOne({ email })) {
+          logger.error('User with specified email already exists in the database.');
+          results.push({
+            username,
+            email,
+            error: 'User with this email already exists',
+          });
+          continue;
+        }
+
+        // The initial password of a user will be set to their username.
+        // If length of the username is not at least 6 characters (password limit),
+        // append "123" at the end of the password.
+        const password = username.length >= 6 ? username : username + '123';
+        logger.info(`The initial password of the user is set to ${password}.`);
+        const salt = await bcrypt.genSalt();
+        const encryptedPassword = await bcrypt.hash(password, salt);
+
+        logger.info('Adding the new user in to the database.');
+        await User.create<IUser>({
+          username: username,
+          bets: [],
+          email: email,
+          password: encryptedPassword,
+          groupId: groupId,
+          scope: ['user'],
+        })
+          .then((_) => {
+            logger.info('The new user was added successfully to the database.');
+            results.push({
+              username,
+              email,
+              error: null,
+            });
+          })
+          .catch((error) => {
+            logger.error('An error occured while adding the user to the database.');
+            logger.error(error);
+            results.push({
+              username,
+              email,
+              error: 'Internal server error.',
+            });
+          });
+      }
+
+      const failed = results.filter((r) => r.error != null);
+      if (failed.length !== 0) {
+        logger.error(
+          `Failed to create ${failed.length} users. Errors: ${JSON.stringify(failed)}`
+        );
+        return res.status(400).json({
+          message: `Failed to create ${failed.length} of ${users.length} users.`,
+          code: 'IMPORT_NOT_SUCCESSFUL',
+        });
+      }
+
+      return res.status(200).json({
+        response: `Successfully added ${users.length} users.`,
+        code: 'SUCCESS',
+      });
+    } catch (error: any) {
+      logger.error(`There was an error creating users. Error: ${error}.`);
+
+      if (error.message) {
+        if ((error.message as string).includes('Unsupported')) {
+          return res.status(400).json({
+            message: error.message,
+            code: 'UNSUPPORTED_FILE_FORMAT',
+          });
+        }
+      }
+
+      return res.status(400).json({
+        message: `Internal server error.`,
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  }
+);
 
 /**
  * Create a new group, populate a specified competition object
@@ -266,11 +419,11 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
     logger.info(
       'Data fetched successfully. Creating a new group document in the database.'
     );
-    const group = await Group.create<IGroup>({
+    const group = await Group.create({
       name: body.name,
       email: body.email,
       website: body.website,
-      upcomingGames: [],
+      upcomingGame: undefined,
       users: [],
       followedTeams: [
         {
@@ -302,11 +455,9 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
       const upcomingGame = await findUpcomingGame(body.team, [body.league]);
 
       if (upcomingGame) {
-        // Save the game in the database, push it into the upcomingGames array,
-        // and save the group object with updated information .
+        // Save the game in the database, and update the upcomingGame of the group.
         const game = await Game.create(upcomingGame);
-        group.upcomingGames.push(game._id);
-
+        group.upcomingGame = game._id as Types.ObjectId;
         await group.save();
       }
     } catch (error) {

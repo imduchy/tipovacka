@@ -1,7 +1,7 @@
 import { Group, ICompetition, IUser } from '@duchynko/tipovacka-models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
-import { isAdmin, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -16,7 +16,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   // If req.headers contains the admin key, continue
-  if (isAdmin(req)) {
+  if (containsAdminKey(req)) {
     return next();
   }
 
@@ -48,7 +48,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
   try {
     const group = await Group.findById(groupId)
-      .populate('upcomingGames')
+      .populate('upcomingGame')
       .select('-followedTeams.seasons.competitions');
 
     if (!group) {
@@ -125,7 +125,7 @@ router.get('/competition', authMiddleware, async (req, res) => {
     // Result of the aggregation pipeline returns a competition object matching
     // the provided query details
     const aggrResult = await Group.aggregate<ICompetition>()
-      .match({ _id: Types.ObjectId(groupId) })
+      .match({ _id: new Types.ObjectId(groupId) })
       .unwind('followedTeams')
       .unwind('followedTeams.seasons')
       .unwind('followedTeams.seasons.competitions')

@@ -1,7 +1,7 @@
 import { IUser, User } from '@duchynko/tipovacka-models';
 import express, { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
-import { isAdmin, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import logger from '../utils/logger';
 
 const router = express.Router();
@@ -10,7 +10,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
 
   // If req.headers contains the admin key, continue
-  if (isAdmin(req)) {
+  if (containsAdminKey(req)) {
     next();
     return;
   }
@@ -44,11 +44,13 @@ router.get('/', authMiddleware, async (req, res) => {
   const userId = req.query.user;
 
   try {
-    const user = await User.findById(userId).populate({
-      path: 'bets',
-      model: 'bet',
-      populate: { path: 'game', model: 'game' },
-    });
+    const user = await User.findById(userId)
+      .populate({
+        path: 'bets',
+        model: 'bet',
+        populate: { path: 'game', model: 'game' },
+      })
+      .lean();
 
     if (!user) {
       logger.warn(`User with _id ${userId} doesn't exist.`);

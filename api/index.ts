@@ -24,16 +24,9 @@ try {
     logger.error('Database connection string is undefined');
     process.exit();
   }
-  mongoose
-    .connect(process.env.DB_CONNECTION_STRING, {
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    })
-    .then((_) => {
-      logger.info('Successfully connected to the database.');
-    });
+  mongoose.connect(process.env.DB_CONNECTION_STRING).then((_) => {
+    logger.info('Successfully connected to the database.');
+  });
 } catch (error) {
   logger.error('Error while connecting to the database. Error: ' + error);
   process.exit();
@@ -90,5 +83,5 @@ const PORT = process.env.PORT || 3003;
 const HOST = process.env.HOST || 'http://localhost';
 
 app.listen(PORT, () => {
-  console.log(`The API is listening at ${HOST}:${PORT}`);
+  logger.info(`The API is listening at ${HOST}:${PORT}`);
 });

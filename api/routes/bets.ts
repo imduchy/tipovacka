@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { IBet, Game, User, IUser, Bet } from '@duchynko/tipovacka-models';
 import { Types } from 'mongoose';
-import { isAdmin, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import { alreadyBet } from '../utils/bets';
 import logger from '../utils/logger';
 
@@ -11,7 +11,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
 
   // If req.headers contains the admin key, continue
-  if (isAdmin(req)) {
+  if (containsAdminKey(req)) {
     return next();
   }
 
@@ -90,7 +90,7 @@ router.post('/', authMiddleware, async ({ body }, res) => {
       scorer: body.scorer,
     };
 
-    user.bets.addToSet(bet);
+    user.bets.push(bet);
     await user.save();
     logger.info(`A user ${user._id} submitted a bet on a game ${gameId}.`);
 

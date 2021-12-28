@@ -64,6 +64,7 @@ export default {
         maxAge: 432000, // 5 days
       },
     },
+    middleware: ['authenticatorMiddleware'],
     redirect: {
       login: '/login',
       logout: '/login',
@@ -111,22 +112,22 @@ export default {
    */
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
+    treeShake: true,
+    defaultAssets: {
+      font: {
+        family: 'Montserrat',
+      },
+    },
     theme: {
-      dark: true,
+      options: {
+        customProperties: true,
+      },
+      dark: false,
       themes: {
-        dark: {
-          primary: colors.blue.darken4,
-          accent: colors.yellow.darken2,
-          secondary: colors.grey.lighten5,
-          info: colors.blue,
-          warning: colors.orange,
-          error: colors.red,
-          success: colors.green,
-        },
         light: {
-          primary: colors.blue.darken2,
-          accent: colors.grey.darken3,
-          secondary: colors.amber.darken3,
+          primary: '#00529F',
+          secondary: '#FEBE10',
+          accent: colors.grey.lighten5,
           info: colors.blue,
           warning: colors.orange,
           error: colors.red,
