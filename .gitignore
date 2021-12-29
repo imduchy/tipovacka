@@ -16,6 +16,7 @@ dist
 .DS_Store
 
 # others
+.turbo
 /logs
 coverage
 .npmrc

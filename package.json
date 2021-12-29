@@ -1,0 +1,67 @@
+{
+  "name": "@tipovacka/root",
+  "version": "1.0.0",
+  "author": "Jakub Duchon",
+  "license": "ISC",
+  "private": true,
+  "description": "Root package for Tipovacka project",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "test": "turbo run test",
+    "prepare": "husky install"
+  },
+  "turbo": {
+    "pipeline": {
+      "build": {
+        "dependsOn": [
+          "^build"
+        ],
+        "outputs": [
+          "dist/**",
+          ".nuxt/**"
+        ]
+      },
+      "lint": {
+        "outputs": []
+      },
+      "test": {},
+      "dev": {
+        "cache": false
+      }
+    }
+  },
+  "lint-staged": {
+    "apps/**/*.{js, ts, vue}": [
+      "eslint --fix"
+    ],
+    "packages/**/*.ts": [
+      "eslint --fix"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "mongoose": "6.1.4"
+  },
+  "devDependencies": {
+    "turbo": "latest",
+    "lint-staged": "^12.1.4",
+    "husky": "^7.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Duchynko/betting-game.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Duchynko/betting-game/issues"
+  },
+  "homepage": "https://github.com/Duchynko/betting-game#readme"
+}
