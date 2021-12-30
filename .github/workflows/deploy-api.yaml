@@ -4,12 +4,9 @@ on:
   push:
     branches:
       - 'master'
+      - 'turborepo'
     paths:
       - 'api/**'
-
-defaults:
-  run:
-    working-directory: 'api'
 
 jobs:
   deploy:
@@ -24,15 +21,12 @@ jobs:
           registry-url: https://npm.pkg.github.com
 
       - name: 'Install and run tests'
-        run: |
-          npm install
-          npm run test
+        run: yarn install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: 'Build application'
-        run: |
-          npm run build
+        run: yarn workspaces focus @tipovacka/api
         env:
           NODE_ENV: 'production'
 

@@ -1,8 +1,19 @@
 module.exports = {
-    ...require("@tipovacka/config/eslint-preset"),
-    parserOptions: {
-        root: true,
-        tsconfigRootDir: __dirname,
-        project: ["./tsconfig.json"]
-    }
-}
+    env: {
+      node: true,
+    },
+    extends: [
+      'plugin:prettier/recommended',
+      'prettier',
+    ],
+    plugins: ['prettier'],
+    rules: {
+      "import/no-mutable-exports": 0
+    },
+    ignorePatterns: [
+      '**/*.js',
+      '**/*.json',
+      'node_modules',
+    ],
+  };
+  

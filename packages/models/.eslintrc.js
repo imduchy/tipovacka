@@ -1,1 +1,1 @@
-module.exports = require("@tipovacka/config/eslint-preset");
+module.exports = require("root/eslint-preset");

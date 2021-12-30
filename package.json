@@ -9,33 +9,16 @@
     "apps/*",
     "packages/*"
   ],
+  "files": [
+    "eslint-preset.js"
+  ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint",
+    "build": "yarn workspaces foreach -pt run build",
+    "dev": "yarn workspaces foreach run dev",
+    "lint": "yarn workspaces foreach run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "turbo run test",
-    "prepare": "husky install"
-  },
-  "turbo": {
-    "pipeline": {
-      "build": {
-        "dependsOn": [
-          "^build"
-        ],
-        "outputs": [
-          "dist/**",
-          ".nuxt/**"
-        ]
-      },
-      "lint": {
-        "outputs": []
-      },
-      "test": {},
-      "dev": {
-        "cache": false
-      }
-    }
+    "test": "yarn workspaces foreach run test",
+    "g:tsc": "cd $INIT_CWD && tsc"
   },
   "lint-staged": {
     "apps/**/*.{js, ts, vue}": [
@@ -48,13 +31,18 @@
       "prettier --write"
     ]
   },
-  "dependencies": {
-    "mongoose": "6.1.4"
-  },
   "devDependencies": {
-    "turbo": "latest",
+    "@babel/eslint-parser": "^7.16.5",
+    "@nuxtjs/eslint-config-typescript": "^8.0.0",
+    "@nuxtjs/eslint-module": "^3.0.2",
+    "eslint": "^8.5.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-nuxt": "^3.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
     "lint-staged": "^12.1.4",
-    "husky": "^7.0.4"
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.4"
   },
   "repository": {
     "type": "git",
