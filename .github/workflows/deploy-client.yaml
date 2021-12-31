@@ -29,6 +29,7 @@ jobs:
 
       - name: 'Generate static site'
         run: |
+          npm run build-common
           npm run generate --workspace=@tipovacka/client
         env:
           NODE_ENV: 'production'
