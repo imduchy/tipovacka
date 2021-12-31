@@ -6,15 +6,11 @@
       ></v-col>
       <v-col cols="6" align="center" justify="center">
         <v-row justify="center" class="no-gutters">
-          <div class="text-h6 font-weight-light grey--text pr-2">
-            ({{ bet.homeTeamScore }})
-          </div>
+          <div class="text-h6 font-weight-light grey--text pr-2">({{ bet.homeTeamScore }})</div>
           <div class="text-h5 font-weight-bold">
             {{ bet.game.homeTeamScore }} : {{ bet.game.awayTeamScore }}
           </div>
-          <div class="text-h6 font-weight-light grey--text pl-2">
-            ({{ bet.awayTeamScore }})
-          </div>
+          <div class="text-h6 font-weight-light grey--text pl-2">({{ bet.awayTeamScore }})</div>
         </v-row>
         <v-row class="no-gutters">
           <v-col
@@ -51,8 +47,7 @@
 </template>
 
 <script lang="ts">
-import { IBet, IGame, IPlayer, ITeam } from '@tipovacka/models';
-import { FixtureEventDetail } from '@tipovacka/models';
+import { IBet, IGame, IPlayer, ITeam, FixtureEventDetail } from '@tipovacka/models';
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
@@ -109,18 +104,12 @@ export default Vue.extend({
   methods: {
     getResultColor(bet: IBet) {
       const game = bet.game as IGame;
-      if (
-        bet.homeTeamScore === game.homeTeamScore &&
-        bet.awayTeamScore === game.awayTeamScore
-      ) {
+      if (bet.homeTeamScore === game.homeTeamScore && bet.awayTeamScore === game.awayTeamScore) {
         return 'success';
       } else if (
-        (bet.homeTeamScore > bet.awayTeamScore &&
-          game.homeTeamScore! > game.awayTeamScore!) ||
-        (bet.awayTeamScore > bet.homeTeamScore &&
-          game.awayTeamScore! > game.homeTeamScore!) ||
-        (bet.homeTeamScore === bet.awayTeamScore &&
-          game.homeTeamScore === game.awayTeamScore)
+        (bet.homeTeamScore > bet.awayTeamScore && game.homeTeamScore! > game.awayTeamScore!) ||
+        (bet.awayTeamScore > bet.homeTeamScore && game.awayTeamScore! > game.homeTeamScore!) ||
+        (bet.homeTeamScore === bet.awayTeamScore && game.homeTeamScore === game.awayTeamScore)
       ) {
         return 'info';
       } else {

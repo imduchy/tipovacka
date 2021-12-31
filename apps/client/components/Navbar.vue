@@ -51,14 +51,7 @@
       <v-spacer></v-spacer>
       <template v-if="$auth.loggedIn">
         <span class="hidden-sm-and-down">
-          <v-btn
-            v-for="item in items"
-            :key="item.title"
-            large
-            class="mr-2"
-            icon
-            :to="item.to"
-          >
+          <v-btn v-for="item in items" :key="item.title" large class="mr-2" icon :to="item.to">
             <v-icon>{{ item.icon }}</v-icon>
           </v-btn>
           <!-- Additional menu -->

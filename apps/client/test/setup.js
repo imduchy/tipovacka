@@ -1,13 +1,13 @@
-import { render } from '@testing-library/vue'
-import Vue from 'vue'
-import Vuetify from 'vuetify'
+import { render } from '@testing-library/vue';
+import Vue from 'vue';
+import Vuetify from 'vuetify';
 
 // We need to use a global Vue instance, otherwise Vuetify will complain about
 // read-only attributes.
 // This could also be done in a custom Jest-test-setup file to execute for all tests.
 // More info: https://github.com/vuetifyjs/vuetify/issues/4068
 //            https://vuetifyjs.com/en/getting-started/unit-testing
-Vue.use(Vuetify)
+Vue.use(Vuetify);
 
 /**
  * Custom container to integrate Vuetify with Vue Testing Library.
@@ -15,8 +15,8 @@ Vue.use(Vuetify)
  * a <div data-app="true"> node.
  */
 export const renderWithVuetify = (component, options, callback) => {
-  const root = document.createElement('div')
-  root.setAttribute('data-app', 'true')
+  const root = document.createElement('div');
+  root.setAttribute('data-app', 'true');
 
   return render(
     component,
@@ -27,5 +27,5 @@ export const renderWithVuetify = (component, options, callback) => {
       ...options,
     },
     callback
-  )
-}
+  );
+};

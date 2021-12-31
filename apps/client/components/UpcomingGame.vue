@@ -1,11 +1,5 @@
 <template>
-  <v-card
-    data-testid="upcoming-game"
-    color="#f5f5f5"
-    class="pa-3 pa-sm-5"
-    elevation="3"
-    light
-  >
+  <v-card data-testid="upcoming-game" color="#f5f5f5" class="pa-3 pa-sm-5" elevation="3" light>
     <v-row align="center" justify="center">
       <v-col cols="4" align="center">
         <v-img
@@ -21,9 +15,7 @@
       </v-col>
       <v-col cols="4" align="center">
         <div>
-          <span class="text-subtitle-1 text-sm-h4 font-weight-light">{{
-            formatedDate
-          }}</span>
+          <span class="text-subtitle-1 text-sm-h4 font-weight-light">{{ formatedDate }}</span>
           <span class="text-subtitle-1 secondary--text text-sm-h4 font-weight-black">{{
             formatedTime
           }}</span>

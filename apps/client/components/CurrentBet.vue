@@ -20,12 +20,7 @@
     </v-row>
     <v-row>
       <v-col cols="12">
-        <v-text-field
-          :value="scorerName"
-          label="Strelec"
-          outlined
-          disabled
-        ></v-text-field>
+        <v-text-field :value="scorerName" label="Strelec" outlined disabled></v-text-field>
       </v-col>
     </v-row>
   </v-col>

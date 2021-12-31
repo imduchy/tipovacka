@@ -20,6 +20,7 @@ declare module '@nuxt/types' {
 
 declare module 'vuex/types/index' {
   // this.$showAlert inside Vuex stores
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Store<S> {
     $showAlert(message: string, color: string): void;
   }

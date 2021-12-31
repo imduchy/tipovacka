@@ -1,28 +1,12 @@
 <template>
   <v-row :class="{ 'align-self-center': !upcomingGame }">
     <!-- Loading bar  -->
-    <v-col
-      v-if="!upcomingGame"
-      cols="12"
-      class="text-center"
-      data-testid="progress-circular"
-    >
-      <v-progress-circular
-        indeterminate
-        :size="70"
-        :width="7"
-        color="amber"
-      ></v-progress-circular>
+    <v-col v-if="!upcomingGame" cols="12" class="text-center" data-testid="progress-circular">
+      <v-progress-circular indeterminate :size="70" :width="7" color="amber"></v-progress-circular>
       <div class="text-overline ma-3">Načítam dáta...</div>
     </v-col>
     <!-- Loading bar -->
-    <v-col
-      v-else
-      cols="12"
-      class="align-self-start"
-      align-self="start"
-      justify-self="start"
-    >
+    <v-col v-else cols="12" class="align-self-start" align-self="start" justify-self="start">
       <!-- Upcoming game -->
       <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
 
@@ -35,11 +19,7 @@
               :upcoming-game="upcomingGame"
               :players="players"
             ></bet-input>
-            <current-bet
-              v-else
-              :upcoming-game="upcomingGame"
-              :players="players"
-            ></current-bet>
+            <current-bet v-else :upcoming-game="upcomingGame" :players="players"></current-bet>
           </v-card>
         </v-col>
       </v-row>
@@ -105,9 +85,7 @@ export default Vue.extend({
       return this.competition.players
         ? (this.competition.players as IPlayer[])
             .filter((p) => p.statistics.games.position !== 'Goalkeeper')
-            .sort(
-              (a, b) => (b.statistics.goals.total || 0) - (a.statistics.goals.total || 0)
-            )
+            .sort((a, b) => (b.statistics.goals.total || 0) - (a.statistics.goals.total || 0))
         : [];
     },
     alreadyStarted(): boolean {

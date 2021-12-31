@@ -20,9 +20,7 @@
       <span class="text-caption"
         >&copy; {{ new Date().getFullYear() }}
         Vytvoril
-        <a href="https://www.linkedin.com/in/jakubduchon9/" target="_blank"
-          >Jakub Duchon.</a
-        ></span
+        <a href="https://www.linkedin.com/in/jakubduchon9/" target="_blank">Jakub Duchon.</a></span
       >
     </v-footer>
   </v-app>

@@ -14,15 +14,9 @@
         <v-card-title>
           Užívatelia
           <v-spacer></v-spacer>
-          <v-dialog
-            v-model="addUserDialog"
-            max-width="800px"
-            @click:outside="closeAddUserDialog"
-          >
+          <v-dialog v-model="addUserDialog" max-width="800px" @click:outside="closeAddUserDialog">
             <template #activator="{ on, attrs }">
-              <v-btn color="secondary" dark class="ma-2" v-bind="attrs" v-on="on">
-                + Pridať
-              </v-btn>
+              <v-btn color="secondary" dark class="ma-2" v-bind="attrs" v-on="on"> + Pridať </v-btn>
             </template>
             <v-card class="pa-4">
               <v-card-title>
@@ -105,9 +99,7 @@
             @click:outside="closeImportUsersDialog"
           >
             <template #activator="{ on, attrs }">
-              <v-btn color="grey" dark class="ma-2" v-bind="attrs" v-on="on">
-                + Importovať
-              </v-btn>
+              <v-btn color="grey" dark class="ma-2" v-bind="attrs" v-on="on"> + Importovať </v-btn>
             </template>
             <v-card class="pa-4">
               <v-card-title>
@@ -129,9 +121,8 @@
                 <v-row>
                   <v-col cols="12">
                     <p class="text-body">
-                      Pomocou šablóny je možné registrovať viacero užívateľov naraz. Na
-                      úspešné spracoavnie Excel súboru je však potrebné dodržať stanovený
-                      formát.
+                      Pomocou šablóny je možné registrovať viacero užívateľov naraz. Na úspešné
+                      spracoavnie Excel súboru je však potrebné dodržať stanovený formát.
                     </p>
                   </v-col>
                 </v-row>
@@ -155,11 +146,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog
-            v-model="editUserDialog"
-            max-width="800px"
-            @click:outside="closeEditUserDialog"
-          >
+          <v-dialog v-model="editUserDialog" max-width="800px" @click:outside="closeEditUserDialog">
             <v-card class="pa-4">
               <v-card-title>
                 <span class="text-h5">Upraviť užívateľa</span>
@@ -252,8 +239,8 @@
                   <v-card-text>
                     <p>Naozaj chceš vymazať užívateľa {{ editedUser.username }}?</p>
                     <p class="font-weight-bold">
-                      Vymazaním užívateľa vymažeš aj všetky informácie spojené z jeho
-                      účtom vrátane tipov a bodov z jednotlivych sezón.
+                      Vymazaním užívateľa vymažeš aj všetky informácie spojené z jeho účtom vrátane
+                      tipov a bodov z jednotlivych sezón.
                     </p>
                   </v-card-text>
                   <v-card-actions>
@@ -271,17 +258,15 @@
               </v-dialog>
             </v-toolbar>
           </template>
-          <template #item.active="{ item }">
+          <template #[`item.active`]="{ item }">
             <v-simple-checkbox
               id="disabled-icon-success"
               v-model="item.active"
               disabled
             ></v-simple-checkbox>
           </template>
-          <template #item.actions="{ item }">
-            <v-icon small class="mr-2" @click="openEditUserDialog(item)">
-              mdi-pencil
-            </v-icon>
+          <template #[`item.actions`]="{ item }">
+            <v-icon small class="mr-2" @click="openEditUserDialog(item)"> mdi-pencil </v-icon>
             <v-icon small @click="openDeleteUserDialog(item)"> mdi-delete </v-icon>
           </template>
         </v-data-table>
@@ -400,9 +385,7 @@ export default Vue.extend({
         this.closeAddUserDialog();
       }
     },
-    openEditUserDialog(
-      item: IUser & { createdAt: string; active: boolean; admin: boolean }
-    ) {
+    openEditUserDialog(item: IUser & { createdAt: string; active: boolean; admin: boolean }) {
       this.editedIndex = this.users.indexOf(item);
       this.editedUser = Object.assign(
         {},
@@ -427,9 +410,7 @@ export default Vue.extend({
     editUser() {
       this.closeEditUserDialog();
     },
-    openDeleteUserDialog(
-      item: IUser & { createdAt: string; active: boolean; admin: boolean }
-    ) {
+    openDeleteUserDialog(item: IUser & { createdAt: string; active: boolean; admin: boolean }) {
       this.editedIndex = this.users.indexOf(item);
       this.editedUser = Object.assign(
         {},

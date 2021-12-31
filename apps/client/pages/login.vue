@@ -8,17 +8,14 @@
           sm="8"
           :align="$vuetify.breakpoint.smAndDown ? 'center' : 'start'"
         >
-          <v-img src="/halamadrid-logo.png" width="150px" class="hide-above-sm mb-10">
-          </v-img>
+          <v-img src="/halamadrid-logo.png" width="150px" class="hide-above-sm mb-10"> </v-img>
           <p class="text-h4 font-weight-bold">Prihlásenie</p>
           <p class="text-subtitle-1 hide-on-sm">
             Prihlasovacia stránka pre členov fanklubu La Peňa Madridista de Eslovaquia
           </p>
           <v-divider class="my-8 hide-on-sm" color="grey"></v-divider>
           <v-form>
-            <p class="text-subtitle-1 font-weight-bold mb-1 hide-on-sm">
-              Prihlasovacie meno
-            </p>
+            <p class="text-subtitle-1 font-weight-bold mb-1 hide-on-sm">Prihlasovacie meno</p>
             <v-text-field
               v-model="login.username"
               :label="$vuetify.breakpoint.smAndDown ? 'Prihlasovacie meno' : ''"
@@ -68,16 +65,14 @@
           </v-form>
 
           <p class="text-body-1 font-weight-light hide-on-sm">
-            Táto aplikácia je vyhradená iba pre členov fanklubu. Ak si členom fanklubu a
-            ešte nemáš účet, kontaktuj prosím vedenie fanklubu.
+            Táto aplikácia je vyhradená iba pre členov fanklubu. Ak si členom fanklubu a ešte nemáš
+            účet, kontaktuj prosím vedenie fanklubu.
           </p>
 
           <p class="text-subtitle-1 font-weight-light mt-10">
             &copy; {{ new Date().getFullYear() }}
             Vytvoril
-            <a href="https://www.linkedin.com/in/jakubduchon9/" target="_blank"
-              >Jakub Duchon.</a
-            >
+            <a href="https://www.linkedin.com/in/jakubduchon9/" target="_blank">Jakub Duchon.</a>
           </p>
         </v-col>
       </v-row>
