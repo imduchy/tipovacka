@@ -111,7 +111,7 @@ export default Vue.extend({
             password: this.login.password,
           },
         });
-      } catch (err) {
+      } catch (err: any) {
         if (err.response && err.response.status === 401) {
           this.$showAlert('Nesprávne meno alebo heslo', 'error');
         } else {

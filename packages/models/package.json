@@ -18,5 +18,13 @@
   },
   "peerDependencies": {
     "mongoose": "^6.1.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Duchynko/betting-game.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Duchynko/betting-game/issues"
+  },
+  "homepage": "https://github.com/Duchynko/betting-game#readme"
 }

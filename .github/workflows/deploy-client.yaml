@@ -4,12 +4,9 @@ on:
   push:
     branches:
       - 'master'
+      - 'turborepo'
     paths:
       - 'client/**'
-
-defaults:
-  run:
-    working-directory: 'client'
 
 jobs:
   deploy:
@@ -17,22 +14,17 @@ jobs:
     steps:
       - uses: 'actions/checkout@v2'
 
-      - name: Use Node.js 12.x
+      - name: Use Node.js 14.x
         uses: actions/setup-node@v2
         with:
-          node-version: 12.x
-          registry-url: https://npm.pkg.github.com
+          node-version: 14.x
 
-      - name: 'Install and run tests'
-        run: |
-          npm install
-          # npm run test
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: 'Install dependencies'
+        run: npm install
 
       - name: 'Generate static site'
         run: |
-          npm run generate
+          npm run generate --workspace=@tipovacka/client
         env:
           NODE_ENV: 'production'
           BASE_URL: 'https://api.onlinetipovacka.sk/api'
@@ -46,7 +38,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-            az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} -d '$web' -s ./client/dist/
+            az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} -d '$web' -s .apps/client/dist/
 
       - name: 'Purge CDN endpoint'
         uses: 'azure/CLI@v1'

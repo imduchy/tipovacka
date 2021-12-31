@@ -366,7 +366,7 @@ export default Vue.extend({
 
         await this.$axios.$post('/admin/users/import', fd);
         this.$showAlert('Užívatelia úspešne pridaný', 'success');
-      } catch (error) {
+      } catch (error: any) {
         const code = error.response.data.code;
         this.$showAlert('Niekde sa stala chyba. Kód chyby: ' + code, 'error');
       } finally {
@@ -393,7 +393,7 @@ export default Vue.extend({
         this.$showAlert('Užívateľ úspešne pridaný', 'success');
         const updatedUsers = await this.fetchUsers();
         this.rawUsers = updatedUsers;
-      } catch (err) {
+      } catch (err: any) {
         const code = err.response.data.code;
         this.$showAlert('Niekde sa stala chyba. Kód chyby: ' + code, 'error');
       } finally {
