@@ -22,9 +22,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.warn(
     `[${req.originalUrl}] Unauthorized request was made by user ${
       req.user && (req.user as IUser & { _id: string })._id
-    } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${req.header(
-      'tipovacka-auth-token'
-    )}`
+    } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${req.header('tipovacka-auth-token')}`
   );
   res.status(401).send('Unauthorized request');
 };
@@ -54,9 +52,7 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
     logger.info('Finding the team with id ' + teamId + 'in the group record.');
     const team = group.followedTeams.find((t) => t.apiId === teamId);
     if (!team) {
-      throw new Error(
-        `The group ${group.name} doesn't follow a team with the API id ${teamId}.`
-      );
+      throw new Error(`The group ${group.name} doesn't follow a team with the API id ${teamId}.`);
     }
 
     // The API doesn't track competition standings before the season starts.
@@ -205,116 +201,109 @@ router.post('/users', authMiddleware, async (req, res) => {
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.post(
-  '/users/import',
-  authMiddleware,
-  upload.single('importFile'),
-  async (req, res) => {
-    if (!req.file) {
-      logger.error("The request doesn't contain an import file.");
-      return res.status(400).send("The request doesn't contain an import file.");
-    }
+router.post('/users/import', authMiddleware, upload.single('importFile'), async (req, res) => {
+  if (!req.file) {
+    logger.error("The request doesn't contain an import file.");
+    return res.status(400).send("The request doesn't contain an import file.");
+  }
 
-    logger.info('Starting to process the request.');
-    try {
-      const groupId = (req.user as IUser).groupId;
-      const fileBuffer = req.file.buffer;
-      const workSheet = xlsx.parse(fileBuffer);
-      // Remove the "headers" row
-      const users = workSheet[0].data
-        .slice(1)
-        .filter((row) => row[0] != undefined && row[1] != undefined);
+  logger.info('Starting to process the request.');
+  try {
+    const groupId = (req.user as IUser).groupId;
+    const fileBuffer = req.file.buffer;
+    const workSheet = xlsx.parse(fileBuffer);
+    // Remove the "headers" row
+    const users = workSheet[0].data
+      .slice(1)
+      .filter((row) => row[0] != undefined && row[1] != undefined);
 
-      const results = [];
+    const results = [];
 
-      logger.info(`The excel sheet contains ${users.length} users.`);
-      for (const user of users) {
-        const email = user[0] as string;
-        const username = user[1] as string;
+    logger.info(`The excel sheet contains ${users.length} users.`);
+    for (const user of users) {
+      const email = user[0] as string;
+      const username = user[1] as string;
 
-        logger.info(`Adding user ${username} (${email}) to the database.`);
+      logger.info(`Adding user ${username} (${email}) to the database.`);
 
-        // Check if a user with this email already exists
-        if (await User.findOne({ email })) {
-          logger.error('User with specified email already exists in the database.');
+      // Check if a user with this email already exists
+      if (await User.findOne({ email })) {
+        logger.error('User with specified email already exists in the database.');
+        results.push({
+          username,
+          email,
+          error: 'User with this email already exists',
+        });
+        continue;
+      }
+
+      // The initial password of a user will be set to their username.
+      // If length of the username is not at least 6 characters (password limit),
+      // append "123" at the end of the password.
+      const password = username.length >= 6 ? username : username + '123';
+      logger.info(`The initial password of the user is set to ${password}.`);
+      const salt = await bcrypt.genSalt();
+      const encryptedPassword = await bcrypt.hash(password, salt);
+
+      logger.info('Adding the new user in to the database.');
+      await User.create<IUser>({
+        username: username,
+        bets: [],
+        email: email,
+        password: encryptedPassword,
+        groupId: groupId,
+        scope: ['user'],
+      })
+        .then((_) => {
+          logger.info('The new user was added successfully to the database.');
           results.push({
             username,
             email,
-            error: 'User with this email already exists',
+            error: null,
           });
-          continue;
-        }
-
-        // The initial password of a user will be set to their username.
-        // If length of the username is not at least 6 characters (password limit),
-        // append "123" at the end of the password.
-        const password = username.length >= 6 ? username : username + '123';
-        logger.info(`The initial password of the user is set to ${password}.`);
-        const salt = await bcrypt.genSalt();
-        const encryptedPassword = await bcrypt.hash(password, salt);
-
-        logger.info('Adding the new user in to the database.');
-        await User.create<IUser>({
-          username: username,
-          bets: [],
-          email: email,
-          password: encryptedPassword,
-          groupId: groupId,
-          scope: ['user'],
         })
-          .then((_) => {
-            logger.info('The new user was added successfully to the database.');
-            results.push({
-              username,
-              email,
-              error: null,
-            });
-          })
-          .catch((error) => {
-            logger.error('An error occured while adding the user to the database.');
-            logger.error(error);
-            results.push({
-              username,
-              email,
-              error: 'Internal server error.',
-            });
+        .catch((error) => {
+          logger.error('An error occured while adding the user to the database.');
+          logger.error(error);
+          results.push({
+            username,
+            email,
+            error: 'Internal server error.',
           });
-      }
-
-      const failed = results.filter((r) => r.error != null);
-      if (failed.length !== 0) {
-        logger.error(
-          `Failed to create ${failed.length} users. Errors: ${JSON.stringify(failed)}`
-        );
-        return res.status(400).json({
-          message: `Failed to create ${failed.length} of ${users.length} users.`,
-          code: 'IMPORT_NOT_SUCCESSFUL',
         });
-      }
+    }
 
-      return res.status(200).json({
-        response: `Successfully added ${users.length} users.`,
-        code: 'SUCCESS',
-      });
-    } catch (error: any) {
-      logger.error(`There was an error creating users. Error: ${error}.`);
-
-      if (error.message) {
-        if ((error.message as string).includes('Unsupported')) {
-          return res.status(400).json({
-            message: error.message,
-            code: 'UNSUPPORTED_FILE_FORMAT',
-          });
-        }
-      }
-
+    const failed = results.filter((r) => r.error != null);
+    if (failed.length !== 0) {
+      logger.error(`Failed to create ${failed.length} users. Errors: ${JSON.stringify(failed)}`);
       return res.status(400).json({
-        message: `Internal server error.`,
-        code: 'INTERNAL_ERROR',
+        message: `Failed to create ${failed.length} of ${users.length} users.`,
+        code: 'IMPORT_NOT_SUCCESSFUL',
       });
     }
+
+    return res.status(200).json({
+      response: `Successfully added ${users.length} users.`,
+      code: 'SUCCESS',
+    });
+  } catch (error: any) {
+    logger.error(`There was an error creating users. Error: ${error}.`);
+
+    if (error.message) {
+      if ((error.message as string).includes('Unsupported')) {
+        return res.status(400).json({
+          message: error.message,
+          code: 'UNSUPPORTED_FILE_FORMAT',
+        });
+      }
+    }
+
+    return res.status(400).json({
+      message: `Internal server error.`,
+      code: 'INTERNAL_ERROR',
+    });
   }
-);
+});
 
 /**
  * Create a new group, populate a specified competition object
@@ -347,9 +336,7 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
       );
       return res
         .status(404)
-        .json(
-          'Team information not found. Make sure the request body contains correct values.'
-        );
+        .json('Team information not found. Make sure the request body contains correct values.');
     }
 
     logger.info('Fetching team statistics from the API.');
@@ -367,9 +354,7 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
       );
       return res
         .status(404)
-        .json(
-          'Team statistics not found. Make sure the request body contains correct values.'
-        );
+        .json('Team statistics not found. Make sure the request body contains correct values.');
     }
 
     logger.info('Fetching competition standings from the API.');
@@ -406,9 +391,7 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
       );
       return res
         .status(404)
-        .json(
-          "Team's players not found. Make sure the request body contains correct values."
-        );
+        .json("Team's players not found. Make sure the request body contains correct values.");
     }
 
     const { team } = teamResponse.data.response[0];
@@ -416,9 +399,7 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
     const teamStatistics = statisticsResponse.data.response;
     const players = playersResponse.data.response;
 
-    logger.info(
-      'Data fetched successfully. Creating a new group document in the database.'
-    );
+    logger.info('Data fetched successfully. Creating a new group document in the database.');
     const group = await Group.create({
       name: body.name,
       email: body.email,
@@ -462,8 +443,7 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
       }
     } catch (error) {
       logger.error(
-        `An error occured while fetching an upcoming game for the group. ` +
-          `Error: ${error}`
+        `An error occured while fetching an upcoming game for the group. ` + `Error: ${error}`
       );
       throw error;
     }

@@ -6,7 +6,7 @@ on:
       - 'master'
       - 'turborepo'
     paths:
-      - 'client/**'
+      - 'apps/client/**'
 
 jobs:
   deploy:
