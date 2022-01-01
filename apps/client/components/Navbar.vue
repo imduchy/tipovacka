@@ -44,14 +44,21 @@
           style="cursor: pointer"
         >
           <span role="link" @click="navigate">
-            {{ title }}
+            <i>{{ title }}</i>
           </span>
         </router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <template v-if="$auth.loggedIn">
         <span class="hidden-sm-and-down">
-          <v-btn v-for="item in items" :key="item.title" plain text class="mr-2" :to="item.to">
+          <v-btn
+            v-for="item in items"
+            :key="item.title"
+            plain
+            text
+            class="mr-2 font-weight-bold"
+            :to="item.to"
+          >
             {{ item.title }}
           </v-btn>
         </span>
