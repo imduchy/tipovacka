@@ -4,10 +4,8 @@ on:
   push:
     branches:
       - 'master'
-      - 'turborepo'
     paths:
       - 'apps/api/**'
-      - '.github/workflows/deploy-api.yaml'
 
 jobs:
   deploy:
