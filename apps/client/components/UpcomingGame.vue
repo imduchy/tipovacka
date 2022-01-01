@@ -1,5 +1,5 @@
 <template>
-  <v-card data-testid="upcoming-game" color="#f5f5f5" class="pa-3 pa-sm-5" elevation="3" light>
+  <v-card color="#f5f5f5" class="pa-3 pa-sm-5" light>
     <v-row align="center" justify="center">
       <v-col cols="4" align="center">
         <v-img

@@ -12,6 +12,11 @@
       </v-system-bar> -->
       <v-container fill-height align-start justify-center>
         <alert id="alert"></alert>
+        <v-row>
+          <v-col class="py-0">
+            <div class="text-h5 font-weight-bold py-3 mt-3">{{ $nuxt.$route.name }}</div>
+          </v-col>
+        </v-row>
         <nuxt keep-alive />
       </v-container>
     </v-main>

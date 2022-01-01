@@ -11,7 +11,7 @@
       <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
 
       <v-row class="mb-5">
-        <v-col cols="12" class="pt-0">
+        <v-col cols="12" class="pt-0 pb-0">
           <v-card class="pt-8 px-8">
             <!-- Input field / Current bet -->
             <bet-input
@@ -25,7 +25,7 @@
       </v-row>
 
       <!-- Last bets -->
-      <div class="mt-5 text-h5">
+      <div class="mt-3 text-h5">
         Posledné tipy
 
         <v-tooltip bottom>
@@ -67,6 +67,7 @@ export default Vue.extend({
       followedTeam: this.$store.state.group.followedTeams[0],
     };
   },
+  // @ts-ignore
   async fetch() {
     this.competition = await this.$axios.$get('/groups/competition', {
       params: {
@@ -119,3 +120,9 @@ export default Vue.extend({
   },
 });
 </script>
+
+<router>
+{
+    name: "Domov"
+}
+</router>

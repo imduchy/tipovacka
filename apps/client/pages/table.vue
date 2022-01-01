@@ -79,3 +79,9 @@ export default Vue.extend({
   background-color: #f5f5f5;
 }
 </style>
+
+<router>
+{
+    name: "Tabuľka"
+}
+</router>

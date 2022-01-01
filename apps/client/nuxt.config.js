@@ -55,7 +55,12 @@ export default {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxt/typescript-build', '@nuxtjs/vuetify', '@nuxtjs/svg'],
+  buildModules: [
+    '@nuxt/typescript-build',
+    '@nuxtjs/vuetify',
+    '@nuxtjs/svg',
+    '@nuxtjs/router-extras',
+  ],
   /*
    ** Nuxt.js modules
    */

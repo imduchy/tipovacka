@@ -448,3 +448,9 @@ export default Vue.extend({
   color: var(--v-success-base) !important;
 }
 </style>
+
+<router>
+{
+    name: "Admin"
+}
+</router>

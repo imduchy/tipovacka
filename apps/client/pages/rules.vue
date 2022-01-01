@@ -1,9 +1,9 @@
 <template>
   <v-row>
-    <v-col>
-      <v-row justify="center" align="center" class="ma-4">
-        <v-col cols="12" md="6">
-          <div class="text-h4 font-weight-bold pb-3">Všeobecné pravidlá</div>
+    <v-col no-gutters>
+      <v-row align="center" no-gutters>
+        <v-col self-justify="start" cols="12" md="6">
+          <div class="text-h4 font-weight-bold pb-3 px-0">Všeobecné pravidlá</div>
           <ul class="text-justify">
             <li class="py-1">
               Tipovanie je počas sezóny rozdelené na dve časti - Počas prvej polovice a počas druhej
@@ -21,12 +21,12 @@
           </ul>
         </v-col>
         <v-col class="order-md-2" cols="12" md="6" align="center">
-          <v-img src="/undraw_game_day.svg" contain width="70%" max-height="300" />
+          <v-img src="/undraw_game_day.svg" contain width="80%" max-height="250" />
         </v-col>
       </v-row>
       <v-row justify="center" align="center" class="pa-4">
         <v-col order="2" order-md="1" cols="12" md="6" align="center">
-          <v-img src="/undraw_spreadsheets.svg" width="70%" contain max-height="300" />
+          <v-img src="/undraw_spreadsheets.svg" width="80%" contain max-height="250" />
         </v-col>
         <v-col order="1" order-md="2" cols="12" md="6">
           <div class="text-h4 font-weight-bold pb-3">Bodovanie</div>
@@ -111,9 +111,15 @@
           </v-row>
         </v-col>
         <v-col cols="12" md="6" align="center">
-          <v-img src="/undraw_fans.svg" contain width="60%" max-height="300" />
+          <v-img src="/undraw_fans.svg" contain width="80%" max-height="250" />
         </v-col>
       </v-row>
     </v-col>
   </v-row>
 </template>
+
+<router>
+{
+    name: "Pravidlá"
+}
+</router>
