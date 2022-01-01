@@ -11,8 +11,9 @@
   ],
   "scripts": {
     "build-common": "npm run build --workspace=packages/",
-    "lint": "echo 'Lint script missing'",
-    "test": "echo 'Test script missing'"
+    "dev": "npm run dev --workspace=apps/",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
   "lint-staged": {
     "apps/**/*.{js, ts, vue}": [

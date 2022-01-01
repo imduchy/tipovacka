@@ -43,7 +43,7 @@
           custom
           style="cursor: pointer"
         >
-          <span role="link" @click="navigate" @keypress.enter="navigate">
+          <span role="link" @click="navigate">
             {{ title }}
           </span>
         </router-link>
@@ -51,9 +51,14 @@
       <v-spacer></v-spacer>
       <template v-if="$auth.loggedIn">
         <span class="hidden-sm-and-down">
-          <v-btn v-for="item in items" :key="item.title" large class="mr-2" icon :to="item.to">
-            <v-icon>{{ item.icon }}</v-icon>
+          <v-btn v-for="item in items" :key="item.title" plain text class="mr-2" :to="item.to">
+            {{ item.title }}
           </v-btn>
+        </span>
+      </template>
+      <v-spacer></v-spacer>
+      <template v-if="$auth.loggedIn">
+        <span class="hidden-sm-and-down">
           <!-- Additional menu -->
           <v-menu bottom offset-y>
             <template #activator="{ on, attrs }">
@@ -118,6 +123,11 @@ export default Vue.extend({
         icon: 'mdi-trophy',
         title: 'Tabuľka',
         to: '/table',
+      },
+      {
+        icon: 'mdi-seal-variant',
+        title: 'Pravidlá',
+        to: '/rules',
       },
     ],
     title: 'Tipovačka',

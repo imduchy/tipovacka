@@ -22,7 +22,13 @@ export default {
         content: 'Online tipovacia súťaž pre futbalové fankluby',
       },
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      // {
+      //   rel: 'stylesheet',
+      //   href: 'https://fonts.googleapis.com/css?family=Montserrat|Assistant&display=swap',
+      // },
+    ],
   },
   router: {
     middleware: ['auth', 'groupData'],
@@ -49,7 +55,7 @@ export default {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxt/typescript-build', '@nuxtjs/vuetify'],
+  buildModules: ['@nuxt/typescript-build', '@nuxtjs/vuetify', '@nuxtjs/svg'],
   /*
    ** Nuxt.js modules
    */
@@ -115,7 +121,7 @@ export default {
     treeShake: true,
     defaultAssets: {
       font: {
-        family: 'Montserrat',
+        family: 'Noto Sans',
       },
     },
     theme: {
