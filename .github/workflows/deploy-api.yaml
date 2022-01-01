@@ -5,11 +5,7 @@ on:
     branches:
       - 'master'
     paths:
-      - 'api/**'
-
-defaults:
-  run:
-    working-directory: 'api'
+      - 'apps/api/**'
 
 jobs:
   deploy:
@@ -17,22 +13,22 @@ jobs:
     steps:
       - uses: 'actions/checkout@v2'
 
-      - name: Use Node.js 12.x
+      - name: Use Node.js 14.x
         uses: actions/setup-node@v2
         with:
-          node-version: 12.x
-          registry-url: https://npm.pkg.github.com
+          node-version: 14.x
+          cache: 'npm'
 
-      - name: 'Install and run tests'
-        run: |
-          npm install
-          npm run test
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Upgrade npm to 8.x
+        run: npm i -g npm@8
+
+      - name: 'Install dependencies'
+        run: npm install
 
       - name: 'Build application'
         run: |
-          npm run build
+          npm run build-common
+          npm run build --workspace=@tipovacka/api
         env:
           NODE_ENV: 'production'
 
@@ -41,4 +37,4 @@ jobs:
         with:
           app-name: 'onlinetipovacka-api'
           publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILE }}
-          package: 'api'
+          package: 'apps/api/dist'

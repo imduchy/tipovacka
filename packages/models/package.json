@@ -1,0 +1,30 @@
+{
+  "name": "@tipovacka/models",
+  "version": "1.11.1",
+  "author": "Jakub Duchon",
+  "license": "ISC",
+  "private": true,
+  "description": "Mongoose models for Tipovacka project",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint ./src"
+  },
+  "lint-staged": {
+    "src/*": [
+      "npm run lint"
+    ]
+  },
+  "peerDependencies": {
+    "mongoose": "^6.1.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Duchynko/betting-game.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Duchynko/betting-game/issues"
+  },
+  "homepage": "https://github.com/Duchynko/betting-game#readme"
+}
