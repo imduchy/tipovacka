@@ -1,14 +1,6 @@
 <template>
   <v-row :class="{ 'align-self-center': $fetchState.pending }">
-    <v-col v-if="$fetchState.pending" class="text-center" cols="12">
-      <v-progress-circular
-        :size="70"
-        :width="7"
-        color="secondary"
-        indeterminate
-      ></v-progress-circular>
-      <div class="text-overline ma-3">Načítam dáta...</div>
-    </v-col>
+    <loading-bar v-if="$fetchState.pending" />
     <v-col v-else cols="12">
       <v-card color="#f5f5f5">
         <v-card-title>
@@ -279,6 +271,7 @@
 import { IUser } from '@tipovacka/models';
 import Vue from 'vue';
 export default Vue.extend({
+  // @ts-ignore
   middleware: ['auth', 'authenticator'],
   data: () => ({
     search: '',

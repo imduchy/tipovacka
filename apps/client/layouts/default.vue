@@ -10,8 +10,8 @@
         </span>
         <v-spacer></v-spacer>
       </v-system-bar> -->
-      <v-container fill-height align-start justify-center>
-        <alert id="alert"></alert>
+      <v-container align-start>
+        <alert id="alert" />
         <v-row>
           <v-col class="py-0">
             <div class="text-h5 font-weight-bold py-3 mt-3">{{ $nuxt.$route.name }}</div>

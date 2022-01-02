@@ -1,14 +1,6 @@
 <template>
   <v-row :class="{ 'align-self-center': $fetchState.pending }">
-    <v-col v-if="$fetchState.pending" class="text-center" cols="12">
-      <v-progress-circular
-        :size="70"
-        :width="7"
-        color="secondary"
-        indeterminate
-      ></v-progress-circular>
-      <div class="text-overline ma-3">Načítam dáta...</div>
-    </v-col>
+    <loading-bar v-if="$fetchState.pending" />
     <v-col v-else cols="12">
       <v-data-table
         :headers="[
@@ -41,6 +33,7 @@ export default Vue.extend({
   data: () => ({
     rawUsers: [] as IUser[],
   }),
+  // @ts-ignore
   async fetch() {
     this.rawUsers = await this.$axios.$get('/groups/users', {
       params: { group: this.$store.state.group._id },

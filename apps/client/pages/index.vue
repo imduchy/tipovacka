@@ -1,11 +1,8 @@
 <template>
   <v-row :class="{ 'align-self-center': !upcomingGame }">
     <!-- Loading bar  -->
-    <v-col v-if="!upcomingGame" cols="12" class="text-center" data-testid="progress-circular">
-      <v-progress-circular indeterminate :size="70" :width="7" color="amber"></v-progress-circular>
-      <div class="text-overline ma-3">Načítam dáta...</div>
-    </v-col>
-    <!-- Loading bar -->
+    <loading-bar v-if="!upcomingGame" />
+    <!-- Main view -->
     <v-col v-else cols="12" class="align-self-start" align-self="start" justify-self="start">
       <!-- Upcoming game -->
       <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
@@ -25,7 +22,7 @@
       </v-row>
 
       <!-- Last bets -->
-      <div class="mt-3 text-h5">
+      <div class="py-3 mt-3 text-h5">
         Posledné tipy
 
         <v-tooltip bottom>
