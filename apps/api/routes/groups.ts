@@ -84,9 +84,7 @@ router.get('/users', authMiddleware, async (req, res) => {
       res.status(404).send("The specified group doesn't exist.");
     }
   } catch (error) {
-    logger.error(
-      `An error occured while fetching the group ${groupId}. Error: ${error}.`
-    );
+    logger.error(`An error occured while fetching the group ${groupId}. Error: ${error}.`);
     res.status(500).send('Internal server error.');
   }
 });
@@ -135,9 +133,7 @@ router.get('/competition', authMiddleware, async (req, res) => {
       .replaceRoot('$followedTeams.seasons.competitions');
 
     if (!aggrResult[0]) {
-      logger.info(
-        'No competition found for the specified parameters. ' + JSON.stringify(q)
-      );
+      logger.info('No competition found for the specified parameters. ' + JSON.stringify(q));
       return res.status(404).json('Competition not found.');
     }
 

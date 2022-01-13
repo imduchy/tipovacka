@@ -33,11 +33,16 @@ try {
 }
 
 strategy(passport);
-
 app.set('trust proxy', 1);
+
+if (!process.env.SESSION_SECRET) {
+  logger.error('The session secret is undefined');
+  process.exit();
+}
+
 app.use(
   session({
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET,
     cookie: {
       maxAge: 172800000,
       sameSite: 'lax',

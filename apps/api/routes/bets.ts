@@ -50,9 +50,7 @@ router.post('/', authMiddleware, async ({ body }, res) => {
     awayTeamScore === undefined ||
     scorer === undefined
   ) {
-    logger.warn(
-      "The request doesn't contain required request body. The bet won't be submitted."
-    );
+    logger.warn("The request doesn't contain required request body. The bet won't be submitted.");
     return res.status(400).send('Bad request');
   }
 

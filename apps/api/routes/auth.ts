@@ -26,14 +26,14 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
 router.get('/user', (req, res) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
-  let user = req.user;
+  const user = req.user;
 
   // For some reason, when submiting a bet in production, the requests arrive
   // with the scorer field as a string. E.g., instead 256, the value is "256".
   // This is a quick workaround to make sure we always return back scorers
   // as numbers, until the root problem is fixed.
   if (user) {
-    let user = req.user as IUser;
+    const user = req.user as IUser;
     user.bets = user.bets!.map((bet) => {
       if (typeof bet.scorer === 'string') {
         bet.scorer = parseInt(bet.scorer);
@@ -55,13 +55,9 @@ router.get('/logout', (req, res) => {
     }
 
     const Sessions = mongoose.connection.collection('sessions');
-    await Sessions.findOneAndDelete({ _id: new Types.ObjectId(req.sessionID) }).catch(
-      (err) => {
-        logger.warn(
-          `Couldn't delete sessions ${req.sessionID} from the database. Error: ${err}`
-        );
-      }
-    );
+    await Sessions.findOneAndDelete({ _id: new Types.ObjectId(req.sessionID) }).catch((err) => {
+      logger.warn(`Couldn't delete sessions ${req.sessionID} from the database. Error: ${err}`);
+    });
   });
   req.logout();
   res.status(200).send();

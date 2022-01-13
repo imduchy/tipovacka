@@ -1,7 +1,7 @@
 <template>
-  <v-alert v-model="show" transition="fade-transition" dismissible :color="color">{{
-    message
-  }}</v-alert>
+  <v-alert v-model="show" dark transition="fade-transition" dismissible :color="color"
+    ><strong>{{ message }}</strong></v-alert
+  >
 </template>
 
 <script lang="ts">
@@ -23,7 +23,7 @@ export default Vue.extend({
         this.show = true;
         await setTimeout(() => {
           this.show = false;
-        }, 3000);
+        }, 5000);
       }
     });
   },

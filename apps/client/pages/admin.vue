@@ -283,6 +283,7 @@ export default Vue.extend({
     rawUsers: [] as IUser[],
     editedIndex: -1,
     editedUser: {
+      _id: '',
       username: '',
       email: '',
       password: '',
@@ -291,6 +292,7 @@ export default Vue.extend({
       admin: false,
     },
     emptyUser: {
+      _id: '',
       username: '',
       email: '',
       password: '',
@@ -305,7 +307,7 @@ export default Vue.extend({
   computed: {
     users() {
       return this.rawUsers.map((rawUser) => {
-        const user = rawUser as IUser & { createdAt: string };
+        const user = rawUser as IUser & { _id: string; createdAt: string };
         return {
           ...user,
           createdAt: new Date(user.createdAt).toLocaleDateString('sk-SK'),
@@ -378,11 +380,14 @@ export default Vue.extend({
         this.closeAddUserDialog();
       }
     },
-    openEditUserDialog(item: IUser & { createdAt: string; active: boolean; admin: boolean }) {
+    openEditUserDialog(
+      item: IUser & { _id: string; createdAt: string; active: boolean; admin: boolean }
+    ) {
       this.editedIndex = this.users.indexOf(item);
       this.editedUser = Object.assign(
         {},
         {
+          _id: item._id,
           username: item.username,
           email: item.email,
           password: '',
@@ -403,11 +408,14 @@ export default Vue.extend({
     editUser() {
       this.closeEditUserDialog();
     },
-    openDeleteUserDialog(item: IUser & { createdAt: string; active: boolean; admin: boolean }) {
+    openDeleteUserDialog(
+      item: IUser & { _id: string; createdAt: string; active: boolean; admin: boolean }
+    ) {
       this.editedIndex = this.users.indexOf(item);
       this.editedUser = Object.assign(
         {},
         {
+          _id: item._id,
           username: item.username,
           email: item.email,
           password: '',
@@ -425,8 +433,19 @@ export default Vue.extend({
         this.editedIndex = -1;
       });
     },
-    deleteUser() {
-      this.closeDeleteUserDialog();
+    async deleteUser() {
+      try {
+        await this.$axios.$delete('/admin/users', { params: { user: this.editedUser._id } });
+
+        this.$showAlert('Užívateľ úspešne vymazaný', 'success');
+        const updatedUsers = await this.fetchUsers();
+        this.rawUsers = updatedUsers;
+      } catch (err: any) {
+        const code = err.response.data.code;
+        this.$showAlert('Niekde sa stala chyba. Kód chyby: ' + code, 'error');
+      } finally {
+        this.closeDeleteUserDialog();
+      }
     },
   },
 });

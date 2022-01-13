@@ -15,13 +15,19 @@ const router = Router();
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
 
-  if (containsAdminKey(req) || hasAdminRole(req.user as IUser | undefined)) {
+  const user = req.user as IUser | undefined;
+
+  if (containsAdminKey(req)) {
+    return next();
+  }
+
+  if (user && hasAdminRole(user)) {
     return next();
   }
 
   logger.warn(
     `[${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUser & { _id: string })._id
+      user && (user as IUser & { _id: string })._id
     } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${req.header('tipovacka-auth-token')}`
   );
   res.status(401).send('Unauthorized request');
@@ -300,6 +306,69 @@ router.post('/users/import', authMiddleware, upload.single('importFile'), async 
 
     return res.status(400).json({
       message: `Internal server error.`,
+      code: 'INTERNAL_ERROR',
+    });
+  }
+});
+
+/**
+ * Delete user in a specified group.
+ *
+ * Access: Admin
+ *
+ * @query user ObjectId of the user
+ */
+router.delete('/users', authMiddleware, async (req, res) => {
+  const userId = req.query.user;
+
+  try {
+    logger.info('Starting to process the request.');
+    logger.info('User ID specified in the query is ' + userId);
+
+    if (!userId) {
+      logger.error('A user ID was not specified in the query.');
+      return res.status(400).json({
+        message: 'Bad request',
+        code: 'BAD_REQUEST',
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      logger.error("User with the specified id doesn't exist in the database.");
+      return res.status(404).json({
+        message: "User doesn't exist",
+        code: 'USER_NOT_FOUND',
+      });
+    }
+
+    if (!containsAdminKey(req)) {
+      if (!user.groupId.equals((req.user as IUser).groupId)) {
+        logger.error('User is not allowed to delete users from a differetn group.');
+        return res.status(404).json({
+          message: "User doesn't exist",
+          code: 'USER_NOT_FOUND',
+        });
+      }
+    }
+
+    logger.info(`Deleting the user with _id ${userId}.`);
+    await User.findByIdAndDelete(userId);
+    logger.info("Deleting the user from the group's users array.");
+    await Group.updateOne({ _id: user.groupId }, { $pull: { users: userId } });
+
+    logger.info('The user was deleted successfully.');
+    logger.info(JSON.stringify(user));
+
+    res.status(200).json({
+      response: user,
+      code: 'SUCCESS',
+    });
+  } catch (error) {
+    logger.error(`There was an error deleting the user. Error: ${error}.`);
+    res.status(500).json({
+      message: 'Internal server error',
       code: 'INTERNAL_ERROR',
     });
   }
