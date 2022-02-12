@@ -1,21 +1,10 @@
 # Dependency directories
 node_modules/
 
-# yarn
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
-
 # environment variables file
 .env
-local.settings.json
 
-# nuxt.js build output
-.nuxt
+# build output
 dist
 
 # VSCode
@@ -23,9 +12,3 @@ dist
 
 # macOS
 .DS_Store
-
-# others
-.turbo
-/logs
-coverage
-.npmrc
