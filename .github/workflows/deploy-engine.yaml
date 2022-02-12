@@ -38,7 +38,7 @@ jobs:
       - name: 'Run tests'
         run: npm run test --workspace=@tipovacka/engine
 
-      - name: Run Azure Functions Action
+      - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
