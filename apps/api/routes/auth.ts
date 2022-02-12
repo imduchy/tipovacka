@@ -1,10 +1,10 @@
-import express, { Request, Response, NextFunction } from 'express';
+import { IUser, User } from '@tipovacka/models';
 import bcrypt from 'bcryptjs';
-import passport from 'passport';
+import express, { NextFunction, Request, Response } from 'express';
 import mongoose, { Types } from 'mongoose';
-import { User, IUser } from '@tipovacka/models';
-import logger from '../utils/logger';
+import passport from 'passport';
 import { isLoggedIn } from '../utils/authMiddleware';
+import logger from '../utils/logger';
 
 const router = express.Router();
 

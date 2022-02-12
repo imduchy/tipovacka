@@ -1,14 +1,14 @@
-import { Game, Group, IUser, User } from '@tipovacka/models';
+import { Game, Group, ISeason, IUser, User } from '@tipovacka/models';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
-import { Types } from 'mongoose';
+import multer from 'multer';
+import xlsx from 'node-xlsx';
 import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
 import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
 import logger from '../utils/logger';
-import multer from 'multer';
-import xlsx from 'node-xlsx';
+import { emptyStatisticsObject } from '../utils/teams';
 
 const router = Router();
 
@@ -43,22 +43,13 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  * @param amount number of upcoming games that should be fetched (e.g., next 3 games of the team)
  */
 router.post('/groups/competition', authMiddleware, async (req, res) => {
-  const groupId: string = req.body.group;
-  const teamId: number = req.body.team;
-  const season: number = req.body.season;
-  const competitionId: number = req.body.competition;
+  const { group: groupId, team: teamId, competition: competitionId, season } = req.body;
 
   try {
     logger.info('Fetching the group with id ' + groupId);
     const group = await Group.findById(groupId);
     if (!group) {
       throw new Error(`Group with id ${groupId} doesn't exist.`);
-    }
-
-    logger.info('Finding the team with id ' + teamId + 'in the group record.');
-    const team = group.followedTeams.find((t) => t.apiId === teamId);
-    if (!team) {
-      throw new Error(`The group ${group.name} doesn't follow a team with the API id ${teamId}.`);
     }
 
     // The API doesn't track competition standings before the season starts.
@@ -79,7 +70,7 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
     });
 
     const league = leagueResponse.data.response[0].league;
-    const seasonObj = {
+    const seasonObj: ISeason = {
       season: season,
       competitions: [
         {
@@ -87,14 +78,25 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
           name: league.name,
           logo: league.logo,
           standings: [],
-          teamStatistics: undefined,
+          teamStatistics: emptyStatisticsObject(),
           players: mapPlayers(playersResponse.data.response),
         },
       ],
     };
 
-    logger.info('Pushing the new season and competition object to the group record.');
-    team.seasons.push(seasonObj);
+    logger.info('Finding the team with id ' + teamId + 'in the group record.');
+    let team = group.followedTeams.find((t) => t.apiId === teamId);
+    if (!team) {
+      const teamResponse = await FootballApi.getTeam({ id: teamId });
+      const teamData = teamResponse.data.response[0].team;
+      team = {
+        apiId: teamData.id,
+        logo: teamData.logo,
+        name: teamData.name,
+        seasons: [seasonObj],
+      };
+      group.followedTeams.push(team);
+    }
 
     logger.info('Saving the updated group object to the database.');
     await group.save();
@@ -168,6 +170,7 @@ router.post('/users', authMiddleware, async (req, res) => {
       username: username,
       bets: [],
       email: email,
+      competitionScore: [],
       password: encryptedPassword,
       groupId: groupId,
       scope: scope,
@@ -255,6 +258,7 @@ router.post('/users/import', authMiddleware, upload.single('importFile'), async 
       await User.create<IUser>({
         username: username,
         bets: [],
+        competitionScore: [],
         email: email,
         password: encryptedPassword,
         groupId: groupId,
@@ -468,12 +472,16 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
     const teamStatistics = statisticsResponse.data.response;
     const players = playersResponse.data.response;
 
+    logger.info('Fetching an upcoming game for the group.');
+    const upcomingGame = await findUpcomingGame(body.team, [body.league]);
+    const game = await Game.create(upcomingGame);
+
     logger.info('Data fetched successfully. Creating a new group document in the database.');
     const group = await Group.create({
       name: body.name,
       email: body.email,
       website: body.website,
-      upcomingGame: undefined,
+      upcomingGame: game._id,
       users: [],
       followedTeams: [
         {
@@ -499,23 +507,6 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
         },
       ],
     });
-
-    try {
-      logger.info('Fetching an upcoming game for the group.');
-      const upcomingGame = await findUpcomingGame(body.team, [body.league]);
-
-      if (upcomingGame) {
-        // Save the game in the database, and update the upcomingGame of the group.
-        const game = await Game.create(upcomingGame);
-        group.upcomingGame = game._id as Types.ObjectId;
-        await group.save();
-      }
-    } catch (error) {
-      logger.error(
-        `An error occured while fetching an upcoming game for the group. ` + `Error: ${error}`
-      );
-      throw error;
-    }
 
     logger.info(`A new group ${group.name} (${group._id}) was created.`);
     res.status(200).json(group);

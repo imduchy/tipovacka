@@ -1,0 +1,19 @@
+{
+  "bindings": [
+    {
+      "name": "queueItem",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "evaluated-games",
+      "connection": "tipovackaevents_STORAGE"
+    },
+    {
+      "type": "queue",
+      "direction": "out",
+      "name": "upcomingGame",
+      "queueName": "upcoming-games",
+      "connection": "tipovackaevents_STORAGE"
+    }
+  ],
+  "scriptFile": "../dist/GetUpcomingGame/index.js"
+}

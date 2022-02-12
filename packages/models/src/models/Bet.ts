@@ -8,6 +8,7 @@ export enum BetStatus {
 }
 
 export interface IBet {
+  _version?: number;
   homeTeamScore: number;
   awayTeamScore: number;
   scorer: number;
@@ -16,11 +17,7 @@ export interface IBet {
   status?: BetStatus;
 }
 
-export interface IBetDocument extends IBet, Types.Subdocument {
-  _version: number;
-}
-
-export const BetSchema = new Schema<IBetDocument>(
+export const BetSchema = new Schema<IBet>(
   {
     _version: { type: Number, required: true, default: 1 },
     homeTeamScore: { type: Number, required: true, default: 1 },

@@ -1,9 +1,10 @@
-import { Document, Model, Schema, Types } from 'mongoose';
-import { IGame, IGameDocument } from './Game';
-import { FollowedTeamSchema, IFollowedTeam, IFollowedTeamDocument } from './Team';
-import { IUser, IUserDocument } from './User';
+import { Schema, Types } from 'mongoose';
+import { IGame } from './Game';
+import { FollowedTeamSchema, IFollowedTeam } from './Team';
+import { IUser } from './User';
 
 export interface IGroup {
+  _version?: number;
   name: string;
   email: string;
   website: string;
@@ -12,16 +13,7 @@ export interface IGroup {
   users: Array<IUser> | Array<Types.ObjectId>;
 }
 
-export interface IGroupDocument extends IGroup, Document<Types.ObjectId> {
-  _version: number;
-  followedTeams: Types.Array<IFollowedTeamDocument>;
-  upcomingGame: Types.ObjectId | IGameDocument;
-  users: Types.Array<IUserDocument> | Types.Array<Types.ObjectId>;
-}
-
-export type IGroupModel = Model<IGroupDocument>;
-
-export const GroupSchema = new Schema<IGroupDocument, IGroupModel>(
+export const GroupSchema = new Schema<IGroup>(
   {
     _version: { type: Number, required: true, default: 2 },
     name: { type: String, required: true, unique: true },

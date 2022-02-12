@@ -1,0 +1,25 @@
+{
+  "bindings": [
+    {
+      "name": "myTimer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 0 */2 * * *"
+    },
+    {
+      "type": "queue",
+      "direction": "out",
+      "name": "updatedGamesOutput",
+      "queueName": "updated-games",
+      "connection": "tipovackaevents_STORAGE"
+    },
+    {
+      "type": "queue",
+      "direction": "out",
+      "name": "evaluatedGamesOutput",
+      "queueName": "evaluated-games",
+      "connection": "tipovackaevents_STORAGE"
+    }
+  ],
+  "scriptFile": "../dist/UpdateGame/index.js"
+}

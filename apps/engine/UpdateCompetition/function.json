@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "name": "upcomingGame",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "upcoming-games",
+      "connection": "tipovackaevents_STORAGE"
+    }
+  ],
+  "scriptFile": "../dist/UpdateCompetition/index.js"
+}

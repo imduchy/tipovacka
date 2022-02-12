@@ -13,9 +13,7 @@ export function getLatestSeason(followedTeam: IFollowedTeam) {
   return sortedSeasons[0];
 }
 
-export function mapTeamStatistics(
-  response: TeamStatisticsResponse.Response
-): ITeamStatistics {
+export function mapTeamStatistics(response: TeamStatisticsResponse.Response): ITeamStatistics {
   return {
     form: response.form != null ? response.form : '',
     cleanSheet: response.clean_sheet,
@@ -53,9 +51,7 @@ export function mapTeamStatistics(
   };
 }
 
-export function mapStandings(
-  response: StandingsResponse.Response
-): ICompetitionStandingRecord[] {
+export function mapStandings(response: StandingsResponse.Response): ICompetitionStandingRecord[] {
   return response.league.standings[0].map((s) => ({
     teamApiId: s.team.id,
     teamName: s.team.name,
@@ -88,12 +84,8 @@ export function mapPlayers(response: PlayersResponse.Response[]): IPlayer[] {
         appearences: r.statistics[0].games.appearences
           ? r.statistics[0].games.appearences
           : undefined,
-        lineups: r.statistics[0].games.lineups
-          ? r.statistics[0].games.lineups
-          : undefined,
-        minutes: r.statistics[0].games.minutes
-          ? r.statistics[0].games.minutes
-          : undefined,
+        lineups: r.statistics[0].games.lineups ? r.statistics[0].games.lineups : undefined,
+        minutes: r.statistics[0].games.minutes ? r.statistics[0].games.minutes : undefined,
         number: r.statistics[0].games.number ? r.statistics[0].games.number : undefined,
         position: r.statistics[0].games.position,
         rating: r.statistics[0].games.rating
@@ -101,12 +93,8 @@ export function mapPlayers(response: PlayersResponse.Response[]): IPlayer[] {
           : undefined,
       },
       goals: {
-        assists: r.statistics[0].goals.assists
-          ? r.statistics[0].goals.assists
-          : undefined,
-        conceded: r.statistics[0].goals.conceded
-          ? r.statistics[0].goals.conceded
-          : undefined,
+        assists: r.statistics[0].goals.assists ? r.statistics[0].goals.assists : undefined,
+        conceded: r.statistics[0].goals.conceded ? r.statistics[0].goals.conceded : undefined,
         saves: r.statistics[0].goals.saves ? r.statistics[0].goals.saves : undefined,
         total: r.statistics[0].goals.total ? r.statistics[0].goals.total : undefined,
       },

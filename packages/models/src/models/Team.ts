@@ -3,8 +3,8 @@
  * https://www.api-football.com/documentation-beta#operation/get-standings
  */
 
-import { Schema, Types } from 'mongoose';
-import { IPlayer, IPlayerDocument, PlayerSchema } from './Player';
+import { Schema } from 'mongoose';
+import { IPlayer, PlayerSchema } from './Player';
 
 // mongoose doesn't accept empty string ('') as a value and raises
 // an error. This modifies the check to accept empty strings if a
@@ -17,6 +17,7 @@ Schema.Types.String.checkRequired((v) => v != null);
  * competition table. A record is a team in a competition table.
  */
 export interface ICompetitionStandingRecord {
+  _version?: number;
   rank: number;
   description: string;
   teamApiId: number;
@@ -32,13 +33,7 @@ export interface ICompetitionStandingRecord {
   form: string;
 }
 
-export interface ICompetitionStandingRecordDocument
-  extends ICompetitionStandingRecord,
-    Types.Subdocument {
-  _version: number;
-}
-
-const CompetitionStandingRecordSchema = new Schema<ICompetitionStandingRecordDocument>({
+const CompetitionStandingRecordSchema = new Schema<ICompetitionStandingRecord>({
   _version: { type: Number, required: true, default: 2 },
   rank: { type: Number, required: true },
   description: { type: String, required: true, default: '' },
@@ -61,9 +56,7 @@ export interface IHomeAwayTotal {
   total: number;
 }
 
-export type IHomeAwayTotalDocument = IHomeAwayTotal & Types.Subdocument;
-
-const HomeAwayTotalSchema = new Schema<IHomeAwayTotalDocument>({
+const HomeAwayTotalSchema = new Schema<IHomeAwayTotal>({
   home: { type: Number, required: true, default: 0 },
   away: { type: Number, required: true, default: 0 },
   total: { type: Number, required: true, default: 0 },
@@ -74,9 +67,7 @@ export interface ITotalAverageGoals {
   average: IHomeAwayTotal;
 }
 
-export type ITotalAverageGoalsDocument = ITotalAverageGoals & Types.Subdocument;
-
-const TotalAverageGoalsSchema = new Schema<ITotalAverageGoalsDocument>({
+const TotalAverageGoalsSchema = new Schema<ITotalAverageGoals>({
   total: { type: HomeAwayTotalSchema },
   average: { type: HomeAwayTotalSchema },
 });
@@ -86,9 +77,7 @@ export interface ITeamStatisticsGoals {
   against: ITotalAverageGoals;
 }
 
-export type ITeamStatisticsGoalsDocument = ITeamStatisticsGoals & Types.Subdocument;
-
-const TeamStatisticsGoalsSchema = new Schema<ITeamStatisticsGoalsDocument>({
+const TeamStatisticsGoalsSchema = new Schema<ITeamStatisticsGoals>({
   for: {
     type: TotalAverageGoalsSchema,
     required: true,
@@ -100,6 +89,7 @@ const TeamStatisticsGoalsSchema = new Schema<ITeamStatisticsGoalsDocument>({
 });
 
 export interface ITeamStatistics {
+  _version?: number;
   form: string;
   played: IHomeAwayTotal;
   wins: IHomeAwayTotal;
@@ -110,11 +100,7 @@ export interface ITeamStatistics {
   failedToScore: IHomeAwayTotal;
 }
 
-export interface ITeamStatisticsDocument extends ITeamStatistics, Types.Subdocument {
-  _version: number;
-}
-
-const TeamStatisticsSchema = new Schema<ITeamStatisticsDocument>({
+const TeamStatisticsSchema = new Schema<ITeamStatistics>({
   _version: { type: Number, required: true, default: 2 },
   form: { type: String, required: true },
   played: { type: HomeAwayTotalSchema, required: true },
@@ -127,6 +113,7 @@ const TeamStatisticsSchema = new Schema<ITeamStatisticsDocument>({
 });
 
 export interface ICompetition {
+  _version?: number;
   apiId: number;
   name: string;
   logo: string;
@@ -135,13 +122,7 @@ export interface ICompetition {
   players: Array<IPlayer>;
 }
 
-export interface ICompetitionDocument extends ICompetition, Types.Subdocument {
-  _version: number;
-  standings: Types.Array<ICompetitionStandingRecordDocument>;
-  players: Types.Array<IPlayerDocument>;
-}
-
-const CompetitionSchema = new Schema<ICompetitionDocument>({
+const CompetitionSchema = new Schema<ICompetition>({
   _version: { type: Number, required: true, default: 2 },
   apiId: { type: Number, required: true },
   name: { type: String, required: true },
@@ -152,34 +133,26 @@ const CompetitionSchema = new Schema<ICompetitionDocument>({
 });
 
 export interface ISeason {
+  _version?: number;
   season: number;
   competitions: Array<ICompetition>;
 }
 
-export interface ISeasonDocument extends ISeason, Types.Subdocument {
-  _version: number;
-  competitions: Types.Array<ICompetitionDocument>;
-}
-
-const SeasonSchema = new Schema<ISeasonDocument>({
+const SeasonSchema = new Schema<ISeason>({
   _version: { type: Number, required: true, default: 2 },
   season: { type: Number, required: true },
   competitions: [{ type: CompetitionSchema, required: true }],
 });
 
 export interface IFollowedTeam {
+  _version?: number;
   apiId: number;
   name: string;
   logo: string;
   seasons: Array<ISeason>;
 }
 
-export interface IFollowedTeamDocument extends IFollowedTeam, Types.Subdocument {
-  _version: number;
-  seasons: Types.Array<ISeasonDocument>;
-}
-
-export const FollowedTeamSchema = new Schema<IFollowedTeamDocument>({
+export const FollowedTeamSchema = new Schema<IFollowedTeam>({
   _version: { type: Number, required: true, default: 2 },
   apiId: { type: Number, required: true },
   name: { type: String, required: true },

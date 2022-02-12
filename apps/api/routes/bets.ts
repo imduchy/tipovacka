@@ -1,5 +1,5 @@
+import { Game, IBet, IUser, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
-import { IBet, Game, User, IUser, Bet } from '@tipovacka/models';
 import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import { alreadyBet } from '../utils/bets';
@@ -16,11 +16,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   if (isLoggedIn(req)) {
-    const user = req.user as IUser & { _id: Types.ObjectId };
-    // Only allow user to create bet if user ids match
-    if (user._id.equals(req.body.user)) {
-      return next();
-    }
+    return next();
   }
 
   logger.warn(
@@ -95,6 +91,72 @@ router.post('/', authMiddleware, async ({ body }, res) => {
     res.status(200).json(user.bets);
   } catch (error) {
     logger.error(`Couldn't create a bet. Error: ${error}.`);
+    res.status(500).json('Internal error occured');
+  }
+});
+
+/**
+ * Update a bet
+ *
+ * Access: Protected (Logged-in)
+ *
+ * @param bet
+ * @param homeTeamScore
+ * @param awayTeamScore
+ * @param scorer
+ */
+router.put('/', authMiddleware, async (req, res) => {
+  logger.info('Data received in the request body: ' + JSON.stringify(req.body));
+
+  const { bet: betId, homeTeamScore, awayTeamScore, scorer } = req.body;
+  const userId = (req.user as IUser & { _id: string })._id;
+
+  if (
+    betId === undefined ||
+    homeTeamScore === undefined ||
+    awayTeamScore === undefined ||
+    scorer === undefined
+  ) {
+    logger.warn("The request doesn't contain required request body. The bet won't be updated.");
+    return res.status(400).send('Bad request');
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      logger.error(`The user ${userId} doesn't exist in the database.`);
+      return res.status(400).json('Bad request');
+    }
+
+    const bet = user.bets.find((b) => (b as IBet & { _id: Types.ObjectId })._id.equals(betId));
+    if (!bet) {
+      logger.error(`The bet ${betId} doesn't exist in the user object.`);
+      return res.status(400).json('Bad request');
+    }
+    const betIndex = user.bets.indexOf(bet);
+
+    const game = await Game.findById(bet.game);
+    if (!game) {
+      logger.error(`The game ${bet.game} doesn't exist in the database.`);
+      return res.status(400).json('Bad request');
+    }
+
+    // Don't update the bet if the game has already started.
+    if (new Date().getTime() > game.date.getTime()) {
+      logger.error("The specified game has already started. The bet won't be updated.");
+      return res.status(400).json('Bad request');
+    }
+
+    bet.awayTeamScore = awayTeamScore;
+    bet.homeTeamScore = homeTeamScore;
+    bet.scorer = scorer;
+    user.markModified('bets');
+    await user.save();
+    logger.info(`The user ${user.username} (${userId}) updated a bet on the game ${game._id}.`);
+
+    res.status(200).json(bet);
+  } catch (error) {
+    logger.error(`Couldn't update the bet. Error: ${error}.`);
     res.status(500).json('Internal error occured');
   }
 });

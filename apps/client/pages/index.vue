@@ -11,12 +11,8 @@
         <v-col cols="12" class="pt-0 pb-0">
           <v-card class="pt-8 px-8">
             <!-- Input field / Current bet -->
-            <bet-input
-              v-if="!alreadyBet"
-              :upcoming-game="upcomingGame"
-              :players="players"
-            ></bet-input>
-            <current-bet v-else :upcoming-game="upcomingGame" :players="players"></current-bet>
+            <bet-input :upcoming-game="upcomingGame" :players="players"></bet-input>
+            <!-- <current-bet v-else :upcoming-game="upcomingGame" :players="players"></current-bet> -->
           </v-card>
         </v-col>
       </v-row>
@@ -53,7 +49,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
-import { BetStatus, IBet, ICompetition, IGame, IPlayer } from '@tipovacka/models';
+import { BetStatus, IBet, ICompetition, IPlayer } from '@tipovacka/models';
 
 export default Vue.extend({
   data() {
@@ -88,18 +84,6 @@ export default Vue.extend({
     },
     alreadyStarted(): boolean {
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
-    },
-    usersBets(): IBet[] {
-      return this.$auth.user.bets;
-    },
-    alreadyBet(): boolean {
-      const upcomingGame = this.upcomingGame._id;
-      if (this.usersBets !== undefined) {
-        return this.usersBets.some(
-          (bet: IBet) => (bet.game as IGame & { _id: string })._id === upcomingGame
-        );
-      }
-      return false;
     },
     evaluatedBets(): IBet[] {
       const bets: IBet[] = this.$auth.user.bets;

@@ -10,15 +10,10 @@ import { FootballApiResponseError, NoResultsInApiResponseError } from './excepti
 import logger from './logger';
 
 function logApiCall(endpoint: string, params: any) {
-  logger.info(
-    `[FootballApi] Get request to ${endpoint} endpoint with parameters %o`,
-    params
-  );
+  logger.info(`[FootballApi] Get request to ${endpoint} endpoint with parameters %o`, params);
 }
 
-export async function getFixture(
-  params: any
-): Promise<AxiosResponse<FixtureResponse.RootObject>> {
+export async function getFixture(params: any): Promise<AxiosResponse<FixtureResponse.RootObject>> {
   try {
     logApiCall('/fixtures', params);
 
@@ -47,18 +42,21 @@ export async function getFixture(
         error.message
       );
     } else {
-      logger.error(
-        `A general error occured while fetching fixtures from the API. Error: ${error}`
-      );
+      logger.error(`A general error occured while fetching fixtures from the API. Error: ${error}`);
     }
 
     throw error;
   }
 }
 
-export async function getTeam(
-  params: any
-): Promise<AxiosResponse<TeamResponse.RootObject>> {
+export async function getTeam(params: {
+  id?: number;
+  name?: string;
+  league?: string;
+  season?: number;
+  country?: string;
+  search?: string;
+}): Promise<AxiosResponse<TeamResponse.RootObject>> {
   try {
     logApiCall('/teams', params);
 
@@ -84,9 +82,7 @@ export async function getTeam(
         error.message
       );
     } else {
-      logger.error(
-        `A general error occured while fetching team from the API. Error: ${error}`
-      );
+      logger.error(`A general error occured while fetching team from the API. Error: ${error}`);
     }
     throw error;
   }
@@ -239,18 +235,14 @@ export async function getPlayers(
       for (let i = 2; i <= pages; i++) {
         params.page = i;
         const nextResponse = await request(params);
-        logger.info(
-          `The page number ${i} contains ${nextResponse.data.results} results.`
-        );
+        logger.info(`The page number ${i} contains ${nextResponse.data.results} results.`);
         response.data.response.push(...nextResponse.data.response);
       }
     }
 
     return response;
   } catch (error) {
-    logger.error(
-      `Error while fetching players information from the API. Error: ${error}`
-    );
+    logger.error(`Error while fetching players information from the API. Error: ${error}`);
     throw error;
   }
 }

@@ -1,4 +1,4 @@
-import { Schema, Types } from 'mongoose';
+import { Schema } from 'mongoose';
 
 export interface IPlayerGoalStatistics {
   total: number | undefined;
@@ -7,9 +7,7 @@ export interface IPlayerGoalStatistics {
   saves: number | undefined;
 }
 
-export type IPlayerGoalStatisticsDocument = IPlayerGoalStatistics & Types.Subdocument;
-
-const PlayerGoalStatistics = new Schema<IPlayerGoalStatisticsDocument>({
+const PlayerGoalStatistics = new Schema<IPlayerGoalStatistics>({
   total: { type: Number, required: true, default: 0 },
   assists: { type: Number, required: true, default: 0 },
   conceded: { type: Number, required: false, default: 0 },
@@ -26,9 +24,7 @@ export interface IPlayerGameStatistics {
   captain: boolean;
 }
 
-export type IPlayerGameStatisticsDocument = IPlayerGameStatistics & Types.Subdocument;
-
-const PlayerGameStatistics = new Schema<IPlayerGameStatisticsDocument>({
+const PlayerGameStatistics = new Schema<IPlayerGameStatistics>({
   appearences: { type: Number, required: true, default: 0 },
   lineups: { type: Number, required: true, default: 0 },
   minutes: { type: Number, required: true, default: 0 },
@@ -43,14 +39,13 @@ export interface IPlayerStatistics {
   goals: IPlayerGoalStatistics;
 }
 
-export type IPlayerStatisticsDocument = IPlayerStatistics & Types.Subdocument;
-
-const PlayerStatisticsSchema = new Schema<IPlayerStatisticsDocument>({
+const PlayerStatisticsSchema = new Schema<IPlayerStatistics>({
   games: { type: PlayerGameStatistics, required: true },
   goals: { type: PlayerGoalStatistics, required: true },
 });
 
 export interface IPlayer {
+  _version?: number;
   apiId: number;
   name: string;
   firstName: string;
@@ -61,11 +56,7 @@ export interface IPlayer {
   age: number;
 }
 
-export interface IPlayerDocument extends IPlayer, Types.Subdocument {
-  _version: number;
-}
-
-export const PlayerSchema = new Schema<IPlayerDocument>({
+export const PlayerSchema = new Schema<IPlayer>({
   _version: { type: Number, default: 1, required: true },
   apiId: { type: Number, required: true },
   name: { type: String, required: true },

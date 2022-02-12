@@ -8,6 +8,7 @@
           type="number"
           min="0"
           max="99"
+          :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
           :rules="[inputRules.minInput, inputRules.maxInput]"
           :label="`${upcomingGame.homeTeam.name} skóre`"
         ></v-text-field>
@@ -15,6 +16,7 @@
       <v-col cols="6">
         <v-text-field
           v-model="awayTeamScore"
+          :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
           outlined
           type="number"
           min="0"
@@ -28,6 +30,7 @@
       <v-col cols="12"
         ><v-select
           v-model="scorer"
+          :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
           :items="players"
           item-text="name"
           item-value="apiId"
@@ -52,17 +55,51 @@
           </template> </v-select
       ></v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="!currentUsersBet">
       <v-col align="center" cols="12" class="pb-8 pt-0">
         <v-btn
           ref="submit-btn"
           color="secondary"
           large
           block
-          :disabled="alreadyStarted || !validInput || submited"
+          :disabled="hasAlreadyStarted || !validInput || sendingRequest"
           @click="submitBet"
         >
           Odoslať tip
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row v-else-if="currentUsersBet && editingEnabled" justify="center">
+      <v-col cols="6">
+        <v-btn color="grey lighten-2" light large block @click="editingEnabled = false">
+          Zrušiť
+        </v-btn>
+      </v-col>
+      <v-col cols="6">
+        <v-btn
+          color="secondary"
+          light
+          large
+          block
+          :disabled="hasAlreadyStarted || !validInput"
+          @click="updateBet"
+        >
+          Uložiť zmeny
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row v-else>
+      <v-col>
+        <v-btn
+          ref="update-btn"
+          color="grey lighten-2"
+          light
+          large
+          block
+          :disabled="hasAlreadyStarted"
+          @click="toggleEditing"
+        >
+          Zmeniť tip
         </v-btn>
       </v-col>
     </v-row>
@@ -70,7 +107,7 @@
 </template>
 
 <script lang="ts">
-import { IGame, IPlayer } from '@tipovacka/models';
+import { IBet, IGame, IPlayer } from '@tipovacka/models';
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
@@ -94,22 +131,44 @@ export default Vue.extend({
           'Skóre môže byť v rozsahu od 0 do 99',
       },
       validInput: true,
+      editingEnabled: false,
+      sendingRequest: false,
       homeTeamScore: 0,
       awayTeamScore: 0,
-      scorer: {} as IPlayer,
-      submited: false,
+      scorer: this.players[0] as IPlayer | undefined,
     };
   },
   computed: {
-    alreadyStarted(): boolean {
+    hasAlreadyStarted(): boolean {
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
     },
+    allUsersBets(): (IBet & { _id: string })[] {
+      return this.$auth.user.bets;
+    },
+    currentUsersBet(): (IBet & { _id: string }) | undefined {
+      const upcomingGame = this.upcomingGame._id;
+
+      return (this.allUsersBets as (IBet & { _id: string })[]).find(
+        (bet) => (bet.game as IGame & { _id: string })._id === upcomingGame
+      );
+    },
+  },
+  mounted() {
+    if (this.currentUsersBet) {
+      const bet = this.currentUsersBet as IBet;
+      this.homeTeamScore = bet.homeTeamScore;
+      this.awayTeamScore = bet.awayTeamScore;
+
+      const scorer = this.players.find((p: IPlayer) => p.apiId === bet.scorer);
+      this.scorer = scorer || undefined;
+    }
   },
   methods: {
+    toggleEditing() {
+      this.editingEnabled = !this.editingEnabled;
+    },
     submitBet() {
-      // Set submited to true, to disable the Submit button and prevent
-      // users from doing multiple clicks and making multiple API calls.
-      this.submited = true;
+      this.sendingRequest = true;
 
       try {
         this.$axios
@@ -118,7 +177,7 @@ export default Vue.extend({
             homeTeamScore: this.homeTeamScore,
             awayTeamScore: this.awayTeamScore,
             user: this.$auth.user._id,
-            scorer: this.scorer.apiId,
+            scorer: this.scorer ? this.scorer.apiId : 0,
           })
           .then(async (response) => {
             if (response.status === 200) {
@@ -133,6 +192,35 @@ export default Vue.extend({
         if (error.response.data === 'Tip na tento zápas si už podal.') {
           this.$showAlert(error.response.data, 'error');
         }
+      } finally {
+        this.sendingRequest = false;
+      }
+    },
+    updateBet() {
+      if (!this.currentUsersBet) return;
+
+      this.sendingRequest = true;
+      this.editingEnabled = false;
+
+      try {
+        this.$axios
+          .put('/bets', {
+            bet: this.currentUsersBet._id,
+            homeTeamScore: this.homeTeamScore,
+            awayTeamScore: this.awayTeamScore,
+            scorer: this.scorer ? this.scorer.apiId : 0,
+          })
+          .then(async (response) => {
+            if (response.status === 200) {
+              this.$showAlert('Tip úspešne zmenený', 'success');
+              await this.$auth.fetchUser();
+            }
+          })
+          .catch((error) => {
+            this.$showAlert(error.response.data, 'error');
+          });
+      } finally {
+        this.sendingRequest = false;
       }
     },
   },
