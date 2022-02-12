@@ -11,8 +11,11 @@
         <v-col cols="12" class="pt-0 pb-0">
           <v-card class="pt-8 px-8">
             <!-- Input field / Current bet -->
-            <bet-input :upcoming-game="upcomingGame" :players="players"></bet-input>
-            <!-- <current-bet v-else :upcoming-game="upcomingGame" :players="players"></current-bet> -->
+            <bet-input
+              :upcoming-game="upcomingGame"
+              :players="players"
+              :current-users-bet="currentUsersBet"
+            ></bet-input>
           </v-card>
         </v-col>
       </v-row>
@@ -49,7 +52,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
-import { BetStatus, IBet, ICompetition, IPlayer } from '@tipovacka/models';
+import { BetStatus, IBet, ICompetition, IGame, IPlayer } from '@tipovacka/models';
 
 export default Vue.extend({
   data() {
@@ -58,6 +61,7 @@ export default Vue.extend({
       awayTeamScore: 0,
       competition: {} as ICompetition,
       followedTeam: this.$store.state.group.followedTeams[0],
+      user: this.$auth.user,
     };
   },
   // @ts-ignore
@@ -76,11 +80,12 @@ export default Vue.extend({
       upcomingGame: 'upcomingGame',
     }),
     players(): IPlayer[] {
-      return this.competition.players
-        ? (this.competition.players as IPlayer[])
-            .filter((p) => p.statistics.games.position !== 'Goalkeeper')
-            .sort((a, b) => (b.statistics.goals.total || 0) - (a.statistics.goals.total || 0))
-        : [];
+      if (!this.competition || !this.competition.players) {
+        return [];
+      }
+      return [...this.competition.players].sort(
+        (a, b) => (b.statistics.goals.total || 0) - (a.statistics.goals.total || 0)
+      );
     },
     alreadyStarted(): boolean {
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
@@ -88,10 +93,16 @@ export default Vue.extend({
     evaluatedBets(): IBet[] {
       const bets: IBet[] = this.$auth.user.bets;
       if (bets) {
-        // TODO: Optimize to shortcut after finding first (last) 3 items
         return bets.filter((b) => b.status === BetStatus.EVALUATED).reverse();
       }
       return [];
+    },
+    currentUsersBet(): (IBet & { _id: string }) | undefined {
+      const upcomingGame = this.upcomingGame._id;
+
+      return (this.user.bets as (IBet & { _id: string })[]).find(
+        (bet) => (bet.game as IGame & { _id: string })._id === upcomingGame
+      );
     },
   },
   activated() {

@@ -107,7 +107,7 @@
 </template>
 
 <script lang="ts">
-import { IBet, IGame, IPlayer } from '@tipovacka/models';
+import { IBet, IGame, IPlayer, IUser } from '@tipovacka/models';
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
@@ -118,6 +118,10 @@ export default Vue.extend({
     players: {
       type: Array as PropType<IPlayer[]>,
       default: [] as IPlayer[],
+    },
+    currentUsersBet: {
+      type: Object as PropType<(IBet & { _id: string }) | undefined>,
+      default: {} as IBet & { _id: string },
     },
   },
   data() {
@@ -133,35 +137,29 @@ export default Vue.extend({
       validInput: true,
       editingEnabled: false,
       sendingRequest: false,
-      homeTeamScore: 0,
-      awayTeamScore: 0,
-      scorer: this.players[0] as IPlayer | undefined,
+      homeTeamScore: this.currentUsersBet ? this.currentUsersBet.homeTeamScore : 0,
+      awayTeamScore: this.currentUsersBet ? this.currentUsersBet.awayTeamScore : 0,
+      // Because of a bug in Vetur, it's not possible to use setter in a computed property.
+      // The following code together with the 'watch' property defined below are a workaround
+      // to make sure that the 'scorer' property gets updated properly when 'players' props
+      // changes.
+      scorer: this.currentUsersBet
+        ? this.players.find((p: IPlayer) => p.apiId === this.currentUsersBet!.scorer)
+        : this.players[0],
+      user: this.$auth.user as IUser & { _id: string },
     };
   },
   computed: {
     hasAlreadyStarted(): boolean {
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
     },
-    allUsersBets(): (IBet & { _id: string })[] {
-      return this.$auth.user.bets;
-    },
-    currentUsersBet(): (IBet & { _id: string }) | undefined {
-      const upcomingGame = this.upcomingGame._id;
-
-      return (this.allUsersBets as (IBet & { _id: string })[]).find(
-        (bet) => (bet.game as IGame & { _id: string })._id === upcomingGame
-      );
-    },
   },
-  mounted() {
-    if (this.currentUsersBet) {
-      const bet = this.currentUsersBet as IBet;
-      this.homeTeamScore = bet.homeTeamScore;
-      this.awayTeamScore = bet.awayTeamScore;
-
-      const scorer = this.players.find((p: IPlayer) => p.apiId === bet.scorer);
-      this.scorer = scorer || undefined;
-    }
+  watch: {
+    players() {
+      this.scorer = this.currentUsersBet
+        ? this.players.find((p: IPlayer) => p.apiId === this.currentUsersBet!.scorer)
+        : this.players[0];
+    },
   },
   methods: {
     toggleEditing() {
@@ -176,7 +174,7 @@ export default Vue.extend({
             game: this.upcomingGame._id,
             homeTeamScore: this.homeTeamScore,
             awayTeamScore: this.awayTeamScore,
-            user: this.$auth.user._id,
+            user: this.user._id,
             scorer: this.scorer ? this.scorer.apiId : 0,
           })
           .then(async (response) => {
