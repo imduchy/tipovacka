@@ -24,6 +24,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "[name]/index.js"
+    filename: "[name]/index.js",
+    libraryTarget: 'commonjs'
   },
 };

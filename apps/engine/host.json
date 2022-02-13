@@ -16,5 +16,6 @@
     "queues": {
       "maxDequeueCount": 1
     }
-  }
+  },
+  "watchDirectories": ["dist"]
 }
