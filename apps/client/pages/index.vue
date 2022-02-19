@@ -52,7 +52,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
-import { BetStatus, IBet, ICompetition, IGame, IPlayer } from '@tipovacka/models';
+import { BetStatus, IBet, ICompetition, IGame, IPlayer, IUser } from '@tipovacka/models';
 
 export default Vue.extend({
   data() {
@@ -99,10 +99,10 @@ export default Vue.extend({
     },
     currentUsersBet(): (IBet & { _id: string }) | undefined {
       const upcomingGame = this.upcomingGame._id;
+      const user = this.$auth.user as IUser;
+      const bets = user.bets as (IBet & { _id: string })[];
 
-      return (this.user.bets as (IBet & { _id: string })[]).find(
-        (bet) => (bet.game as IGame & { _id: string })._id === upcomingGame
-      );
+      return bets.find((bet) => (bet.game as IGame & { _id: string })._id === upcomingGame);
     },
   },
   activated() {
