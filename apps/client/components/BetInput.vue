@@ -55,17 +55,18 @@
           </template> </v-select
       ></v-col>
     </v-row>
-    <v-row v-if="!currentUsersBet">
-      <v-col align="center" cols="12" class="pb-8 pt-0">
+    <v-row v-if="currentUsersBet && !editingEnabled">
+      <v-col>
         <v-btn
-          ref="submit-btn"
-          color="secondary"
+          ref="update-btn"
+          color="grey lighten-2"
+          light
           large
           block
-          :disabled="hasAlreadyStarted || !validInput || sendingRequest"
-          @click="submitBet"
+          :disabled="hasAlreadyStarted"
+          @click="toggleEditing"
         >
-          Odoslať tip
+          Zmeniť tip
         </v-btn>
       </v-col>
     </v-row>
@@ -89,17 +90,16 @@
       </v-col>
     </v-row>
     <v-row v-else>
-      <v-col>
+      <v-col align="center" cols="12" class="pb-8 pt-0">
         <v-btn
-          ref="update-btn"
-          color="grey lighten-2"
-          light
+          ref="submit-btn"
+          color="secondary"
           large
           block
-          :disabled="hasAlreadyStarted"
-          @click="toggleEditing"
+          :disabled="hasAlreadyStarted || !validInput || sendingRequest"
+          @click="submitBet"
         >
-          Zmeniť tip
+          Odoslať tip
         </v-btn>
       </v-col>
     </v-row>
@@ -121,7 +121,7 @@ export default Vue.extend({
     },
     currentUsersBet: {
       type: Object as PropType<(IBet & { _id: string }) | undefined>,
-      default: {} as IBet & { _id: string },
+      default: undefined,
     },
   },
   data() {
