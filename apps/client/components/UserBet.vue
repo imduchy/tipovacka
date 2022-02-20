@@ -96,7 +96,11 @@ export default Vue.extend({
       const game = this.bet.game as IGame;
       return (
         game.events
-          ?.filter((event) => event.detail === FixtureEventDetail.NORMAL_GOAL)
+          ?.filter(
+            (event) =>
+              event.detail === FixtureEventDetail.NORMAL_GOAL ||
+              event.detail === FixtureEventDetail.PENALTY
+          )
           .some((goal) => goal.playerId === this.bet.scorer) || false
       );
     },
