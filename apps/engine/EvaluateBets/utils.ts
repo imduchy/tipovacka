@@ -110,7 +110,8 @@ function evaluateScorerBet(bet: IBet, game: IGame): number {
   const hasScored = game.events.some(
     (event) =>
       event.type === FixtureEventType.GOAL &&
-      event.detail === FixtureEventDetail.NORMAL_GOAL &&
+      (event.detail === FixtureEventDetail.NORMAL_GOAL ||
+        event.detail === FixtureEventDetail.PENALTY) &&
       event.playerId === scorer
   );
 
