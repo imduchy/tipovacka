@@ -3,10 +3,10 @@ import { GameSchema, IGame } from './models/Game';
 import { GroupSchema, IGroup } from './models/Group';
 import { IUser, UserSchema } from './models/User';
 
-export { BetStatus, IBet } from './models/Bet';
+export { BetStatus, IBet, IBetWithID } from './models/Bet';
 export { FixtureEventDetail, FixtureEventType, GameStatus } from './models/Enums';
-export { IGame, IGameEvent, ITeam } from './models/Game';
-export { IGroup } from './models/Group';
+export { IGame, IGameEvent, ITeam, IGameWithID } from './models/Game';
+export { IGroup, IGroupWithID } from './models/Group';
 export {
   IPlayer,
   IPlayerGameStatistics,
@@ -28,7 +28,7 @@ export {
   ITotalAverageGoals,
   ISeason,
 } from './models/Team';
-export { ICompetitionScore, IUser } from './models/User';
+export { ICompetitionScore, IUser, IUserWithID } from './models/User';
 
 export let Group: Model<IGroup>;
 export let User: Model<IUser>;

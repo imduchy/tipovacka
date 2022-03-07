@@ -1,4 +1,4 @@
-import { Game, Group, ISeason, IUser, User } from '@tipovacka/models';
+import { Game, Group, ISeason, IUser, IUserWithID, User } from '@tipovacka/models';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
 import multer from 'multer';
@@ -27,7 +27,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   logger.warn(
     `[${req.originalUrl}] Unauthorized request was made by user ${
-      user && (user as IUser & { _id: string })._id
+      user && (user as IUserWithID)._id
     } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${req.header('tipovacka-auth-token')}`
   );
   res.status(401).send('Unauthorized request');

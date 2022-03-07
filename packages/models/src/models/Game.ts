@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { Schema, Types } from 'mongoose';
 import { FixtureEventDetail, FixtureEventType, GameStatus } from './Enums';
 
 export interface ITeam {
@@ -36,6 +36,8 @@ export interface IGame {
   season: number;
   venue: string;
 }
+
+export type IGameWithID = IGame & { _id: Types.ObjectId };
 
 const TeamSchema = new Schema<ITeam>({
   _version: { type: Number, default: 1, required: true },

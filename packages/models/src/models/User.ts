@@ -25,6 +25,8 @@ export interface IUser {
   scope: Array<string>;
 }
 
+export type IUserWithID = IUser & { _id: Types.ObjectId };
+
 const CompetitionScoreSchema = new Schema<ICompetitionScore>(
   {
     _version: { type: Number, default: 1, required: true },

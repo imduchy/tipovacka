@@ -1,6 +1,5 @@
-import { IUser, User } from '@tipovacka/models';
+import { IUserWithID, User } from '@tipovacka/models';
 import express, { NextFunction, Request, Response } from 'express';
-import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import logger from '../utils/logger';
 
@@ -16,10 +15,10 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   if (isLoggedIn(req)) {
-    const user = req.user as IUser & { _id: Types.ObjectId };
+    const user = req.user as IUserWithID;
     // Allow users to only access their own User document.
     // E.g., Alice can't fetch Bob's User document
-    if (user._id!.equals(req.params.userId)) {
+    if (user._id.equals(req.params.userId)) {
       next();
       return;
     }
@@ -27,7 +26,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   logger.warn(
     `[${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUser & { _id: Types.ObjectId })._id
+      req.user && (req.user as IUserWithID)._id
     } from IP: ${req.ip}.`
   );
   res.status(401).send('Unauthorized request');

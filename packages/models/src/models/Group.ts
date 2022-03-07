@@ -13,6 +13,8 @@ export interface IGroup {
   users: Array<IUser> | Array<Types.ObjectId>;
 }
 
+export type IGroupWithID = IGroup & { _id: Types.ObjectId };
+
 export const GroupSchema = new Schema<IGroup>(
   {
     _version: { type: Number, required: true, default: 2 },

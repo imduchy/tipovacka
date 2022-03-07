@@ -1,6 +1,5 @@
-import { Game, IBet, IUser, User } from '@tipovacka/models';
+import { Game, IBet, IBetWithID, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
-import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import { alreadyBet } from '../utils/bets';
 import logger from '../utils/logger';
@@ -21,7 +20,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   logger.warn(
     `[${req.method} ${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUser & { _id: Types.ObjectId })._id
+      req.user && (req.user as IUserWithID)._id
     } from IP: ${req.ip}.`
   );
   res.status(401).send('Unauthorized request');
@@ -109,7 +108,7 @@ router.put('/', authMiddleware, async (req, res) => {
   logger.info('Data received in the request body: ' + JSON.stringify(req.body));
 
   const { bet: betId, homeTeamScore, awayTeamScore, scorer } = req.body;
-  const userId = (req.user as IUser & { _id: string })._id;
+  const userId = (req.user as IUserWithID)._id;
 
   if (
     betId === undefined ||
@@ -128,12 +127,11 @@ router.put('/', authMiddleware, async (req, res) => {
       return res.status(400).json('Bad request');
     }
 
-    const bet = user.bets.find((b) => (b as IBet & { _id: Types.ObjectId })._id.equals(betId));
+    const bet = user.bets.find((b) => (b as IBetWithID)._id.equals(betId));
     if (!bet) {
       logger.error(`The bet ${betId} doesn't exist in the user object.`);
       return res.status(400).json('Bad request');
     }
-    const betIndex = user.bets.indexOf(bet);
 
     const game = await Game.findById(bet.game);
     if (!game) {

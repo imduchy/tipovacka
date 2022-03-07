@@ -1,4 +1,4 @@
-import { IUser, User } from '@tipovacka/models';
+import { IUser, IUserWithID, User } from '@tipovacka/models';
 import bcrypt from 'bcryptjs';
 import express, { NextFunction, Request, Response } from 'express';
 import mongoose, { Types } from 'mongoose';
@@ -17,7 +17,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   } else {
     logger.warn(
       `[${req.originalUrl}] Unauthorized request was made by user ${
-        req.user && (req.user as IUser & { _id: string })._id
+        req.user && (req.user as IUserWithID)._id
       } from IP: ${req.ip}.`
     );
     res.status(401).send('Unauthorized request');
@@ -34,7 +34,7 @@ router.get('/user', (req, res) => {
   // as numbers, until the root problem is fixed.
   if (user) {
     const user = req.user as IUser;
-    user.bets = user.bets!.map((bet) => {
+    user.bets = user.bets.map((bet) => {
       if (typeof bet.scorer === 'string') {
         bet.scorer = parseInt(bet.scorer);
       }
@@ -122,7 +122,7 @@ router.post('/password', authMiddleware, async (req, res) => {
   }
 
   try {
-    const user = await User.findById((req.user as any)._id);
+    const user = await User.findById((req.user as IUserWithID)._id);
 
     if (!user) {
       return res.status(404).send("User doesn't exist");

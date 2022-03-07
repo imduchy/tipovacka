@@ -1,4 +1,4 @@
-import { Group, ICompetition, IUser } from '@tipovacka/models';
+import { Group, ICompetition, IUser, IUserWithID } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
@@ -23,14 +23,14 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   if (isLoggedIn(req)) {
     const user = req.user as IUser;
     // Only allow users to access Group document of a group they're part of
-    if (user.groupId!.equals(group.toString())) {
+    if (user.groupId.equals(group.toString())) {
       return next();
     }
   }
 
   logger.warn(
     `[${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUser & { _id: Types.ObjectId })._id
+      req.user && (req.user as IUserWithID)._id
     } from IP: ${req.ip}.`
   );
   res.status(401).send('Unauthorized request');

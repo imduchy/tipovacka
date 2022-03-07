@@ -17,6 +17,8 @@ export interface IBet {
   status?: BetStatus;
 }
 
+export type IBetWithID = IBet & { _id: Types.ObjectId };
+
 export const BetSchema = new Schema<IBet>(
   {
     _version: { type: Number, required: true, default: 1 },
