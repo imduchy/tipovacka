@@ -11,12 +11,14 @@ const queueTrigger: AzureFunction = async function (
 ): Promise<void> {
   context.log('Starting to process the item', queueItem);
   const { gameId, groupId } = queueItem;
-  const upcomingGame = await Game.findById(gameId);
 
   await getDatabase().catch((err) => {
     context.log.error("Couldn't connect to the database. Error:", err);
     throw err;
   });
+
+  context.log('Fetching the upcoming game from the database.')
+  const upcomingGame = await Game.findById(gameId);
 
   context.log('Fetching the group from the database.');
   const group = await Group.findById(groupId)
