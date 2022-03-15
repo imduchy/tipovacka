@@ -92,7 +92,7 @@ const timerTrigger: AzureFunction = async function (context: Context): Promise<v
         context.log("Publishing the groupId and game record to the 'updated-games' queue.");
         context.bindings.updatedGamesOutput = {
           groupId: group._id,
-          gameId: updatedRecord,
+          game: updatedRecord,
         };
         context.log('The updated game record was successfully published to the queue.');
 
