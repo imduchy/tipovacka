@@ -1,6 +1,7 @@
 import { Document, model, Schema, Types } from 'mongoose';
-import { IGroup } from '..';
+import { IGroup } from './Group';
 import { BetSchema, IBet } from './Bet';
+import { UserSchemaPostHookError, UserSchemaPreHookError } from './exceptions';
 
 export interface ICompetitionScore {
   _version?: number;
@@ -58,57 +59,55 @@ export const UserSchema = new Schema<IUser>(
 );
 
 /**
- * Before a user is saved, create an empty competitionScore
- * objects for each of the group's competitions in the latest
- * season.
+ * Before a new user is saved, create an empty competitionScore objects
+ * for each of the group's competitions in the latest season.
  */
-UserSchema.pre<IUser & Document>('save', function (next) {
+UserSchema.pre<IUser & Document>('save', async function (next) {
   if (!this.isNew) next();
   else {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
+    const self = this as IUser & Document & { wasNew: boolean };
 
     // A dirty workaround to pass isNew property to the post script
     // https://stackoverflow.com/a/18305924/8475178
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this as any).wasNew = this.isNew;
+    self.wasNew = this.isNew;
 
-    const Group = model<IGroup>('group');
-    Group.findById(this.groupId, {}, {}, (err, group) => {
-      if (err) {
-        console.error(
-          `<User.pre middleware> An error occured while fetching a group ` +
-            `with _id ${self.groupId} (groupId).`
-        );
-        next(err);
-      } else if (group) {
-        for (const team of group.followedTeams) {
-          const seasons = [...team.seasons];
-          const latestSeason = seasons.sort((a, b) => b.season - a.season)[0];
+    const GroupModel = model<IGroup>('group');
 
-          for (const comp of latestSeason.competitions) {
-            self.competitionScore.push({
-              competitionApiId: comp.apiId,
-              score: 0,
-              season: latestSeason.season,
-            });
-          }
-        }
+    try {
+      const group = await GroupModel.findById(this.groupId);
 
-        console.info(
-          `<User.pre middleware> Successfully created competitionScore object(s) ` +
-            `for the user ${self.email} (${self._id}).`
+      if (!group) {
+        return next(
+          new UserSchemaPreHookError(
+            "A pre save hook of the UserSchema wasn't executed successfully " +
+              `for the document with _id ${this._id}. The group with _id ` +
+              `${this.groupId} doesn't exist.`
+          )
         );
-        next();
-      } else {
-        console.error(
-          `<User.pre middleware> A group with groupId ${self.groupId} doesn't ` +
-            `exist. Creation of the competitionScore objects for the user ${self.email}` +
-            `(${self._id}) was skipped.`
-        );
-        next();
       }
-    });
+
+      for (const team of group.followedTeams) {
+        const seasons = [...team.seasons];
+        const latestSeason = seasons.sort((a, b) => b.season - a.season)[0];
+
+        for (const comp of latestSeason.competitions) {
+          self.competitionScore.push({
+            competitionApiId: comp.apiId,
+            score: 0,
+            season: latestSeason.season,
+          });
+        }
+      }
+    } catch (error) {
+      next(
+        new UserSchemaPreHookError(
+          'An exception occurred while executing a pre save hook of the UserSchema ' +
+            `for the document with _id ${this._id}. The error is: ${error}.`
+        )
+      );
+    }
   }
 });
 
@@ -120,33 +119,51 @@ UserSchema.post('save', async function (doc: IUser & Document & { wasNew: boolea
   // https://stackoverflow.com/a/18305924/8475178
   if (!doc.wasNew) next();
   else {
-    const Group = model<IGroup>('group');
+    const GroupModel = model<IGroup>('group');
 
     try {
-      const group = await Group.findOneAndUpdate(
-        { _id: doc.groupId },
-        { $push: { users: doc._id } }
-      );
+      await GroupModel.findOneAndUpdate({ _id: doc.groupId }, { $push: { users: doc._id } });
       // Not checking if the group is null, as we perform a validation on the groupId
       // field before saving the document.
-      console.info(
-        `<User.post middleware> Successfully pushed the user id ${doc._id} to ` +
-          `the group ${group?._id}.`
-      );
       next();
-    } catch {
-      console.error(
-        `<User.post middleware> An error occured while pushing the user id ` +
-          `${doc._id} to the group ${doc.groupId}.`
+    } catch (error) {
+      next(
+        new UserSchemaPostHookError(
+          'An exception occurred while executing a post save hook of the UserSchema ' +
+            `for the document with _id ${this._id}. The error is: ${error}.`
+        )
       );
-      next();
     }
   }
 });
 
+/**
+ * After a user is deleted, delete the user from a group.
+ */
+UserSchema.post(
+  'deleteOne',
+  { document: true, query: false },
+  async function (doc: IUser & Document, next) {
+    const GroupModel = model<IGroup>('group');
+
+    try {
+      await GroupModel.findOneAndUpdate({ _id: doc.groupId }, { $pop: { users: doc._id } });
+      next();
+    } catch (error) {
+      next(
+        new UserSchemaPostHookError(
+          'An exception occurred while executing a post deleteOne hook of the UserSchema ' +
+            `for the document with _id ${this._id}. The error is: ${error}.`
+        )
+      );
+    }
+  }
+);
+
 UserSchema.path('groupId').validate(function (value: Types.ObjectId) {
-  const Group = model<IGroup>('group');
-  return new Promise(function (resolve, _reject) {
-    Group.findById(value, (_: unknown, group: IGroup) => resolve(!!group));
+  const GroupModel = model<IGroup>('group');
+
+  return new Promise(function (resolve) {
+    GroupModel.findById(value, (_: unknown, group: IGroup) => resolve(!!group));
   });
-}, 'A group with id `{VALUE}` was not found');
+}, 'A group with _id `{VALUE}` was not found');

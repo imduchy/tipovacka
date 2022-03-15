@@ -54,10 +54,14 @@ router.get('/logout', (req, res) => {
       );
     }
 
-    const Sessions = mongoose.connection.collection('sessions');
-    await Sessions.findOneAndDelete({ _id: new Types.ObjectId(req.sessionID) }).catch((err) => {
-      logger.warn(`Couldn't delete sessions ${req.sessionID} from the database. Error: ${err}`);
-    });
+    if (process.env.ENVIRONMENT === 'production') {
+      const Sessions = mongoose.connection.collection('sessions');
+      await Sessions.findOneAndDelete({ _id: new mongoose.Types.ObjectId(req.sessionID) }).catch(
+        (err) => {
+          logger.warn(`Couldn't delete sessions ${req.sessionID} from the database. Error: ${err}`);
+        }
+      );
+    }
   });
   req.logout();
   res.status(200).send();
