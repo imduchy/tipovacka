@@ -6,6 +6,7 @@ on:
       - 'master'
     paths:
       - 'apps/engine/**'
+      - 'packages/**'
 
 env:
   AZURE_FUNCTIONAPP_NAME: tipovacka-utils

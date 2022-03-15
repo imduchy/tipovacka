@@ -6,6 +6,7 @@ on:
       - 'master'
     paths:
       - 'apps/client/**'
+      - 'packages/**'
 
 env:
   NODE_VERSION: 14.x

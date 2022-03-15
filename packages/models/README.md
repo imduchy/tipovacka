@@ -1,2 +1,2 @@
 # tipovacka-models
-Mongoose schema for tipovacka
+Mongoose schemas for tipovacka
