@@ -19,6 +19,12 @@ export const queueTrigger: AzureFunction = async function (context: Context): Pr
     context.log(`The group ${group.name} successfully fetched.`);
     const users = group.users;
 
+    // Check if the game was a derby
+    const rivals = group.followedTeams[0].rivals;
+    const isRivalHomeTeam = rivals.find(teamId => teamId === game.homeTeam.teamId);
+    const isRivalAwayTeam = rivals.find(teamId => teamId === game.awayTeam.teamId);
+    const isDerby = !!(isRivalAwayTeam || isRivalHomeTeam)
+
     context.log('Starting to loop over bets and evaluate them.');
     for (const user of users as HydratedDocument<IUser>[]) {
       if (placedBetOnGame(user, game)) {
@@ -36,7 +42,7 @@ export const queueTrigger: AzureFunction = async function (context: Context): Pr
         }
 
         context.log(`Evaluating the bet (${bet._id}) and calculating earned points.`);
-        const points = evaluatePoints(bet, game);
+        const points = evaluatePoints(bet, game, isDerby);
 
         // If the user earned some points, assign them and update the user record
         // in the database, otherwise no action is needed.

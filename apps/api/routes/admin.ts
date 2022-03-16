@@ -92,6 +92,7 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
       team = {
         apiId: teamData.id,
         logo: teamData.logo,
+        rivals: [],
         name: teamData.name,
         seasons: [seasonObj],
       };
@@ -102,6 +103,7 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
     await group.save();
 
     res.status(200).json(seasonObj);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     logger.error(
       `An error occured while enrolling a group in a new competition. Error: ${error.message}`
@@ -176,6 +178,7 @@ router.post('/users', authMiddleware, async (req, res) => {
       scope: scope,
     }).then((res) => {
       // Remove password from the object before returning it in the response
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...user } = res.toObject();
       return user;
     });
@@ -264,7 +267,7 @@ router.post('/users/import', authMiddleware, upload.single('importFile'), async 
         groupId: groupId,
         scope: ['user'],
       })
-        .then((_) => {
+        .then(() => {
           logger.info('The new user was added successfully to the database.');
           results.push({
             username,
@@ -296,6 +299,7 @@ router.post('/users/import', authMiddleware, upload.single('importFile'), async 
       response: `Successfully added ${users.length} users.`,
       code: 'SUCCESS',
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     logger.error(`There was an error creating users. Error: ${error}.`);
 
@@ -488,6 +492,7 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
           apiId: team.id,
           name: team.name,
           logo: team.logo,
+          rivals: body.rivals,
           seasons: [
             {
               season: body.season,

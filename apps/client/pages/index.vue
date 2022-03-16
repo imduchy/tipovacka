@@ -5,12 +5,15 @@
     <!-- Main view -->
     <v-col v-else cols="12" class="align-self-start" align-self="start" justify-self="start">
       <!-- Upcoming game -->
-      <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
+      <v-row>
+        <v-col cols="12" class="pb-0">
+          <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
+        </v-col>
+      </v-row>
 
       <v-row class="mb-5">
-        <v-col cols="12" class="pt-0 pb-0">
-          <v-card class="pt-8 px-8">
-            <!-- Input field / Current bet -->
+        <v-col cols="12" class="pt-0">
+          <v-card class="pa-4">
             <bet-input
               :upcoming-game="upcomingGame"
               :players="players"

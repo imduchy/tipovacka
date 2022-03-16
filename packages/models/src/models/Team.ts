@@ -150,6 +150,7 @@ export interface IFollowedTeam {
   name: string;
   logo: string;
   seasons: Array<ISeason>;
+  rivals: Array<number>;
 }
 
 export const FollowedTeamSchema = new Schema<IFollowedTeam>({
@@ -158,4 +159,5 @@ export const FollowedTeamSchema = new Schema<IFollowedTeam>({
   name: { type: String, required: true },
   logo: { type: String, required: true },
   seasons: [{ type: SeasonSchema, required: true }],
+  rivals: [{ type: Number, required: true, default: [] }],
 });

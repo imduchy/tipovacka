@@ -24,7 +24,7 @@ try {
     logger.error('Database connection string is undefined');
     process.exit();
   }
-  mongoose.connect(process.env.DB_CONNECTION_STRING).then((_) => {
+  mongoose.connect(process.env.DB_CONNECTION_STRING).then(() => {
     logger.info('Successfully connected to the database.');
   });
 } catch (error) {
