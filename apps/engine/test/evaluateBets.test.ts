@@ -72,7 +72,7 @@ describe('evaluatePoints function', () => {
       ],
     } as IGame;
 
-    expect(evaluatePoints(mockBet, mockGame)).toBe(4);
+    expect(evaluatePoints(mockBet, mockGame, false)).toBe(4);
   });
 
   it('should return 3 points if exact score was guessed', () => {
@@ -100,7 +100,7 @@ describe('evaluatePoints function', () => {
       ],
     } as IGame;
 
-    expect(evaluatePoints(mockBet, mockGame)).toBe(3);
+    expect(evaluatePoints(mockBet, mockGame, false)).toBe(3);
   });
 
   it('should return 2 points if correct end result and scorer were guessed', () => {
@@ -128,7 +128,7 @@ describe('evaluatePoints function', () => {
       ],
     } as IGame;
 
-    expect(evaluatePoints(mockBet, mockGame)).toBe(2);
+    expect(evaluatePoints(mockBet, mockGame, false)).toBe(2);
   });
 
   it('should return 1 point if correct end result was guessed', () => {
@@ -156,7 +156,7 @@ describe('evaluatePoints function', () => {
       ],
     } as IGame;
 
-    expect(evaluatePoints(mockBet, mockGame)).toBe(1);
+    expect(evaluatePoints(mockBet, mockGame, false)).toBe(1);
   });
 
   it('should return 1 point if scorer was guessed', () => {
@@ -184,7 +184,7 @@ describe('evaluatePoints function', () => {
       ],
     } as IGame;
 
-    expect(evaluatePoints(mockBet, mockGame)).toBe(1);
+    expect(evaluatePoints(mockBet, mockGame, false)).toBe(1);
   });
 
   it('should return 0 points if nothing was guessed correctly', () => {
@@ -212,7 +212,7 @@ describe('evaluatePoints function', () => {
       ],
     } as IGame;
 
-    expect(evaluatePoints(mockBet, mockGame)).toBe(0);
+    expect(evaluatePoints(mockBet, mockGame, false)).toBe(0);
   });
 
   it('should return 0 points if scorer scored own goal', () => {
@@ -234,7 +234,7 @@ describe('evaluatePoints function', () => {
       ],
     } as IGame;
 
-    expect(evaluatePoints(mockBet, mockGame)).toBe(0);
+    expect(evaluatePoints(mockBet, mockGame, false)).toBe(0);
   });
 });
 
