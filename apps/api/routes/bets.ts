@@ -1,5 +1,6 @@
 import { Game, IBet, IBetWithID, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
+import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import { alreadyBet } from '../utils/bets';
 import logger from '../utils/logger';
@@ -33,14 +34,15 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  *
  * @param game ObjectId of the game to fetch
  */
-router.post('/', authMiddleware, async ({ body }, res) => {
-  logger.info('Data received in the request body: ' + JSON.stringify(body));
+router.post('/', authMiddleware, async (req, res) => {
+  logger.info('Data received in the request body: ' + JSON.stringify(req.body));
 
-  const { user: userId, game: gameId, homeTeamScore, awayTeamScore, scorer } = body;
+  const { game: gameId, homeTeamScore, awayTeamScore, scorer } = req.body;
+  const rawUser = req.user as IUserWithID;
+  const userId = new Types.ObjectId(rawUser._id);
 
   if (
     gameId === undefined ||
-    userId === undefined ||
     homeTeamScore === undefined ||
     awayTeamScore === undefined ||
     scorer === undefined
@@ -78,9 +80,9 @@ router.post('/', authMiddleware, async ({ body }, res) => {
     const bet: IBet = {
       game: gameId,
       user: userId,
-      homeTeamScore: body.homeTeamScore,
-      awayTeamScore: body.awayTeamScore,
-      scorer: body.scorer,
+      homeTeamScore: homeTeamScore,
+      awayTeamScore: awayTeamScore,
+      scorer: scorer,
     };
 
     user.bets.push(bet);

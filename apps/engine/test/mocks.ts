@@ -68,6 +68,7 @@ export function mockFollowedTeam(seasons?: ISeason[]): IFollowedTeam {
     name: 'FC ' + faker.address.city(),
     logo: 'logo.png',
     seasons: seasons ? seasons : [],
+    rivals: [],
   };
 }
 

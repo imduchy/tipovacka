@@ -7,7 +7,7 @@
   "description": "Root package for Tipovacka project",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/models"
   ],
   "scripts": {
     "build-common": "npm run build --workspace=packages/",

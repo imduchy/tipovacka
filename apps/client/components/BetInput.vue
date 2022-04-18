@@ -174,7 +174,6 @@ export default Vue.extend({
             game: this.upcomingGame._id,
             homeTeamScore: this.homeTeamScore,
             awayTeamScore: this.awayTeamScore,
-            user: this.user._id,
             scorer: this.scorer ? this.scorer.apiId : 0,
           })
           .then(async (response) => {
