@@ -1,4 +1,4 @@
-import { Game, IBet, IBetWithID, IUserWithID, User } from '@tipovacka/models';
+import { Game, IBet, IBetWithID, IGameWithID, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
@@ -83,6 +83,7 @@ router.post('/', authMiddleware, async (req, res) => {
       homeTeamScore: homeTeamScore,
       awayTeamScore: awayTeamScore,
       scorer: scorer,
+      points: 0,
     };
 
     user.bets.push(bet);
@@ -157,6 +158,88 @@ router.put('/', authMiddleware, async (req, res) => {
     res.status(200).json(bet);
   } catch (error) {
     logger.error(`Couldn't update the bet. Error: ${error}.`);
+    res.status(500).json('Internal error occured');
+  }
+});
+
+/**
+ * Get the most accurate bets for a given season, competition and round
+ *
+ * Access: Protected (Logged-in)
+ *
+ * @param team
+ * @param season
+ * @param competition
+ * @param round
+ * @param limit
+ */
+router.get('/top', authMiddleware, async (req, res) => {
+  logger.info('Data received in the request query: ' + JSON.stringify(req.query));
+
+  if (
+    req.query.team === undefined ||
+    typeof req.query.team !== 'string' ||
+    req.query.season === undefined ||
+    typeof req.query.season !== 'string' ||
+    req.query.competition === undefined ||
+    typeof req.query.competition !== 'string' ||
+    req.query.round === undefined ||
+    typeof req.query.round !== 'string'
+  ) {
+    logger.warn("The request doesn't contain required request query.");
+    return res.status(400).send('Bad request');
+  }
+
+  const userId = (req.user as IUserWithID)._id;
+  const team = parseInt(req.query.team);
+  const season = parseInt(req.query.season);
+  const competition = parseInt(req.query.competition);
+  const round = parseInt(req.query.round);
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      logger.error(`The user ${userId} doesn't exist in the database.`);
+      return res.status(400).json('Bad request');
+    }
+
+    const gamesAggregate = await Game.aggregate([
+      {
+        $match: {
+          season: season,
+          competitionId: competition,
+          $or: [{ 'homeTeam.teamId': team }, { 'awayTeam.teamId': team }],
+        },
+      },
+    ]);
+
+    const games = gamesAggregate.flat() as IGameWithID[];
+    const game = round >= 0 ? games[round] : games[games.length + round];
+
+    const users = await User.aggregate([
+      { $match: { groupId: user.groupId, 'bets.game': game._id } },
+      { $unwind: '$bets' },
+      { $match: { groupId: user.groupId, 'bets.game': game._id, 'bets.points': { $gt: 0 } } },
+      {
+        $lookup: {
+          from: 'games',
+          localField: 'bets.game',
+          foreignField: '_id',
+          as: 'bets.game',
+        },
+      },
+      { $sort: { 'bets.points': -1 } },
+    ]);
+
+    // TODO: This should be idealy moved to the aggregation pipeline
+    users.forEach((user) => (user.bets = [user.bets]));
+    users.forEach((user) => (user.bets[0].game = user.bets[0].game[0]));
+
+    // Returns
+    // [{ username, ..., bets: [{}] }, { username, ..., bets: [{}] }, { username, ..., bets: [{}] }]
+    res.status(200).json(users);
+  } catch (error) {
+    logger.error(`Couldn't find bets. Error: ${error}.`);
     res.status(500).json('Internal error occured');
   }
 });
