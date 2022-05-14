@@ -14,7 +14,7 @@
             Prihlasovacia stránka pre členov fanklubu La Peňa Madridista de Eslovaquia
           </p>
           <v-divider class="my-8 hide-on-sm" color="grey"></v-divider>
-          <v-form>
+          <v-form @submit.prevent="userLogin">
             <p class="text-subtitle-1 font-weight-bold mb-1 hide-on-sm">Prihlasovacie meno</p>
             <v-text-field
               v-model="login.username"
@@ -59,7 +59,7 @@
               </v-col>
             </v-row> -->
 
-            <v-btn class="my-8" color="secondary" large rounded block @click="userLogin">
+            <v-btn class="my-8" color="secondary" type="submit" large rounded block>
               Prihlásiť sa
             </v-btn>
           </v-form>
