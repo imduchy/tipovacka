@@ -1,8 +1,8 @@
 <template>
-  <v-card data-testid="user-bet">
-    <v-row align="center" class="no-gutters">
-      <v-col cols="3" align="center" class="py-5">
-        <v-img alt="home team logo" :src="homeTeam.logo" width="50px"></v-img
+  <v-card data-testid="user-bet" class="d-flex flex-column" height="120">
+    <v-row align="center" class="justify-space-around no-gutters">
+      <v-col cols="3" align="center">
+        <v-img alt="home team logo" :src="homeTeam.logo" min-width="50px" max-width="75px"></v-img
       ></v-col>
       <v-col cols="6" align="center" justify="center">
         <v-row justify="center" class="no-gutters">
@@ -34,14 +34,12 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="3" align="center" class="py-5">
-        <v-img alt="away team logo" :src="awayTeam.logo" width="50px"></v-img
+      <v-col cols="3" align="center">
+        <v-img alt="away team logo" :src="awayTeam.logo" min-width="50px" max-width="75px"></v-img
       ></v-col>
     </v-row>
-    <v-row class="no-gutters">
-      <v-col>
-        <v-progress-linear :color="resultColor" value="100"></v-progress-linear>
-      </v-col>
+    <v-row class="no-gutters align-end">
+      <v-progress-linear :color="resultColor" value="100"></v-progress-linear>
     </v-row>
   </v-card>
 </template>
