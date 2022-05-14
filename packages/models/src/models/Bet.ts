@@ -15,6 +15,7 @@ export interface IBet {
   game: IGame | Types.ObjectId;
   user: IUser | Types.ObjectId;
   status?: BetStatus;
+  points: number;
 }
 
 export type IBetWithID = IBet & { _id: Types.ObjectId };
@@ -32,6 +33,7 @@ export const BetSchema = new Schema<IBet>(
       default: BetStatus.PENDING,
       enum: Object.values(BetStatus),
     },
+    points: { type: Number, required: true, default: 0 },
   },
   { timestamps: true }
 );

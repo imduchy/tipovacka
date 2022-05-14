@@ -21,9 +21,9 @@ export const queueTrigger: AzureFunction = async function (context: Context): Pr
 
     // Check if the game was a derby
     const rivals = group.followedTeams[0].rivals;
-    const isRivalHomeTeam = rivals.find(teamId => teamId === game.homeTeam.teamId);
-    const isRivalAwayTeam = rivals.find(teamId => teamId === game.awayTeam.teamId);
-    const isDerby = !!(isRivalAwayTeam || isRivalHomeTeam)
+    const isRivalHomeTeam = rivals.find((teamId) => teamId === game.homeTeam.teamId);
+    const isRivalAwayTeam = rivals.find((teamId) => teamId === game.awayTeam.teamId);
+    const isDerby = !!(isRivalAwayTeam || isRivalHomeTeam);
 
     context.log('Starting to loop over bets and evaluate them.');
     for (const user of users as HydratedDocument<IUser>[]) {
@@ -64,7 +64,12 @@ export const queueTrigger: AzureFunction = async function (context: Context): Pr
         // be updated too.
         await User.findOneAndUpdate(
           { _id: user._id, bets: { $elemMatch: { _id: bet._id } } },
-          { $set: { 'bets.$.status': BetStatus.EVALUATED } }
+          {
+            $set: {
+              'bets.$.status': BetStatus.EVALUATED,
+              'bets.$.points': points,
+            },
+          }
         );
       }
     }

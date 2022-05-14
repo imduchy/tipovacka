@@ -154,6 +154,7 @@ export function mockBet(
     game: game ? game : new Types.ObjectId(),
     user: user ? user : new Types.ObjectId(),
     status: betStatus ? betStatus : BetStatus.PENDING,
+    points: 0,
     homeTeamScore:
       homeTeamScore !== undefined ? homeTeamScore : faker.random.number({ min: 0, max: 10 }),
     awayTeamScore:
