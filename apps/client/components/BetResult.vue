@@ -36,14 +36,6 @@
           >
             ({{ scorerName }})
           </v-col>
-          <v-col cols="12">
-            <div class="text-caption font-weight-light">
-              {{ formatedDate }}
-            </div>
-          </v-col>
-          <v-col cols="12">
-            <div class="text-caption font-weight-bold">{{ formatedTime }}</div>
-          </v-col>
         </v-row>
       </v-col>
       <v-col cols="3" align="center">

@@ -30,7 +30,7 @@
       <v-col cols="12"
         ><v-select
           v-model="scorer"
-          :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
+          :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled) || emptyScorerRule"
           :items="players"
           item-text="name"
           item-value="apiId"
@@ -137,15 +137,17 @@ export default Vue.extend({
       validInput: true,
       editingEnabled: false,
       sendingRequest: false,
-      homeTeamScore: this.currentUsersBet ? this.currentUsersBet.homeTeamScore : 0,
-      awayTeamScore: this.currentUsersBet ? this.currentUsersBet.awayTeamScore : 0,
-      // Because of a bug in Vetur, it's not possible to use setter in a computed property.
-      // The following code together with the 'watch' property defined below are a workaround
-      // to make sure that the 'scorer' property gets updated properly when 'players' props
-      // changes.
+      homeTeamScore: this.currentUsersBet ? this.currentUsersBet.homeTeamScore : '0',
+      awayTeamScore: this.currentUsersBet ? this.currentUsersBet.awayTeamScore : '0',
+      /**
+       * Because of a bug in Vetur, it's not possible to use setter in a computed property.
+       * The following code together with the 'watch' property defined below are a workaround
+       * to make sure that the 'scorer' property gets updated properly when 'players' props
+       * changes.
+       */
       scorer: this.currentUsersBet
-        ? this.players.find((p: IPlayer) => p.apiId === this.currentUsersBet!.scorer)
-        : this.players[0],
+        ? this.players.find((p: IPlayer) => p.apiId === this.currentUsersBet.scorer)
+        : undefined,
       user: this.$auth.user as IUser & { _id: string },
     };
   },
@@ -153,12 +155,45 @@ export default Vue.extend({
     hasAlreadyStarted(): boolean {
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
     },
+    isFollowedTeamHomeTeam(): boolean {
+      return this.upcomingGame.homeTeam.teamId === this.$store.state.group.followedTeams[0].apiId;
+    },
+    emptyScorerRule(): boolean {
+      if (this.isFollowedTeamHomeTeam && this.homeTeamScore === '0') {
+        return true;
+      } else if (!this.isFollowedTeamHomeTeam && this.awayTeamScore === '0') {
+        return true;
+      }
+      return false;
+    },
   },
   watch: {
+    /**
+     * This is a workaround due to a bug in Vetur. All details are described in a
+     * comment in the data section, above the 'scorer' attribute.
+     */
     players() {
       this.scorer = this.currentUsersBet
         ? this.players.find((p: IPlayer) => p.apiId === this.currentUsersBet!.scorer)
-        : this.players[0];
+        : undefined;
+    },
+    /**
+     * The value of 'scorer' should be undefined whenever the value of 'score'
+     * for the 'followedTeam' is 0.
+     */
+    homeTeamScore() {
+      if (this.isFollowedTeamHomeTeam && this.homeTeamScore === '0') {
+        this.scorer = undefined;
+      }
+    },
+    /**
+     * Same as the above. The value of 'scorer' should be undefined whenever the
+     * value of 'score' for the 'followedTeam' is 0.
+     */
+    awayTeamScore() {
+      if (!this.isFollowedTeamHomeTeam && this.awayTeamScore === '0') {
+        this.scorer = undefined;
+      }
     },
   },
   methods: {
