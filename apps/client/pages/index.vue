@@ -48,6 +48,32 @@
           <user-bet :bet="evaluatedBets[2]" :players="players"></user-bet>
         </v-col>
       </v-row>
+
+      <!-- Best bets -->
+      <div class="py-3 mt-3 text-h5">
+        Najlepšie tipy kola
+
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
+              mdi-information-outline
+            </v-icon>
+          </template>
+          <span>Užívateľov tip je v zátvorkách vedľa výsledku zápasu</span>
+        </v-tooltip>
+      </div>
+
+      <v-row class="mt-0">
+        <v-col v-if="bestBets[0]" cols="12" lg="4">
+          <bet-result :user="bestBets[0]" :players="players"></bet-result>
+        </v-col>
+        <v-col v-if="bestBets[1]" cols="12" lg="4">
+          <bet-result :user="bestBets[1]" :players="players"></bet-result>
+        </v-col>
+        <v-col v-if="bestBets[2]" cols="12" lg="4">
+          <bet-result :user="bestBets[2]" :players="players"></bet-result>
+        </v-col>
+      </v-row>
     </v-col>
   </v-row>
 </template>
@@ -63,6 +89,7 @@ export default Vue.extend({
       homeTeamScore: 0,
       awayTeamScore: 0,
       competition: {} as ICompetition,
+      bestBets: [] as IBet[] | undefined,
       followedTeam: this.$store.state.group.followedTeams[0],
       user: this.$auth.user,
     };
@@ -75,6 +102,15 @@ export default Vue.extend({
         team: this.followedTeam.apiId,
         season: this.upcomingGame.season,
         competition: this.upcomingGame.competitionId,
+      },
+    });
+
+    this.bestBets = await this.$axios.$get('/bets/top', {
+      params: {
+        team: this.followedTeam.apiId,
+        season: this.upcomingGame.season,
+        competition: this.upcomingGame.competitionId,
+        round: -2,
       },
     });
   },
