@@ -1,5 +1,5 @@
 import { AzureFunction, Context } from '@azure/functions';
-import { Game, Group } from '@tipovacka/models';
+import { Group } from '@tipovacka/models';
 import { getDatabase } from '../src/database';
 import * as FootballApi from '../src/footballApi';
 import { getCompetition } from '../src/utils';
@@ -7,18 +7,15 @@ import { mapPlayersResponse } from './utils';
 
 const queueTrigger: AzureFunction = async function (
   context: Context,
-  queueItem: { gameId: string; groupId: string }
+  queueItem: { groupId: string; competitionId: number; season: number }
 ): Promise<void> {
   context.log('Starting to process the item', queueItem);
-  const { gameId, groupId } = queueItem;
+  const { groupId, competitionId, season } = queueItem;
 
   await getDatabase().catch((err) => {
     context.log.error("Couldn't connect to the database. Error:", err);
     throw err;
   });
-
-  context.log('Fetching the upcoming game from the database.')
-  const upcomingGame = await Game.findById(gameId);
 
   context.log('Fetching the group from the database.');
   const group = await Group.findById(groupId)
@@ -33,17 +30,17 @@ const queueTrigger: AzureFunction = async function (
   const followedTeam = group.followedTeams[0];
 
   context.log('Finding the competition object in the group record.');
-  const competition = getCompetition(followedTeam, upcomingGame.season, upcomingGame.competitionId);
+  const competition = getCompetition(followedTeam, season, competitionId);
   context.log(
-    `Found the competition object for the competition ${upcomingGame.competitionId} ` +
-      `and the season ${upcomingGame.season}.`
+    `Found the competition object for the competition ${competitionId} ` +
+      `and the season ${season}.`
   );
 
   context.log('Fetching players statistics from the API.');
   const playersResponse = await FootballApi.getPlayers(context.log, {
     team: followedTeam.apiId,
     league: competition.apiId,
-    season: upcomingGame.season,
+    season: season,
   }).catch((err) => {
     context.log.error("Couldn't fetch players from the API. Error:", err);
     throw err;

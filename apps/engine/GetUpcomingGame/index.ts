@@ -43,9 +43,21 @@ const queueTrigger: AzureFunction = async function (
     // If no new upcoming game was found, we can return as there is nothing else to do.
     // This can happen e.g., at the end of the season, after the last game was played.
     if (!newUpcomingGame) {
-      context.log(
-        `Didn't find an upcoming game for the team ${team.name}. Terminating ` + `the function.`
-      );
+      context.log(`Didn't find an upcoming game for the team ${team.name}.`);
+      context.log('Updating the upcoming game in the group record.');
+      await group.updateOne({ upcomingGame: null }).exec();
+
+      context.log('Saving the updated group record in the database');
+      await group.save();
+
+      context.log('Publishing the group id and undefined game id to the queue.');
+      context.bindings.upcomingGame = {
+        groupId: group._id,
+        competitionId: competitionIds[0],
+        season: latestSeason.season,
+      };
+
+      context.log('The GetUpcomingGame service has finished successfully.');
       return;
     }
 
@@ -98,7 +110,8 @@ const queueTrigger: AzureFunction = async function (
     context.log('Publishing the upcoming game id and group id to the queue.');
     context.bindings.upcomingGame = {
       groupId: group._id,
-      gameId: upcomingGameId,
+      competitionId: competitionIds[0],
+      season: latestSeason.season,
     };
 
     context.log('The GetUpcomingGame service has finished successfully.');

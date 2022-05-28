@@ -1,9 +1,7 @@
 <template>
-  <v-row :class="{ 'align-self-center': !upcomingGame }">
-    <!-- Loading bar  -->
-    <loading-bar v-if="!upcomingGame" />
+  <v-row>
     <!-- Main view -->
-    <v-col v-else cols="12" class="align-self-start" align-self="start" justify-self="start">
+    <v-col cols="12" align-self="start" justify-self="start">
       <!-- Upcoming game -->
       <v-row>
         <v-col cols="12" class="pb-0">
@@ -13,29 +11,32 @@
 
       <v-row class="mb-5">
         <v-col cols="12" class="pt-0">
-          <v-card class="pa-4">
-            <bet-input
-              :upcoming-game="upcomingGame"
-              :players="players"
-              :current-users-bet="currentUsersBet"
-            ></bet-input>
-          </v-card>
+          <bet-input
+            v-if="upcomingGame"
+            :upcoming-game="upcomingGame"
+            :players="players"
+            :current-users-bet="currentUsersBet"
+          ></bet-input>
         </v-col>
       </v-row>
 
       <!-- Last bets -->
-      <div class="py-3 mt-3 text-h5">
-        Posledné tipy
+      <v-row>
+        <v-col cols="12">
+          <div class="text-h5">
+            Posledné tipy
 
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
-              mdi-information-outline
-            </v-icon>
-          </template>
-          <span>Tvoj tip je v zátvorkách vedľa výsledku zápasu</span>
-        </v-tooltip>
-      </div>
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
+                  mdi-information-outline
+                </v-icon>
+              </template>
+              <span>Tvoj tip je v zátvorkách vedľa výsledku zápasu</span>
+            </v-tooltip>
+          </div>
+        </v-col>
+      </v-row>
 
       <v-row class="mt-0">
         <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
@@ -50,18 +51,22 @@
       </v-row>
 
       <!-- Best bets -->
-      <div class="py-3 mt-3 text-h5">
-        Najlepšie tipy kola
+      <v-row>
+        <v-col cols="12">
+          <div class="text-h5">
+            Najlepšie tipy kola
 
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
-              mdi-information-outline
-            </v-icon>
-          </template>
-          <span>Užívateľov tip je v zátvorkách vedľa výsledku zápasu</span>
-        </v-tooltip>
-      </div>
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
+                  mdi-information-outline
+                </v-icon>
+              </template>
+              <span>Užívateľov tip je v zátvorkách vedľa výsledku zápasu</span>
+            </v-tooltip>
+          </div>
+        </v-col>
+      </v-row>
 
       <v-row class="mt-0">
         <v-col v-if="bestBets[0]" cols="12" lg="4">
@@ -128,6 +133,10 @@ export default Vue.extend({
       );
     },
     alreadyStarted(): boolean {
+      if (!this.upcomingGame) {
+        return false;
+      }
+
       return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
     },
     evaluatedBets(): IBet[] {
@@ -138,6 +147,10 @@ export default Vue.extend({
       return [];
     },
     currentUsersBet(): (IBet & { _id: string }) | undefined {
+      if (!this.upcomingGame) {
+        return undefined;
+      }
+
       const upcomingGame = this.upcomingGame._id;
       const user = this.$auth.user as IUser;
       const bets = user.bets as (IBet & { _id: string })[];

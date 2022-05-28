@@ -1,7 +1,7 @@
 <template>
   <v-card color="#f5f5f5" class="pa-3 pa-sm-5" light>
     <v-row align="center" justify="center">
-      <v-col cols="4" align="center">
+      <v-col v-if="upcomingGame" cols="4" align="center">
         <v-img
           :src="upcomingGame.homeTeam.logo"
           height="auto"
@@ -12,6 +12,10 @@
         <div class="hidden-xs-only text-sm-h5 text-md-h4 font-weight-light mt-3">
           {{ upcomingGame.homeTeam.name }}
         </div>
+      </v-col>
+      <v-col v-else cols="4" align="center">
+        <v-skeleton-loader type="image" max-width="100px" max-height="100px"></v-skeleton-loader>
+        <v-skeleton-loader type="heading" max-width="100px" class="mt-3"></v-skeleton-loader>
       </v-col>
       <v-col cols="4" align="center">
         <v-row v-if="isDerby" justify="center">
@@ -45,9 +49,13 @@
           <v-col class="d-flex justify-center pb-0">
             <v-icon class="mr-1">mdi-stadium</v-icon>
             <div
+              v-if="upcomingGame"
               class="d-inline-block text-truncate text-sm-subtitle-2 text-md-subtitle-1 font-weight-light"
             >
               {{ upcomingGame.venue }}
+            </div>
+            <div v-else class="d-inline-block">
+              <v-skeleton-loader type="heading" max-width="150px" width="150px"></v-skeleton-loader>
             </div>
           </v-col>
         </v-row>
@@ -55,14 +63,18 @@
           <v-col class="d-flex justify-center pt-0">
             <v-icon class="mr-1">mdi-trophy-variant</v-icon>
             <div
+              v-if="upcomingGame"
               class="d-inline-block text-truncate text-sm-subtitle-2 text-md-subtitle-1 font-weight-light"
             >
               {{ upcomingGame.competitionName }}
             </div>
+            <div v-else class="d-inline-block mt-1">
+              <v-skeleton-loader type="heading" max-width="100px" width="100px"></v-skeleton-loader>
+            </div>
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="4" align="center">
+      <v-col v-if="upcomingGame" cols="4" align="center">
         <v-img
           :src="upcomingGame.awayTeam.logo"
           height="auto"
@@ -74,6 +86,10 @@
           {{ upcomingGame.awayTeam.name }}
         </div>
       </v-col>
+      <v-col v-else cols="4" align="center">
+        <v-skeleton-loader type="image" max-width="100px" max-height="100px"></v-skeleton-loader>
+        <v-skeleton-loader type="heading" max-width="100px" class="mt-3"></v-skeleton-loader>
+      </v-col>
     </v-row>
   </v-card>
 </template>
@@ -84,8 +100,8 @@ import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
     upcomingGame: {
-      type: Object as PropType<IGame>,
-      default: {} as IGame,
+      type: Object as PropType<IGame> | undefined,
+      default: undefined,
     },
   },
   data() {
@@ -93,6 +109,10 @@ export default Vue.extend({
   },
   computed: {
     isDerby(): boolean {
+      if (!this.upcomingGame) {
+        return false;
+      }
+
       const rivals = this.$store.state.group.followedTeams[0].rivals;
 
       if (!rivals) {
@@ -109,12 +129,20 @@ export default Vue.extend({
       return !!(isHomeTeam || isAwayTeam);
     },
     formatedDate(): string {
+      if (!this.upcomingGame) {
+        return 'X';
+      }
+
       return new Date(this.upcomingGame.date).toLocaleDateString('sk-SK', {
         month: 'long',
         day: 'numeric',
       });
     },
     formatedTime(): string {
+      if (!this.upcomingGame) {
+        return 'X';
+      }
+
       return new Date(this.upcomingGame.date).toLocaleTimeString('sk-SK', {
         hour: '2-digit',
         minute: '2-digit',
@@ -123,3 +151,11 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style>
+.v-skeleton-loader__heading {
+  border-radius: 12px;
+  height: 24px;
+  width: unset !important;
+}
+</style>

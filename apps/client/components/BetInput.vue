@@ -1,109 +1,111 @@
 <template>
-  <v-form ref="form" v-model="validInput" data-testid="bet-input">
-    <v-row>
-      <v-col cols="6">
-        <v-text-field
-          v-model="homeTeamScore"
-          outlined
-          type="number"
-          min="0"
-          max="99"
-          :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
-          :rules="[inputRules.minInput, inputRules.maxInput]"
-          :label="`${upcomingGame.homeTeam.name} skóre`"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          v-model="awayTeamScore"
-          :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
-          outlined
-          type="number"
-          min="0"
-          max="99"
-          :rules="[inputRules.minInput, inputRules.maxInput]"
-          :label="`${upcomingGame.awayTeam.name} skóre`"
-        ></v-text-field>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12"
-        ><v-select
-          v-model="scorer"
-          :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled) || emptyScorerRule"
-          :items="players"
-          item-text="name"
-          item-value="apiId"
-          :menu-props="{ top: true, offsetY: true }"
-          outlined
-          return-object
-          label="Strelec gólu"
-        >
-          <template #item="{ item, on, attrs }">
-            <v-list-item v-bind="attrs" v-on="on">
-              <v-list-item-avatar>
-                <v-img :src="item.photo"></v-img>
-              </v-list-item-avatar>
+  <v-card class="pa-4">
+    <v-form ref="form" v-model="validInput" data-testid="bet-input">
+      <v-row>
+        <v-col cols="6">
+          <v-text-field
+            v-model="homeTeamScore"
+            outlined
+            type="number"
+            min="0"
+            max="99"
+            :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
+            :rules="[inputRules.minInput, inputRules.maxInput]"
+            :label="`${upcomingGame.homeTeam.name} skóre`"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="6">
+          <v-text-field
+            v-model="awayTeamScore"
+            :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
+            outlined
+            type="number"
+            min="0"
+            max="99"
+            :rules="[inputRules.minInput, inputRules.maxInput]"
+            :label="`${upcomingGame.awayTeam.name} skóre`"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12"
+          ><v-select
+            v-model="scorer"
+            :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled) || emptyScorerRule"
+            :items="players"
+            item-text="name"
+            item-value="apiId"
+            :menu-props="{ top: true, offsetY: true }"
+            outlined
+            return-object
+            label="Strelec gólu"
+          >
+            <template #item="{ item, on, attrs }">
+              <v-list-item v-bind="attrs" v-on="on">
+                <v-list-item-avatar>
+                  <v-img :src="item.photo"></v-img>
+                </v-list-item-avatar>
 
-              <v-list-item-content>
-                <v-list-item-title v-text="`${item.name}`"></v-list-item-title>
-                <v-list-item-subtitle
-                  v-text="'Počet gólov: ' + item.statistics.goals.total"
-                ></v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </template> </v-select
-      ></v-col>
-    </v-row>
-    <v-row v-if="currentUsersBet && !editingEnabled">
-      <v-col>
-        <v-btn
-          ref="update-btn"
-          color="grey lighten-2"
-          light
-          large
-          block
-          :disabled="hasAlreadyStarted"
-          @click="toggleEditing"
-        >
-          Zmeniť tip
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row v-else-if="currentUsersBet && editingEnabled" justify="center">
-      <v-col cols="6">
-        <v-btn color="grey lighten-2" light large block @click="editingEnabled = false">
-          Zrušiť
-        </v-btn>
-      </v-col>
-      <v-col cols="6">
-        <v-btn
-          color="secondary"
-          light
-          large
-          block
-          :disabled="hasAlreadyStarted || !validInput"
-          @click="updateBet"
-        >
-          Uložiť zmeny
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row v-else>
-      <v-col align="center" cols="12" class="pb-8 pt-0">
-        <v-btn
-          ref="submit-btn"
-          color="secondary"
-          large
-          block
-          :disabled="hasAlreadyStarted || !validInput || sendingRequest"
-          @click="submitBet"
-        >
-          Odoslať tip
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-form>
+                <v-list-item-content>
+                  <v-list-item-title v-text="`${item.name}`"></v-list-item-title>
+                  <v-list-item-subtitle
+                    v-text="'Počet gólov: ' + item.statistics.goals.total"
+                  ></v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </template> </v-select
+        ></v-col>
+      </v-row>
+      <v-row v-if="currentUsersBet && !editingEnabled">
+        <v-col>
+          <v-btn
+            ref="update-btn"
+            color="grey lighten-2"
+            light
+            large
+            block
+            :disabled="hasAlreadyStarted"
+            @click="toggleEditing"
+          >
+            Zmeniť tip
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row v-else-if="currentUsersBet && editingEnabled" justify="center">
+        <v-col cols="6">
+          <v-btn color="grey lighten-2" light large block @click="editingEnabled = false">
+            Zrušiť
+          </v-btn>
+        </v-col>
+        <v-col cols="6">
+          <v-btn
+            color="secondary"
+            light
+            large
+            block
+            :disabled="hasAlreadyStarted || !validInput"
+            @click="updateBet"
+          >
+            Uložiť zmeny
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row v-else>
+        <v-col align="center" cols="12" class="pb-8 pt-0">
+          <v-btn
+            ref="submit-btn"
+            color="secondary"
+            large
+            block
+            :disabled="hasAlreadyStarted || !validInput || sendingRequest"
+            @click="submitBet"
+          >
+            Odoslať tip
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-form>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -146,7 +148,7 @@ export default Vue.extend({
        * changes.
        */
       scorer: this.currentUsersBet
-        ? this.players.find((p: IPlayer) => p.apiId === this.currentUsersBet.scorer)
+        ? this.players.find((p: IPlayer) => p.apiId === this.currentUsersBet!.scorer)
         : undefined,
       user: this.$auth.user as IUser & { _id: string },
     };

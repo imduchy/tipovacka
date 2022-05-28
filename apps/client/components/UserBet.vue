@@ -19,10 +19,10 @@
               'text-subtitle-2',
               'font-weight-light',
               'grey--text',
-              correctScorer ? '' : 'text-decoration-line-through',
+              !(correctScorer && scorerName) ? '' : 'text-decoration-line-through',
             ]"
           >
-            ({{ scorerName }})
+            ({{ scorerName ? scorerName : 'N/A' }})
           </v-col>
           <v-col cols="12">
             <div class="text-caption font-weight-light">
@@ -59,14 +59,14 @@ export default Vue.extend({
     },
   },
   computed: {
-    scorerName(): string {
+    scorerName(): string | undefined {
       if (!this.bet) {
         return '';
       } else {
         const playerId = this.bet.scorer;
 
         const scorer = this.players.find((p: IPlayer) => p.apiId === playerId);
-        return scorer ? scorer.name : '';
+        return scorer ? scorer.name : undefined;
       }
     },
     formatedDate(): string {

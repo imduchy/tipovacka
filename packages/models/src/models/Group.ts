@@ -9,7 +9,7 @@ export interface IGroup {
   email: string;
   website: string;
   followedTeams: Array<IFollowedTeam>;
-  upcomingGame: IGame | Types.ObjectId;
+  upcomingGame: IGame | Types.ObjectId | undefined;
   users: Array<IUser> | Array<Types.ObjectId>;
 }
 
@@ -27,7 +27,7 @@ export const GroupSchema = new Schema<IGroup>(
         required: true,
       },
     ],
-    upcomingGame: { type: Schema.Types.ObjectId, ref: 'game', required: true },
+    upcomingGame: { type: Schema.Types.ObjectId, ref: 'game', required: false, default: undefined },
     users: [{ type: Schema.Types.ObjectId, ref: 'user', required: true, default: [] }],
   },
   { timestamps: true }
