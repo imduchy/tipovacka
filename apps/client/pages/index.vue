@@ -117,6 +117,8 @@ export default Vue.extend({
   computed: {
     ...mapGetters({
       upcomingGame: 'upcomingGame',
+      followedTeam: 'followedTeam',
+      latestSeason: 'latestSeason',
     }),
     players(): IPlayer[] {
       if (!this.competition || !this.competition.players) {

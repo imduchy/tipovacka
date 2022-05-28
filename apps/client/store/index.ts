@@ -13,6 +13,13 @@ export type RootState = ReturnType<typeof state>;
 
 export const getters: GetterTree<RootState, RootState> = {
   upcomingGame: (state) => state.group.upcomingGame,
+  followedTeam: (state) => state.group.followedTeams[0],
+  latestSeason: (state) => {
+    const followedTeam = state.group.followedTeams[0];
+    const seasons = followedTeam.seasons;
+
+    return seasons[seasons.length - 1].season;
+  },
 };
 
 export const mutations: MutationTree<RootState> = {
