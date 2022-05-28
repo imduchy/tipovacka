@@ -26,9 +26,7 @@ export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
       upcomingGames.push(response);
     }
   } catch (error) {
-    logger.error(
-      `Error while getting upcoming games for team ${teamId} & leagues ${leagueIds}`
-    );
+    logger.error(`Error while getting upcoming games for team ${teamId} & leagues ${leagueIds}`);
     throw error;
   }
 
@@ -72,9 +70,7 @@ const getUpcomingGame = async (teamId: number, leagueId: number) => {
 
     return responseMapping(data.response[0]);
   } catch (error) {
-    logger.error(
-      `Error while getting upcoming games for team ${teamId} & leagues ${leagueId}`
-    );
+    logger.error(`Error while getting upcoming games for team ${teamId} & leagues ${leagueId}`);
     throw error;
   }
 };

@@ -1,8 +1,9 @@
-import { Game, IBet, IBetWithID, IGameWithID, IUserWithID, User } from '@tipovacka/models';
+import { Game, Group, IBet, IBetWithID, IGameWithID, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import { alreadyBet } from '../utils/bets';
+import { getLatestSeason } from '../utils/groups';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -171,10 +172,9 @@ router.get('/top', authMiddleware, async (req, res) => {
     typeof req.query.team !== 'string' ||
     req.query.season === undefined ||
     typeof req.query.season !== 'string' ||
-    req.query.competition === undefined ||
-    typeof req.query.competition !== 'string' ||
     req.query.round === undefined ||
-    typeof req.query.round !== 'string'
+    typeof req.query.round !== 'string' ||
+    (req.query.competition !== undefined && typeof req.query.competition !== 'string')
   ) {
     logger.warn("The request doesn't contain required request query.");
     return res.status(400).send('Bad request');
@@ -183,14 +183,25 @@ router.get('/top', authMiddleware, async (req, res) => {
   const userId = (req.user as IUserWithID)._id;
   const team = parseInt(req.query.team);
   const season = parseInt(req.query.season);
-  const competition = parseInt(req.query.competition);
   const round = parseInt(req.query.round);
+  let competition = req.query.competition ? parseInt(req.query.competition) : undefined;
 
   try {
     const user = await User.findById(userId);
     if (!user) {
       logger.error(`The user ${userId} doesn't exist in the database.`);
       return res.status(400).json('Bad request');
+    }
+
+    // If no competition is specified in the request, pick the first competition
+    // TODO: Should the competition object be mandatory?
+    if (!competition) {
+      const group = await Group.findById(user.groupId).orFail(
+        new Error(`Group with _id ${user.groupId} doesn't exist`)
+      );
+
+      const latestSeason = getLatestSeason(group.followedTeams[0]);
+      competition = latestSeason.competitions[0].apiId;
     }
 
     const gamesAggregate = await Game.aggregate([

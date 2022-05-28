@@ -2,6 +2,7 @@ import { Group, ICompetition, IUser, IUserWithID } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
+import { getLatestSeason } from '../utils/groups';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -102,22 +103,34 @@ router.get('/users', authMiddleware, async (req, res) => {
 router.get('/competition', authMiddleware, async (req, res) => {
   const q = req.query;
 
-  if (!q.group || !q.team || !q.competition || !q.season) {
-    logger.info('Not all required query parameters were specified. ' + JSON.stringify(q));
+  if (!q.group || !q.team || !q.season) {
+    logger.warn('Not all required query parameters were specified. ');
+    logger.warn(JSON.stringify({ ...q }));
     return res
-      .status(403)
+      .status(400)
       .json('Query parameters group, team, competition and season are required!');
   }
 
   try {
     const groupId = q.group.toString();
     const teamApiId = parseInt(q.team.toString());
-    const competitionApiId = parseInt(q.competition.toString());
     const season = parseInt(q.season.toString());
+    let competitionApiId = q.competition ? parseInt(q.competition.toString()) : undefined;
 
     if (!Types.ObjectId.isValid(groupId)) {
       logger.info('Provided group id is of a wrong format. Provided value: ' + q.group);
       return res.status(403).json('Invalid value for the group parameter.');
+    }
+
+    // If no competition is specified in the request, pick the first competition
+    // TODO: Should the competition object be mandatory?
+    if (!competitionApiId) {
+      const group = await Group.findById(groupId).orFail(
+        new Error(`Group with _id ${groupId} doesn't exist`)
+      );
+
+      const latestSeason = getLatestSeason(group.followedTeams[0]);
+      competitionApiId = latestSeason.competitions[0].apiId;
     }
 
     // Result of the aggregation pipeline returns a competition object matching
@@ -133,7 +146,8 @@ router.get('/competition', authMiddleware, async (req, res) => {
       .replaceRoot('$followedTeams.seasons.competitions');
 
     if (!aggrResult[0]) {
-      logger.info('No competition found for the specified parameters. ' + JSON.stringify(q));
+      logger.warn('No competition found for the specified parameters. ');
+      logger.warn(JSON.stringify({ ...q }));
       return res.status(404).json('Competition not found.');
     }
 

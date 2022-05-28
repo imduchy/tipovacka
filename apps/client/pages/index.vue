@@ -89,8 +89,7 @@ export default Vue.extend({
       homeTeamScore: 0,
       awayTeamScore: 0,
       competition: {} as ICompetition,
-      bestBets: [] as IBet[] | undefined,
-      followedTeam: this.$store.state.group.followedTeams[0],
+      bestBets: [] as IBet[],
       user: this.$auth.user,
     };
   },
@@ -100,17 +99,17 @@ export default Vue.extend({
       params: {
         group: this.$store.state.group._id,
         team: this.followedTeam.apiId,
-        season: this.upcomingGame.season,
-        competition: this.upcomingGame.competitionId,
+        season: this.latestSeason,
       },
     });
 
     this.bestBets = await this.$axios.$get('/bets/top', {
       params: {
         team: this.followedTeam.apiId,
-        season: this.upcomingGame.season,
-        competition: this.upcomingGame.competitionId,
-        round: -2,
+        season: this.latestSeason,
+        // If there's no upcomingGame, get the last game.
+        // Othewrise, get the second last game
+        round: this.upcomingGame ? -2 : -1,
       },
     });
   },
