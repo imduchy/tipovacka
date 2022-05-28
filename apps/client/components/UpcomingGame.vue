@@ -38,10 +38,10 @@
         <v-row justify="center" class="ma-0">
           <v-col class="px-0 d-flex flex-wrap justify-center">
             <div class="text-subtitle-1 text-sm-h5 text-md-h4 font-weight-light pr-1">
-              {{ formatedDate }}
+              {{ upcomingGame ? formatedDate : 'Koniec sezóny' }}
             </div>
             <div class="text-subtitle-1 secondary--text text-sm-h5 text-md-h4 font-weight-black">
-              {{ formatedTime }}
+              {{ upcomingGame ? formatedTime : '' }}
             </div>
           </v-col>
         </v-row>
@@ -128,9 +128,9 @@ export default Vue.extend({
 
       return !!(isHomeTeam || isAwayTeam);
     },
-    formatedDate(): string {
+    formatedDate(): string | undefined {
       if (!this.upcomingGame) {
-        return 'X';
+        return undefined;
       }
 
       return new Date(this.upcomingGame.date).toLocaleDateString('sk-SK', {
@@ -138,9 +138,9 @@ export default Vue.extend({
         day: 'numeric',
       });
     },
-    formatedTime(): string {
+    formatedTime(): string | undefined {
       if (!this.upcomingGame) {
-        return 'X';
+        return undefined;
       }
 
       return new Date(this.upcomingGame.date).toLocaleTimeString('sk-SK', {

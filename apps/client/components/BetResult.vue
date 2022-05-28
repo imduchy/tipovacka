@@ -31,7 +31,7 @@
               'text-subtitle-2',
               'font-weight-light',
               'grey--text',
-              correctScorer ? '' : 'text-decoration-line-through',
+              !(correctScorer && scorerName) ? '' : 'text-decoration-line-through',
             ]"
           >
             ({{ scorerName }})
