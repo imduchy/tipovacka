@@ -66,7 +66,10 @@ export function evaluatePoints(bet: IBet, game: IGame, isDerby: boolean): number
   // to only evaluate bets on results, while others might want
   // to evaluate all bets.
   points += evaluateResultBet(bet, game);
-  points += evaluateScorerBet(bet, game);
+
+  if (bet.scorer) {
+    points += evaluateScorerBet(bet, game);
+  }
 
   if (isDerby && points > 0) {
     points = points * 2;

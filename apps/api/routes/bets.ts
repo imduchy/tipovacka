@@ -41,12 +41,7 @@ router.post('/', authMiddleware, async (req, res) => {
   const rawUser = req.user as IUserWithID;
   const userId = new Types.ObjectId(rawUser._id);
 
-  if (
-    gameId === undefined ||
-    homeTeamScore === undefined ||
-    awayTeamScore === undefined ||
-    scorer === undefined
-  ) {
+  if (gameId === undefined || homeTeamScore === undefined || awayTeamScore === undefined) {
     logger.warn("The request doesn't contain required request body. The bet won't be submitted.");
     return res.status(400).send('Bad request');
   }
@@ -113,12 +108,7 @@ router.put('/', authMiddleware, async (req, res) => {
   const { bet: betId, homeTeamScore, awayTeamScore, scorer } = req.body;
   const userId = (req.user as IUserWithID)._id;
 
-  if (
-    betId === undefined ||
-    homeTeamScore === undefined ||
-    awayTeamScore === undefined ||
-    scorer === undefined
-  ) {
+  if (betId === undefined || homeTeamScore === undefined || awayTeamScore === undefined) {
     logger.warn("The request doesn't contain required request body. The bet won't be updated.");
     return res.status(400).send('Bad request');
   }

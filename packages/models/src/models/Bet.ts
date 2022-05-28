@@ -11,7 +11,7 @@ export interface IBet {
   _version?: number;
   homeTeamScore: number;
   awayTeamScore: number;
-  scorer: number;
+  scorer: number | undefined;
   game: IGame | Types.ObjectId;
   user: IUser | Types.ObjectId;
   status?: BetStatus;
@@ -25,7 +25,7 @@ export const BetSchema = new Schema<IBet>(
     _version: { type: Number, required: true, default: 1 },
     homeTeamScore: { type: Number, required: true, default: 1 },
     awayTeamScore: { type: Number, required: true, default: 1 },
-    scorer: { type: Number, required: false },
+    scorer: { type: Number, required: true, default: undefined },
     game: { type: Schema.Types.ObjectId, ref: 'game' },
     user: { type: Schema.Types.ObjectId, ref: 'user' },
     status: {
