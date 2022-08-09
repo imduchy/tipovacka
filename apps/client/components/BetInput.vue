@@ -211,7 +211,7 @@ export default Vue.extend({
             game: this.upcomingGame._id,
             homeTeamScore: this.homeTeamScore,
             awayTeamScore: this.awayTeamScore,
-            scorer: this.scorer,
+            scorer: this.scorer ? this.scorer.apiId : 0,
           })
           .then(async (response) => {
             if (response.status === 200) {
@@ -242,7 +242,7 @@ export default Vue.extend({
             bet: this.currentUsersBet._id,
             homeTeamScore: this.homeTeamScore,
             awayTeamScore: this.awayTeamScore,
-            scorer: this.scorer,
+            scorer: this.scorer ? this.scorer.apiId : 0,
           })
           .then(async (response) => {
             if (response.status === 200) {
