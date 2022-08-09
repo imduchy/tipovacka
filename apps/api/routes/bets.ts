@@ -187,6 +187,7 @@ router.get('/top', authMiddleware, async (req, res) => {
   let competition = req.query.competition ? parseInt(req.query.competition) : undefined;
 
   try {
+    logger.info('Fetching the user by user ID.');
     const user = await User.findById(userId);
     if (!user) {
       logger.error(`The user ${userId} doesn't exist in the database.`);
@@ -196,14 +197,17 @@ router.get('/top', authMiddleware, async (req, res) => {
     // If no competition is specified in the request, pick the first competition
     // TODO: Should the competition object be mandatory?
     if (!competition) {
+      logger.info('Fetching the group by group ID.');
       const group = await Group.findById(user.groupId).orFail(
         new Error(`Group with _id ${user.groupId} doesn't exist`)
       );
 
+      logger.info('Getting the latest season object from the group.');
       const latestSeason = getLatestSeason(group.followedTeams[0]);
       competition = latestSeason.competitions[0].apiId;
     }
 
+    logger.info('Running an aggregation query against games.');
     const gamesAggregate = await Game.aggregate([
       {
         $match: {
@@ -216,7 +220,14 @@ router.get('/top', authMiddleware, async (req, res) => {
 
     const games = gamesAggregate.flat() as IGameWithID[];
     const game = round >= 0 ? games[round] : games[games.length + round];
+    logger.info('The game object: ' + game);
 
+    if (!game) {
+      logger.info('No games found. Returning an empty list back.');
+      return res.status(200).json([]);
+    }
+
+    logger.info('Running an aggregation query against users.');
     const users = await User.aggregate([
       { $match: { groupId: user.groupId, 'bets.game': game._id } },
       { $unwind: '$bets' },
@@ -235,6 +246,7 @@ router.get('/top', authMiddleware, async (req, res) => {
     // TODO: This should be idealy moved to the aggregation pipeline
     users.forEach((user) => (user.bets = [user.bets]));
     users.forEach((user) => (user.bets[0].game = user.bets[0].game[0]));
+    logger.info('Aggregation result: ' + users);
 
     // Returns
     // [{ username, ..., bets: [{}] }, { username, ..., bets: [{}] }, { username, ..., bets: [{}] }]

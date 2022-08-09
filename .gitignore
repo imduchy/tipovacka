@@ -12,3 +12,8 @@ dist
 
 # macOS
 .DS_Store
+
+# Azurite
+__azurite_db_*.json
+__blobstorage__
+__queuestorage__

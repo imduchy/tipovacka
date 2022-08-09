@@ -51,7 +51,7 @@
       </v-row>
 
       <!-- Best bets -->
-      <v-row>
+      <v-row v-if="bestBets.length > 0">
         <v-col cols="12">
           <div class="text-h5">
             Najlepšie tipy kola
@@ -68,7 +68,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="mt-0">
+      <v-row v-if="bestBets.length > 0" class="mt-0">
         <v-col v-if="bestBets[0]" cols="12" lg="4">
           <bet-result :user="bestBets[0]" :players="players"></bet-result>
         </v-col>
