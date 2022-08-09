@@ -84,10 +84,14 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
       ],
     };
 
-    logger.info('Finding the team with id ' + teamId + 'in the group record.');
-    let team = group.followedTeams.find((t) => t.apiId === teamId);
+    logger.info(`Finding the team with id ${teamId} in the group record.`);
+    let team = group.followedTeams.find((t) => t.apiId === parseInt(teamId));
     if (!team) {
+      logger.info('A team object not found.');
+      logger.info('Fetching the team information from the API.');
       const teamResponse = await FootballApi.getTeam({ id: teamId });
+
+      logger.info('Creating a new teams object.');
       const teamData = teamResponse.data.response[0].team;
       team = {
         apiId: teamData.id,
@@ -99,6 +103,7 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
       group.followedTeams.push(team);
     }
 
+    team.seasons.push(seasonObj);
     logger.info('Saving the updated group object to the database.');
     await group.save();
 
