@@ -205,6 +205,69 @@ router.post('/users', authMiddleware, async (req, res) => {
 });
 
 /**
+ * Update the password of a user.
+ *
+ * Access: Admin
+ *
+ * @param user ID of the user
+ * @param password new password of the user
+ * @param password2 new password of the user
+ */
+router.patch('/users/password', authMiddleware, async (req, res) => {
+  const { user: userId, password, password2 } = req.body;
+
+  try {
+    logger.info('Starting to process the request.');
+
+    if (password !== password2) {
+      logger.error('Passwords provided in the request do not match.');
+      return res.status(400).json({
+        message: 'Passwords provided in the request do not match.',
+        code: 'PASSWORDS_DONT_MATCH',
+      });
+    }
+
+    if (password.length < 6) {
+      logger.error('Password provided in the request is shorther than 6 characters.');
+      return res.status(400).json({
+        message: 'Password provided in the request is shorther than 6 characters.',
+        code: 'PASSWORD_TOO_SHORT',
+      });
+    }
+
+    // Check if a user with this email already exists
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({
+        message: "User with the provided _id doesn't exists",
+        code: 'USER_NOT_FOUND',
+      });
+    }
+
+    logger.info('Hashing the password.');
+    const salt = await bcrypt.genSalt();
+    const encryptedPassword = await bcrypt.hash(password, salt);
+
+    logger.info("Updating the user's password in the database.");
+    await user.updateOne({ $set: { password: encryptedPassword } });
+
+    logger.info('The password was successfully updated.');
+
+    res.status(200).json({
+      response: 'The password was successfully updated',
+      code: 'SUCCESS',
+    });
+  } catch (error) {
+    logger.error(`There was an error while updating the user's password. Error: ${error}.`);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'INTERNAL_ERROR',
+    });
+  }
+});
+
+/**
  * Create new users using an Excel sheet
  *
  * Access: Admin

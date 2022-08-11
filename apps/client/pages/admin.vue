@@ -192,6 +192,48 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+          <v-dialog
+            v-model="changeUserPasswordDialog"
+            max-width="800px"
+            @click:outside="closeUserPasswordDialog"
+          >
+            <v-card class="pa-4">
+              <v-card-title>
+                <span class="text-h5">Zmeniť užívateľove heslo</span>
+              </v-card-title>
+
+              <v-card-text class="pa-4">
+                <v-row>
+                  <v-col cols="6">
+                    <v-text-field
+                      v-model="editedUser.password"
+                      dense
+                      hide-details
+                      outlined
+                      type="password"
+                      label="Nové heslo"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      v-model="editedUser.password2"
+                      hide-details
+                      dense
+                      outlined
+                      type="password"
+                      label="Zopakovať nové heslo"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="grey" dark @click="closeUserPasswordDialog">Zrušiť</v-btn>
+                <v-btn color="secondary" @click="changeUserPassword">Uložiť</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-card-title>
         <v-data-table
           :headers="[
@@ -259,6 +301,9 @@
           </template>
           <template #[`item.actions`]="{ item }">
             <v-icon small class="mr-2" @click="openEditUserDialog(item)"> mdi-pencil </v-icon>
+            <v-icon small class="mr-2" @click="openUserPasswordDialog(item)">
+              mdi-lock-reset
+            </v-icon>
             <v-icon small @click="openDeleteUserDialog(item)"> mdi-delete </v-icon>
           </template>
         </v-data-table>
@@ -276,6 +321,7 @@ export default Vue.extend({
   data: () => ({
     search: '',
     editUserDialog: false,
+    changeUserPasswordDialog: false,
     deleteUserDialog: false,
     addUserDialog: false,
     importUsersDialog: false,
@@ -404,6 +450,47 @@ export default Vue.extend({
         this.editedUser = Object.assign({}, this.emptyUser);
         this.editedIndex = -1;
       });
+    },
+    openUserPasswordDialog(
+      item: IUser & { _id: string; createdAt: string; active: boolean; admin: boolean }
+    ) {
+      this.editedIndex = this.users.indexOf(item);
+      this.editedUser = Object.assign(
+        {},
+        {
+          _id: item._id,
+          username: item.username,
+          email: item.email,
+          password: '',
+          password2: '',
+          active: item.active,
+          admin: item.admin,
+        }
+      );
+      this.changeUserPasswordDialog = true;
+    },
+    closeUserPasswordDialog() {
+      this.changeUserPasswordDialog = false;
+      this.$nextTick(() => {
+        this.editedUser = Object.assign({}, this.emptyUser);
+        this.editedIndex = -1;
+      });
+    },
+    async changeUserPassword() {
+      try {
+        await this.$axios.$patch('/admin/users/password', {
+          user: this.editedUser._id,
+          password: this.editedUser.password,
+          password2: this.editedUser.password2,
+        });
+
+        this.$showAlert('Heslo úspešne zmenené', 'success');
+      } catch (err: any) {
+        const code = err.response.data.code;
+        this.$showAlert('Niekde sa stala chyba. Kód chyby: ' + code, 'error');
+      } finally {
+        this.closeUserPasswordDialog();
+      }
     },
     editUser() {
       this.closeEditUserDialog();
