@@ -5,18 +5,12 @@
         <v-col self-justify="start" cols="12" md="6">
           <div class="text-h4 font-weight-bold pb-3 px-0">Všeobecné pravidlá</div>
           <ul class="text-justify">
-            <li class="py-1">
-              Tipovanie je počas sezóny rozdelené na dve časti - Počas prvej polovice a počas druhej
-              polovice sezóny.
-            </li>
+            <li class="py-1">Tipuje sa počas celej sezóny a víťazi sa určia po poslednom kole.</li>
             <li class="py-1">
               Tipy na zápas je možné pridať iba pred začiatkom zápasu na stránke onlinetipovacka.sk
             </li>
             <li class="py-1">
               V prebiehajúcej časti Tipovačky bude možné tipovať iba zápasy La Ligy.
-            </li>
-            <li class="py-1">
-              <b>Prebiehajúca časť Tipovačky trvá do 31.5.2022 a bude vyhodnotená 6.6.2022.</b>
             </li>
           </ul>
         </v-col>
@@ -65,7 +59,10 @@
                 </v-card-title>
                 <v-card-text>
                   <ul>
-                    <li>Peňažná výhra 100€</li>
+                    <li>
+                      200 € na nákup oficiálnych produktov Realu Madrid alebo iný tovar z eshopu
+                      <a href="https://11teamsports.sk/?a_box=hqzugtck">11teamsports.sk</a>
+                    </li>
                   </ul></v-card-text
                 >
               </v-card></v-col
@@ -84,7 +81,10 @@
                 </v-card-title>
                 <v-card-text>
                   <ul>
-                    <li>Peňažná výhra 50€</li>
+                    <li>
+                      100 € na nákup oficiálnych produktov Realu Madrid alebo iný tovar z eshopu
+                      <a href="https://11teamsports.sk/?a_box=hqzugtck">11teamsports.sk</a>
+                    </li>
                   </ul></v-card-text
                 >
               </v-card></v-col
@@ -103,7 +103,10 @@
                 </v-card-title>
                 <v-card-text>
                   <ul>
-                    <li>Peňažná výhra 30€</li>
+                    <li>
+                      50 € na nákup oficiálnych produktov Realu Madrid alebo iný tovar z eshopu
+                      <a href="https://11teamsports.sk/?a_box=hqzugtck">11teamsports.sk</a>
+                    </li>
                   </ul></v-card-text
                 >
               </v-card></v-col
