@@ -41,7 +41,7 @@ export async function assignPoints(
       score: points,
     });
   } else {
-    competition.score += points;
+    competition.score = competition.score + points;
   }
 
   return await User.findOneAndUpdate(
