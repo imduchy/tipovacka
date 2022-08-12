@@ -4,6 +4,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import multer from 'multer';
 import xlsx from 'node-xlsx';
 import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
+import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
 import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
@@ -30,7 +31,10 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
       user && (user as IUserWithID)._id
     } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${req.header('tipovacka-auth-token')}`
   );
-  res.status(401).send('Unauthorized request');
+  res.status(401).json({
+    message: ResponseMessages.UNAUTHORIZED_REQUEST,
+    code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
+  });
 };
 
 /**
@@ -113,7 +117,10 @@ router.post('/groups/competition', authMiddleware, async (req, res) => {
     logger.error(
       `An error occured while enrolling a group in a new competition. Error: ${error.message}`
     );
-    res.status(400).json(error.message);
+    res.status(400).json({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseMessages.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 
@@ -137,34 +144,34 @@ router.post('/users', authMiddleware, async (req, res) => {
     if (password !== password2) {
       logger.error('Passwords provided in the request do not match.');
       return res.status(400).json({
-        message: 'Passwords provided in the request do not match.',
-        code: 'PASSWORDS_DONT_MATCH',
+        message: ResponseMessages.PASSWORDS_DONT_MATCH,
+        code: ResponseErrorCodes.INVALID_REQUEST_BODY,
       });
     }
 
     if (password.length < 6) {
       logger.error('Password provided in the request is shorther than 6 characters.');
       return res.status(400).json({
-        message: 'Password provided in the request is shorther than 6 characters.',
-        code: 'PASSWORD_TOO_SHORT',
+        message: ResponseMessages.PASSWORD_TOO_SHORT,
+        code: ResponseErrorCodes.INVALID_REQUEST_BODY,
       });
     }
 
     // Check if a user with this email already exists
     if (await User.findOne({ email })) {
-      logger.error('User with specified email already exists in the database.');
+      logger.error('User with the specified email already exists in the database.');
       return res.status(400).json({
-        message: 'User with this email already exists',
-        code: 'USER_ALREADY_EXISTS',
+        message: ResponseMessages.USER_EMAIL_ALREADY_EXISTS,
+        code: ResponseErrorCodes.RESOURCE_ALREADY_EXISTS,
       });
     }
 
-    // Check if a group with the provided ID exists
-    if (!(await Group.findById(groupId))) {
+    const group = await Group.findById(groupId);
+    if (!group) {
       logger.error(`The specified group with id ${groupId} doesn't exist.`);
       return res.status(404).json({
-        message: "Group with provided ID doesn't exist",
-        code: 'GROUP_DOESNT_EXIST',
+        message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
     }
 
@@ -191,15 +198,12 @@ router.post('/users', authMiddleware, async (req, res) => {
     logger.info('The new user was created created successfully.');
     logger.info(JSON.stringify(newUser));
 
-    res.status(200).json({
-      response: newUser,
-      code: 'SUCCESS',
-    });
+    res.status(200).json(newUser);
   } catch (error) {
     logger.error(`There was an error creting the user. Error: ${error}.`);
     res.status(500).json({
-      message: 'Internal server error',
-      code: 'INTERNAL_ERROR',
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
   }
 });
@@ -222,16 +226,16 @@ router.patch('/users/password', authMiddleware, async (req, res) => {
     if (password !== password2) {
       logger.error('Passwords provided in the request do not match.');
       return res.status(400).json({
-        message: 'Passwords provided in the request do not match.',
-        code: 'PASSWORDS_DONT_MATCH',
+        message: ResponseMessages.PASSWORDS_DONT_MATCH,
+        code: ResponseErrorCodes.INVALID_REQUEST_BODY,
       });
     }
 
     if (password.length < 6) {
       logger.error('Password provided in the request is shorther than 6 characters.');
       return res.status(400).json({
-        message: 'Password provided in the request is shorther than 6 characters.',
-        code: 'PASSWORD_TOO_SHORT',
+        message: ResponseMessages.PASSWORD_TOO_SHORT,
+        code: ResponseErrorCodes.INVALID_REQUEST_BODY,
       });
     }
 
@@ -239,9 +243,9 @@ router.patch('/users/password', authMiddleware, async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(400).json({
-        message: "User with the provided _id doesn't exists",
-        code: 'USER_NOT_FOUND',
+      return res.status(404).json({
+        message: ResponseMessages.RESOURCE_NOT_FOUND,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
     }
 
@@ -255,14 +259,13 @@ router.patch('/users/password', authMiddleware, async (req, res) => {
     logger.info('The password was successfully updated.');
 
     res.status(200).json({
-      response: 'The password was successfully updated',
-      code: 'SUCCESS',
+      response: ResponseMessages.PASSWORD_SUCCESSFULLY_UPDATED,
     });
   } catch (error) {
     logger.error(`There was an error while updating the user's password. Error: ${error}.`);
     res.status(500).json({
-      message: 'Internal server error',
-      code: 'INTERNAL_ERROR',
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
   }
 });
@@ -284,7 +287,10 @@ const upload = multer({ storage: storage });
 router.post('/users/import', authMiddleware, upload.single('importFile'), async (req, res) => {
   if (!req.file) {
     logger.error("The request doesn't contain an import file.");
-    return res.status(400).send("The request doesn't contain an import file.");
+    return res.status(400).json({
+      message: ResponseMessages.NO_IMPORT_FILE,
+      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
+    });
   }
 
   logger.info('Starting to process the request.');
@@ -358,15 +364,12 @@ router.post('/users/import', authMiddleware, upload.single('importFile'), async 
     if (failed.length !== 0) {
       logger.error(`Failed to create ${failed.length} users. Errors: ${JSON.stringify(failed)}`);
       return res.status(400).json({
-        message: `Failed to create ${failed.length} of ${users.length} users.`,
-        code: 'IMPORT_NOT_SUCCESSFUL',
+        message: ResponseMessages.IMPORT_NOT_SUCCESSFUL,
+        code: ResponseErrorCodes.IMPORT_NOT_SUCCESSFUL,
       });
     }
 
-    return res.status(200).json({
-      response: `Successfully added ${users.length} users.`,
-      code: 'SUCCESS',
-    });
+    return res.status(200).json(`Successfully added ${users.length} users.`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     logger.error(`There was an error creating users. Error: ${error}.`);
@@ -374,15 +377,15 @@ router.post('/users/import', authMiddleware, upload.single('importFile'), async 
     if (error.message) {
       if ((error.message as string).includes('Unsupported')) {
         return res.status(400).json({
-          message: error.message,
-          code: 'UNSUPPORTED_FILE_FORMAT',
+          message: ResponseMessages.INVALID_FILE_FORMAT,
+          code: ResponseErrorCodes.INVALID_REQUEST_BODY,
         });
       }
     }
 
     return res.status(400).json({
-      message: `Internal server error.`,
-      code: 'INTERNAL_ERROR',
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
   }
 });
@@ -404,18 +407,18 @@ router.delete('/users', authMiddleware, async (req, res) => {
     if (!userId) {
       logger.error('A user ID was not specified in the query.');
       return res.status(400).json({
-        message: 'Bad request',
-        code: 'BAD_REQUEST',
+        message: ResponseMessages.USER_ID_NOT_PROVIDED_IN_QUERY,
+        code: ResponseErrorCodes.INVALID_REQUEST_BODY,
       });
     }
 
     const user = await User.findById(userId);
 
     if (!user) {
-      logger.error("User with the specified id doesn't exist in the database.");
+      logger.error("User with the specified ID doesn't exist in the database.");
       return res.status(404).json({
-        message: "User doesn't exist",
-        code: 'USER_NOT_FOUND',
+        message: ResponseMessages.USER_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
     }
 
@@ -423,8 +426,8 @@ router.delete('/users', authMiddleware, async (req, res) => {
       if (!user.groupId.equals((req.user as IUser).groupId)) {
         logger.error('User is not allowed to delete users from a differetn group.');
         return res.status(404).json({
-          message: "User doesn't exist",
-          code: 'USER_NOT_FOUND',
+          message: ResponseMessages.USER_ID_DOESNT_EXIST,
+          code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
         });
       }
     }
@@ -437,15 +440,12 @@ router.delete('/users', authMiddleware, async (req, res) => {
     logger.info('The user was deleted successfully.');
     logger.info(JSON.stringify(user));
 
-    res.status(200).json({
-      response: user,
-      code: 'SUCCESS',
-    });
+    res.status(200).json(user);
   } catch (error) {
     logger.error(`There was an error deleting the user. Error: ${error}.`);
     res.status(500).json({
-      message: 'Internal server error',
-      code: 'INTERNAL_ERROR',
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
   }
 });
@@ -479,9 +479,10 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
         'The team response object contains 0 results. Make sure that the request ' +
           'body contains correct values.'
       );
-      return res
-        .status(404)
-        .json('Team information not found. Make sure the request body contains correct values.');
+      return res.status(404).json({
+        message: ResponseMessages.NO_API_TEAM_RESULTS,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     logger.info('Fetching team statistics from the API.');
@@ -497,9 +498,10 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
         'The team statistics response object contains 0 results. Make sure that the ' +
           'request body contains correct values.'
       );
-      return res
-        .status(404)
-        .json('Team statistics not found. Make sure the request body contains correct values.');
+      return res.status(404).json({
+        message: ResponseMessages.NO_API_STATISTICS_RESULTS,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     logger.info('Fetching competition standings from the API.');
@@ -514,11 +516,10 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
         'The competition standings response object contains 0 results. Make sure that the ' +
           'request body contains correct values.'
       );
-      return res
-        .status(404)
-        .json(
-          'Team competition standings not found. Make sure the request body contains correct values.'
-        );
+      return res.status(404).json({
+        message: ResponseMessages.NO_API_STANDINGS_RESULTS,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     logger.info("Fetching team's players from the API.");
@@ -534,9 +535,10 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
         'The players response object contains 0 results. Make sure that the ' +
           'request body contains correct values.'
       );
-      return res
-        .status(404)
-        .json("Team's players not found. Make sure the request body contains correct values.");
+      return res.status(404).json({
+        message: ResponseMessages.NO_API_PLAYERS_RESULTS,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     const { team } = teamResponse.data.response[0];
@@ -585,7 +587,10 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
     res.status(200).json(group);
   } catch (error) {
     logger.error(`Couldn't create a new group. Error: ${error}`);
-    res.status(500).json('Internal server error');
+    res.status(500).json({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 
