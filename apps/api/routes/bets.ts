@@ -24,7 +24,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   warnAuditLog(req, user);
-  res.status(401).json({
+  return res.status(401).json({
     message: ResponseMessages.UNAUTHORIZED_REQUEST,
     code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
   });
@@ -128,33 +128,48 @@ router.put('/', authMiddleware, async (req, res) => {
   const userId = (req.user as IUserWithID)._id;
 
   if (betId === undefined || homeTeamScore === undefined || awayTeamScore === undefined) {
-    logger.warn("The request doesn't contain required request body. The bet won't be updated.");
-    return res.status(400).send('Bad request');
+    logger.warn("The request doesn't contain required request body.");
+    return res.status(400).json({
+      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
+      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
+    });
   }
 
   try {
     const user = await User.findById(userId);
     if (!user) {
       logger.error(`The user ${userId} doesn't exist in the database.`);
-      return res.status(400).json('Bad request');
+      return res.status(400).json({
+        message: ResponseMessages.USER_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     const bet = user.bets.find((b) => (b as IBetWithID)._id.equals(betId));
     if (!bet) {
       logger.error(`The bet ${betId} doesn't exist in the user object.`);
-      return res.status(400).json('Bad request');
+      return res.status(400).json({
+        message: ResponseMessages.BET_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     const game = await Game.findById(bet.game);
     if (!game) {
       logger.error(`The game ${bet.game} doesn't exist in the database.`);
-      return res.status(400).json('Bad request');
+      return res.status(400).json({
+        message: ResponseMessages.GAME_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     // Don't update the bet if the game has already started.
     if (new Date().getTime() > game.date.getTime()) {
       logger.error("The specified game has already started. The bet won't be updated.");
-      return res.status(400).json('Bad request');
+      return res.status(400).json({
+        message: ResponseMessages.GAME_ALREADY_STARTED,
+        code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
+      });
     }
 
     bet.awayTeamScore = awayTeamScore;
@@ -167,7 +182,10 @@ router.put('/', authMiddleware, async (req, res) => {
     res.status(200).json(bet);
   } catch (error) {
     logger.error(`Couldn't update the bet. Error: ${error}.`);
-    res.status(500).json('Internal error occured');
+    res.status(500).json({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 
@@ -195,7 +213,10 @@ router.get('/top', authMiddleware, async (req, res) => {
     (req.query.competition !== undefined && typeof req.query.competition !== 'string')
   ) {
     logger.warn("The request doesn't contain required request query.");
-    return res.status(400).send('Bad request');
+    return res.status(400).send({
+      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
+      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
+    });
   }
 
   const userId = (req.user as IUserWithID)._id;
@@ -209,7 +230,10 @@ router.get('/top', authMiddleware, async (req, res) => {
     const user = await User.findById(userId);
     if (!user) {
       logger.error(`The user ${userId} doesn't exist in the database.`);
-      return res.status(400).json('Bad request');
+      return res.status(400).json({
+        message: ResponseMessages.USER_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     // If no competition is specified in the request, pick the first competition
@@ -269,7 +293,10 @@ router.get('/top', authMiddleware, async (req, res) => {
     res.status(200).json(users);
   } catch (error) {
     logger.error(`Couldn't find bets. Error: ${error}.`);
-    res.status(500).json('Internal error occured');
+    res.status(500).json({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 

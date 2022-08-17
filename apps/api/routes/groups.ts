@@ -1,7 +1,7 @@
 import { Group, ICompetition, IGameWithID, IUser, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
-import { containsAdminKey, infoAuditLog, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import { getLatestSeason } from '../utils/groups';
 import logger from '../utils/logger';
@@ -35,12 +35,11 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     }
   }
 
-  logger.warn(
-    `[${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUserWithID)._id
-    } from IP: ${req.ip}.`
-  );
-  res.status(401).send('Unauthorized request');
+  warnAuditLog(req, user);
+  return res.status(401).json({
+    message: ResponseMessages.UNAUTHORIZED_REQUEST,
+    code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
+  });
 };
 
 /**
@@ -60,13 +59,19 @@ router.get('/', authMiddleware, async (req, res) => {
 
     if (!group) {
       logger.warn(`Group with _id ${groupId} doesn't exist.`);
-      return res.status(404).json("The provided group doesn't exist");
+      return res.status(404).json({
+        message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     res.status(200).json(group);
   } catch (error) {
     logger.error(`Couldn't fetch a group ${groupId}. Error: ${error}`);
-    res.status(500).json('Internal server error');
+    res.status(500).json({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 
@@ -101,7 +106,10 @@ router.get('/users', authMiddleware, async (req, res) => {
     res.status(200).json(users);
   } catch (error) {
     logger.error(`An error occured while fetching the group ${groupId}. Error: ${error}.`);
-    res.status(500).send('Internal server error.');
+    res.status(500).send({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 
@@ -121,9 +129,10 @@ router.get('/competition', authMiddleware, async (req, res) => {
   if (!q.group || !q.team || !q.season) {
     logger.warn('Not all required query parameters were specified. ');
     logger.warn(JSON.stringify({ ...q }));
-    return res
-      .status(400)
-      .json('Query parameters group, team, competition and season are required!');
+    return res.status(400).json({
+      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
+      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
+    });
   }
 
   try {
@@ -134,7 +143,10 @@ router.get('/competition', authMiddleware, async (req, res) => {
 
     if (!Types.ObjectId.isValid(groupId)) {
       logger.info('Provided group id is of a wrong format. Provided value: ' + q.group);
-      return res.status(403).json('Invalid value for the group parameter.');
+      return res.status(403).json({
+        message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     // If no competition is specified in the request, pick the first competition

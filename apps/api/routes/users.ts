@@ -1,35 +1,35 @@
 import { IUserWithID, User } from '@tipovacka/models';
 import express, { NextFunction, Request, Response } from 'express';
-import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
+import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import logger from '../utils/logger';
 
 const router = express.Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+  infoAuditLog(req);
+
+  const user = req.user as IUserWithID | undefined;
 
   // If req.headers contains the admin key,continue
   if (containsAdminKey(req)) {
-    next();
-    return;
+    return next();
   }
 
   if (isLoggedIn(req)) {
     const user = req.user as IUserWithID;
     // Allow users to only access their own User document.
-    // E.g., Alice can't fetch Bob's User document
     if (user._id.equals(req.params.userId)) {
-      next();
-      return;
+      return next();
     }
   }
 
-  logger.warn(
-    `[${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUserWithID)._id
-    } from IP: ${req.ip}.`
-  );
-  res.status(401).send('Unauthorized request');
+  warnAuditLog(req, user);
+
+  return res.status(401).json({
+    message: ResponseMessages.UNAUTHORIZED_REQUEST,
+    code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
+  });
 };
 
 /**
@@ -53,14 +53,20 @@ router.get('/', authMiddleware, async (req, res) => {
 
     if (!user) {
       logger.warn(`User with _id ${userId} doesn't exist.`);
-      res.status(404).json("The specified user doesn't exist.");
+      res.status(404).json({
+        message: ResponseMessages.USER_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
       return;
     }
 
     res.status(200).json(user);
   } catch (error) {
     logger.error(`Couldn't fetch a user with id ${userId}. Error: ${error}.`);
-    res.status(500).json('Internal server error');
+    res.status(500).json({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 

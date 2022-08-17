@@ -32,7 +32,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   warnAuditLog(req, user);
-  res.status(401).json({
+  return res.status(401).json({
     message: ResponseMessages.UNAUTHORIZED_REQUEST,
     code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
   });

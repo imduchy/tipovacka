@@ -13,11 +13,14 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   // If req.headers contains the admin key, continue
   if (containsAdminKey(req) || isLoggedIn(req)) {
-    next();
+    return next();
   }
 
   warnAuditLog(req, user);
-  res.status(401).send('Unauthorized request');
+  return res.status(401).json({
+    message: ResponseMessages.UNAUTHORIZED_REQUEST,
+    code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
+  });
 };
 
 /**

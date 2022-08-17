@@ -16,13 +16,13 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   if (!isLoggedIn(req)) {
     warnAuditLog(req, user);
-    res.status(401).json({
+    return res.status(401).json({
       message: ResponseMessages.UNAUTHORIZED_REQUEST,
       code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
     });
   }
 
-  next();
+  return next();
 };
 
 router.get('/user', (req, res) => {
