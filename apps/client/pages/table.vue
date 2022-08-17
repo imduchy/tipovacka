@@ -36,7 +36,7 @@ export default Vue.extend({
   // @ts-ignore
   async fetch() {
     this.rawUsers = await this.$axios.$get('/groups/users', {
-      params: { group: this.$store.state.group._id },
+      params: { group: this.$store.state.group._id, season: 2022 },
     });
   },
   computed: {
@@ -44,7 +44,7 @@ export default Vue.extend({
       return this.rawUsers
         .map((u) => ({
           username: u.username,
-          points: u.competitionScore![0].score || 0,
+          points: u.competitionScore![u.competitionScore.length - 1].score || 0,
           bets: u.bets?.length || 0,
           rank: '0',
         }))

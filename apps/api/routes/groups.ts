@@ -1,4 +1,4 @@
-import { Group, ICompetition, IUser, IUserWithID } from '@tipovacka/models';
+import { Group, ICompetition, IGameWithID, IUser, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
@@ -69,21 +69,30 @@ router.get('/', authMiddleware, async (req, res) => {
  *
  * Access: Protected (Logged-in & Part of the group)
  *
- * @param username username of the newly created user
- * @param email email of the newly created user
- * @param password password of the newly created user
- * @param group ObjectId of the group the user will be part of
+ * @param group ObjectId of the group
+ * @param season Filter for a season in which a users is enrolled
  */
 router.get('/users', authMiddleware, async (req, res) => {
-  const groupId = req.query.group;
+  const groupId = req.query.group as string;
+  const season = parseInt(req.query.season as string);
 
   try {
-    const group = await Group.findById(groupId).populate('users');
-    if (group) {
-      res.status(200).json(group.users);
-    } else {
-      res.status(404).send("The specified group doesn't exist.");
+    const query = User.find({ groupId: groupId }).populate({ path: 'bets.game' });
+
+    if (season) {
+      query.where('competitionScore.season').equals(season);
     }
+
+    const users = await query;
+
+    // The filtering should be performed in an aggregation pipeline instead
+    if (season) {
+      for (const user of users) {
+        user.bets = user.bets.filter((bet) => (bet.game as IGameWithID).season === season);
+      }
+    }
+
+    res.status(200).json(users);
   } catch (error) {
     logger.error(`An error occured while fetching the group ${groupId}. Error: ${error}.`);
     res.status(500).send('Internal server error.');

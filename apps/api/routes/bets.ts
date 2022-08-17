@@ -207,7 +207,6 @@ router.get('/top', authMiddleware, async (req, res) => {
       competition = latestSeason.competitions[0].apiId;
     }
 
-    logger.info('Running an aggregation query against games.');
     const gamesAggregate = await Game.aggregate([
       {
         $match: {
@@ -227,7 +226,6 @@ router.get('/top', authMiddleware, async (req, res) => {
       return res.status(200).json([]);
     }
 
-    logger.info('Running an aggregation query against users.');
     const users = await User.aggregate([
       { $match: { groupId: user.groupId, 'bets.game': game._id } },
       { $unwind: '$bets' },
