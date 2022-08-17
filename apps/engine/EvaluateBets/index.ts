@@ -1,5 +1,5 @@
 import { AzureFunction, Context } from '@azure/functions';
-import { BetStatus, Game, Group, IBet, IBetWithID, IUser, User } from '@tipovacka/models';
+import { BetStatus, Game, Group, IBetWithID, IUser, User } from '@tipovacka/models';
 import { HydratedDocument, Types } from 'mongoose';
 import { getDatabase } from '../src/database';
 import { assignPoints, evaluatePoints, placedBetOnGame } from './utils';

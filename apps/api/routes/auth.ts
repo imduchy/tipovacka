@@ -1,27 +1,28 @@
 import { IUser, IUserWithID, User } from '@tipovacka/models';
 import bcrypt from 'bcryptjs';
 import express, { NextFunction, Request, Response } from 'express';
-import mongoose, { Types } from 'mongoose';
+import mongoose from 'mongoose';
 import passport from 'passport';
-import { isLoggedIn } from '../utils/authMiddleware';
+import { infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
+import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import logger from '../utils/logger';
 
 const router = express.Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+  infoAuditLog(req);
 
-  // If req.headers contains the admin key, continue
-  if (isLoggedIn(req)) {
-    next();
-  } else {
-    logger.warn(
-      `[${req.originalUrl}] Unauthorized request was made by user ${
-        req.user && (req.user as IUserWithID)._id
-      } from IP: ${req.ip}.`
-    );
-    res.status(401).send('Unauthorized request');
+  const user = req.user as IUserWithID | undefined;
+
+  if (!isLoggedIn(req)) {
+    warnAuditLog(req, user);
+    res.status(401).json({
+      message: ResponseMessages.UNAUTHORIZED_REQUEST,
+      code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
+    });
   }
+
+  next();
 };
 
 router.get('/user', (req, res) => {
@@ -49,7 +50,7 @@ router.get('/logout', (req, res) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
   req.session?.destroy(async (err) => {
     if (err) {
-      logger.info(
+      logger.warn(
         `Couldn't destory session ${req.sessionID} for a user ${req.user}. Error: ${err}`
       );
     }
@@ -116,12 +117,18 @@ router.post('/password', authMiddleware, async (req, res) => {
   const { oldPassword, newPassword, confirmedPassword } = req.body;
 
   if (!oldPassword || !newPassword || !confirmedPassword) {
-    res.status(400).send('Not all values were provided.');
+    res.status(400).json({
+      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
+      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
+    });
     return;
   }
 
   if (newPassword !== confirmedPassword) {
-    res.status(400).send("New passwords doesn't match.");
+    res.status(400).json({
+      message: ResponseMessages.PASSWORDS_DONT_MATCH,
+      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
+    });
     return;
   }
 
@@ -134,7 +141,10 @@ router.post('/password', authMiddleware, async (req, res) => {
 
     const passwordsMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordsMatch) {
-      res.status(400).send('Wrong password');
+      res.status(401).json({
+        message: ResponseMessages.UNAUTHORIZED_REQUEST,
+        code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
+      });
       return;
     }
 
@@ -147,7 +157,10 @@ router.post('/password', authMiddleware, async (req, res) => {
 
     res.status(200).send();
   } catch (error) {
-    res.status(500).send('Internal error');
+    res.status(500).send({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 

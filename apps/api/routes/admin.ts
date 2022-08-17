@@ -3,7 +3,12 @@ import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
 import multer from 'multer';
 import xlsx from 'node-xlsx';
-import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
+import {
+  containsAdminKey,
+  hasAdminRole,
+  infoAuditLog,
+  warnAuditLog,
+} from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
@@ -14,9 +19,9 @@ import { emptyStatisticsObject } from '../utils/teams';
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+  infoAuditLog(req);
 
-  const user = req.user as IUser | undefined;
+  const user = req.user as IUserWithID | undefined;
 
   if (containsAdminKey(req)) {
     return next();
@@ -26,11 +31,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     return next();
   }
 
-  logger.warn(
-    `[${req.originalUrl}] Unauthorized request was made by user ${
-      user && (user as IUserWithID)._id
-    } from IP: ${req.ip}. The provided ADMIN_API_TOKEN was ${req.header('tipovacka-auth-token')}`
-  );
+  warnAuditLog(req, user);
   res.status(401).json({
     message: ResponseMessages.UNAUTHORIZED_REQUEST,
     code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,

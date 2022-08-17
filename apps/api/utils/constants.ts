@@ -5,6 +5,7 @@ export enum ResponseErrorCodes {
   UNAUTHORIZED_REQUEST = 'UNAUTHORIZED_REQUEST',
   RESOURCE_ALREADY_EXISTS = 'RESOURCE_ALREADY_EXISTS',
   IMPORT_NOT_SUCCESSFUL = 'IMPORT_NOT_SUCCESSFUL',
+  BAD_REQUEST = 'BAD_REQUEST',
 }
 
 export enum ResponseMessages {
@@ -25,4 +26,8 @@ export enum ResponseMessages {
   NO_API_STATISTICS_RESULTS = 'No team statistics results found with the provided league ID and season.',
   NO_API_STANDINGS_RESULTS = 'No standings results found with the provided league ID and season.',
   NO_API_PLAYERS_RESULTS = 'No players results found with the provided league ID, team ID and season.',
+  USER_ALREADY_PLACED_BET = 'The specified user has already placed a bet on this game.',
+  GAME_ID_DOESNT_EXIST = "A game with the specified ID doesn't exist.",
+  GAME_ALREADY_STARTED = "The specified game has already started and it's not possible to place a bet on it.",
+  REQUIRED_ATTRIBUTES_MISSING = "The request body doesn't contain all required attributes.",
 }

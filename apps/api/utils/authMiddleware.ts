@@ -1,5 +1,6 @@
-import { IUser } from '@tipovacka/models';
+import { IUser, IUserWithID } from '@tipovacka/models';
 import { Request } from 'express';
+import logger from './logger';
 
 export const isLoggedIn = (req: Request): boolean => {
   return req.user !== undefined;
@@ -11,4 +12,16 @@ export const containsAdminKey = (req: Request): boolean => {
 
 export const hasAdminRole = (user: IUser | undefined): boolean => {
   return user ? user.scope.includes('admin') : false;
+};
+
+export const infoAuditLog = (req: Request): void => {
+  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+};
+
+export const warnAuditLog = (req: Request, user: IUserWithID | undefined): void => {
+  logger.warn(
+    `[${req.originalUrl}] Unauthorized request was made by user ` +
+      `${user && user._id} from IP: ${req.ip}. The provided ADMIN_API_TOKEN ` +
+      `was ${req.header('tipovacka-auth-token')}`
+  );
 };

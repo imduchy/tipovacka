@@ -1,19 +1,25 @@
 import { Group, ICompetition, IGameWithID, IUser, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
-import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, infoAuditLog, isLoggedIn } from '../utils/authMiddleware';
+import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import { getLatestSeason } from '../utils/groups';
 import logger from '../utils/logger';
 
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+  infoAuditLog(req);
+
+  const user = req.user as IUserWithID | undefined;
 
   const group = req.query.group;
   if (!group) {
     logger.warn("The query parameter 'group' wasn't specified.");
-    return res.status(400).send('Bad request');
+    return res.status(400).send({
+      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
+      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
+    });
   }
 
   // If req.headers contains the admin key, continue
@@ -157,13 +163,19 @@ router.get('/competition', authMiddleware, async (req, res) => {
     if (!aggrResult[0]) {
       logger.warn('No competition found for the specified parameters. ');
       logger.warn(JSON.stringify({ ...q }));
-      return res.status(404).json('Competition not found.');
+      return res.status(404).json({
+        message: ResponseMessages.INTERNAL_SERVER_ERROR,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     res.status(200).json(aggrResult[0]);
   } catch (error) {
     logger.error(`Couldn't fetch group ${req.params.groupId}. Error: ${error}.`);
-    res.status(500).json('Internal server error');
+    res.status(500).json({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 

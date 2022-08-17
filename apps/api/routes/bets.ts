@@ -1,15 +1,18 @@
 import { Game, Group, IBet, IBetWithID, IGameWithID, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
-import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
 import { alreadyBet } from '../utils/bets';
+import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import { getLatestSeason } from '../utils/groups';
 import logger from '../utils/logger';
 
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+  infoAuditLog(req);
+
+  const user = req.user as IUserWithID | undefined;
 
   // If req.headers contains the admin key, continue
   if (containsAdminKey(req)) {
@@ -20,12 +23,11 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     return next();
   }
 
-  logger.warn(
-    `[${req.method} ${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUserWithID)._id
-    } from IP: ${req.ip}.`
-  );
-  res.status(401).send('Unauthorized request');
+  warnAuditLog(req, user);
+  res.status(401).json({
+    message: ResponseMessages.UNAUTHORIZED_REQUEST,
+    code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
+  });
 };
 
 /**
@@ -43,34 +45,47 @@ router.post('/', authMiddleware, async (req, res) => {
   const userId = new Types.ObjectId(rawUser._id);
 
   if (gameId === undefined || homeTeamScore === undefined || awayTeamScore === undefined) {
-    logger.warn("The request doesn't contain required request body. The bet won't be submitted.");
-    return res.status(400).send('Bad request');
+    logger.warn("The request doesn't contain required request body.");
+    return res.status(400).json({
+      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
+      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
+    });
   }
 
   try {
     const user = await User.findById(userId);
     if (!user) {
-      logger.warn("The specified user doesn't exist. The bet won't be submitted.");
-      return res.status(404).json("The specified resource doesn't exist");
+      logger.warn("The specified user doesn't exist.");
+      return res.status(404).json({
+        message: ResponseMessages.USER_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     if (alreadyBet(user, gameId)) {
-      logger.warn(
-        "The specified user has already placed a bet on this game. The bet won't be submitted."
-      );
-      return res.status(400).json('Bad request');
+      logger.warn('The specified user has already placed a bet on this game.');
+      return res.status(400).json({
+        message: ResponseMessages.USER_ALREADY_PLACED_BET,
+        code: ResponseErrorCodes.RESOURCE_ALREADY_EXISTS,
+      });
     }
 
     const game = await Game.findById(gameId);
     if (!game) {
-      logger.warn("The specified game doesn't exist. The bet won't be submitted.");
-      return res.status(404).json("The specified resource doesn't exist");
+      logger.warn("The specified game doesn't exist.");
+      return res.status(404).json({
+        message: ResponseMessages.GAME_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
     }
 
     // Don't submit the bet if the game already started.
     if (new Date().getTime() > game.date.getTime()) {
-      logger.warn("The specified game has already started. The bet won't be submitted.");
-      return res.status(400).json('Bad request');
+      logger.warn('The specified game has already started.');
+      return res.status(400).json({
+        message: ResponseMessages.GAME_ALREADY_STARTED,
+        code: ResponseErrorCodes.BAD_REQUEST,
+      });
     }
 
     const bet: IBet = {
@@ -89,7 +104,10 @@ router.post('/', authMiddleware, async (req, res) => {
     res.status(200).json(user.bets);
   } catch (error) {
     logger.error(`Couldn't create a bet. Error: ${error}.`);
-    res.status(500).json('Internal error occured');
+    res.status(500).json({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 

@@ -1,24 +1,22 @@
 import { Game, IUserWithID } from '@tipovacka/models';
 import express, { NextFunction, Request, Response } from 'express';
-import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
+import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
+import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import logger from '../utils/logger';
 
 const router = express.Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+  infoAuditLog(req);
+
+  const user = req.user as IUserWithID | undefined;
 
   // If req.headers contains the admin key, continue
   if (containsAdminKey(req) || isLoggedIn(req)) {
     next();
-    return;
   }
 
-  logger.warn(
-    `[${req.originalUrl}] Unauthorized request was made by user ${
-      req.user && (req.user as IUserWithID)._id
-    } from IP: ${req.ip}.`
-  );
+  warnAuditLog(req, user);
   res.status(401).send('Unauthorized request');
 };
 
@@ -36,14 +34,20 @@ router.get('/', authMiddleware, async (req, res) => {
     const game = await Game.findById(gameId);
     if (!game) {
       logger.warn(`Game with _id ${gameId} doesn't exist.`);
-      res.status(404).json("The specified game doesn't exist.");
+      res.status(404).json({
+        message: ResponseMessages.GAME_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
       return;
     }
 
     res.status(200).json(game);
   } catch (error) {
     logger.error(`Couldn't fetch a game with id ${gameId}. Error: ${error}`);
-    res.status(500).json('Internal server error');
+    res.status(500).json({
+      message: ResponseMessages.INTERNAL_SERVER_ERROR,
+      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 

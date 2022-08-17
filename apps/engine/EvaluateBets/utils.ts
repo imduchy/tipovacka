@@ -16,7 +16,6 @@ export function placedBetOnGame(user: IUser, game: HydratedDocument<IGame>): boo
  * If there isn't a matching competitionScore record, it creates one and saves
  * the points.
  *
- * @param db wrapper class for database
  * @param user a user to whom points should be assigned
  * @param points number of points to assign
  * @param season competition season
