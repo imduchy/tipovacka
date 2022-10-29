@@ -13,6 +13,7 @@ import games from './routes/games';
 import groups from './routes/groups';
 import users from './routes/users';
 import cors from 'cors';
+import helmet from 'helmet';
 
 const app = express();
 const MongoStore = connectMongo(session);
@@ -62,6 +63,20 @@ app.use(
   })
 );
 
+// Enable secure response headers
+// https://hackernoon.com/nodejs-security-headers-101-mf9k24zn
+app.use(
+  helmet({
+    dnsPrefetchControl: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  })
+);
 app.use(urlencoded({ extended: false }));
 app.use(json());
 

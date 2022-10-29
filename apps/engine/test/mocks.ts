@@ -35,7 +35,7 @@ export function mockSeason(year: number, competitions?: ICompetition[]): ISeason
 
 export function mockCompetition(): ICompetition {
   return {
-    apiId: faker.random.number(500),
+    apiId: faker.datatype.number(500),
     name: faker.company.companyName() + ' Liga',
     logo: 'logo.png',
     players: [],
@@ -64,7 +64,7 @@ export function mockCompetition(): ICompetition {
 
 export function mockFollowedTeam(seasons?: ISeason[]): IFollowedTeam {
   return {
-    apiId: faker.random.number(),
+    apiId: faker.datatype.number(),
     name: 'FC ' + faker.address.city(),
     logo: 'logo.png',
     seasons: seasons ? seasons : [],
@@ -87,7 +87,7 @@ export function mockGame(
     : {
         name: generateTeamName(),
         logo: faker.image.imageUrl(50, 50, 'sport', true),
-        teamId: faker.random.number({ min: 0, max: 2000 }),
+        teamId: faker.datatype.number({ min: 0, max: 2000 }),
       };
 
   awayTeam = awayTeam
@@ -95,7 +95,7 @@ export function mockGame(
     : {
         name: generateTeamName(),
         logo: faker.image.imageUrl(50, 50, 'sport', true),
-        teamId: faker.random.number({ min: 0, max: 2000 }),
+        teamId: faker.datatype.number({ min: 0, max: 2000 }),
       };
 
   return {
@@ -105,7 +105,7 @@ export function mockGame(
     competitionName: competition.name,
     season: season,
     date: gameStatus === GameStatus.FT ? faker.date.past() : faker.date.future(),
-    gameId: faker.random.number({ min: 1000, max: 50000 }),
+    gameId: faker.datatype.number({ min: 1000, max: 50000 }),
     status: gameStatus,
     venue: faker.company.companyName() + ' Arena',
     awayTeamScore: awayTeamScore,
@@ -156,9 +156,9 @@ export function mockBet(
     status: betStatus ? betStatus : BetStatus.PENDING,
     points: 0,
     homeTeamScore:
-      homeTeamScore !== undefined ? homeTeamScore : faker.random.number({ min: 0, max: 10 }),
+      homeTeamScore !== undefined ? homeTeamScore : faker.datatype.number({ min: 0, max: 10 }),
     awayTeamScore:
-      awayTeamScore != undefined ? awayTeamScore : faker.random.number({ min: 0, max: 10 }),
+      awayTeamScore != undefined ? awayTeamScore : faker.datatype.number({ min: 0, max: 10 }),
     scorer: scorer ? scorer : 99999,
   };
 }
@@ -167,7 +167,7 @@ function generateTeamName(): string {
   const clubNamePrefixes = ['AC', 'Real', 'FC', 'Atletico', 'Inter', 'Bayern'];
   const clubNameSuffixes = ['City', 'United', 'Town', 'Country', 'Athletic'];
   const decorators = [clubNamePrefixes, clubNameSuffixes];
-  const index = faker.random.number({ min: 0, max: 1 });
+  const index = faker.datatype.number({ min: 0, max: 1 });
   const decorator = faker.random.arrayElement(decorators[index]);
   const city = faker.address.city();
   return index === 0 ? decorator + ' ' + city : city + ' ' + decorator;

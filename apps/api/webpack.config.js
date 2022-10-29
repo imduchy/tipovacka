@@ -1,4 +1,6 @@
 var path = require("path");
+var nodeExternals = require('webpack-node-externals');
+
 // var webpack = require('webpack');
 // var ContextReplacementPlugin = webpack.ContextReplacementPlugin
 
@@ -15,6 +17,7 @@ module.exports = {
       },
     ],
   },
+  externals: [nodeExternals()],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },

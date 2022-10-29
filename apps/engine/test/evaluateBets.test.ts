@@ -303,7 +303,10 @@ describe('queueTrigger', () => {
     const context = queueTriggerContext({
       game: game.toObject(),
       groupId: group._id,
+      log: jest.fn(),
     });
+    context.log.verbose = jest.fn();
+
     await queueTrigger(context);
     const updatedUser = await User.findById(user._id);
 
@@ -340,7 +343,10 @@ describe('queueTrigger', () => {
     const context = queueTriggerContext({
       game: game.toObject(),
       groupId: group._id,
+      log: jest.fn(),
     });
+    context.log.verbose = jest.fn();
+
     await queueTrigger(context);
     const updatedUser = await User.findById(user._id);
 
@@ -382,7 +388,10 @@ describe('queueTrigger', () => {
     const context = queueTriggerContext({
       game: game.toObject(),
       groupId: group._id,
+      log: jest.fn(),
     });
+    context.log.verbose = jest.fn();
+
     await queueTrigger(context);
 
     const updatedUser1 = await User.findById(user1._id);
