@@ -85,10 +85,9 @@ app.use(passport.session());
 
 app.use(
   cors({
+    origin: /\.onlinetipovacka\.sk$/,
     credentials: true,
-    preflightContinue: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    origin: [process.env.CORS_ORIGIN || 'http://localhost:3000'],
     optionsSuccessStatus: 200,
   })
 );
