@@ -5,7 +5,7 @@ export default {
    ** Nuxt target
    ** See https://nuxtjs.org/api/configuration-target
    */
-  target: 'server',
+  target: 'static',
   /*
    ** Headers of the page
    ** See https://nuxtjs.org/api/configuration-head
@@ -114,18 +114,8 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'http://localhost:3003/api',
+    baseURL: process.env.BASE_URL || 'http://localhost:3003/api',
     credentials: true,
-  },
-  publicRuntimeConfig: {
-    axios: {
-      browserBaseURL: process.env.BROWSER_BASE_URL,
-    },
-  },
-  privateRuntimeConfig: {
-    axios: {
-      baseURL: process.env.BASE_URL,
-    },
   },
   /*
    ** vuetify module configuration
