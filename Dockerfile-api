@@ -12,7 +12,7 @@ ENV NODE_ENV=production
 RUN npm run build-common
 RUN npm run build --workspace=@tipovacka/api
 
-# Deploy to production stage
+# Deploy stage
 FROM node:14-alpine
 
 WORKDIR /usr/src
