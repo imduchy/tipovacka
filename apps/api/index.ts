@@ -75,9 +75,6 @@ app.use(
         scriptSrc: ["'self'", "'unsafe-inline'"],
       },
     },
-    crossOriginResourcePolicy: false,
-    crossOriginEmbedderPolicy: false,
-    crossOriginOpenerPolicy: false,
   })
 );
 app.use(urlencoded({ extended: false }));
@@ -86,12 +83,14 @@ app.use(json());
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(
-  cors({
-    origin: /\.onlinetipovacka\.sk$/,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  })
-);
+if (process.env.NODE_ENV === 'development') {
+  app.use(
+    cors({
+      origin: 'http://localhost:3000',
+      credentials: true,
+    })
+  );
+}
 
 app.use('/api/auth', auth);
 app.use('/api/admin', admin);
