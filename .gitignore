@@ -17,3 +17,8 @@ dist
 __azurite_db_*.json
 __blobstorage__
 __queuestorage__
+
+# Terraform
+.terraform
+.terraform.lock.hcl
+terraform.tfstate*
