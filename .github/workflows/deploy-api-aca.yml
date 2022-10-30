@@ -30,7 +30,7 @@ jobs:
       - name: Log in to container registry
         uses: docker/login-action@v1
         with:
-          registry: ${CONTAINER_REGISTRY_NAME}.azurecr.io
+          registry: ${{ env.CONTAINER_REGISTRY_NAME }}.azurecr.io
           username: ${{ secrets.TIPOVACKA_REGISTRY_USERNAME }}
           password: ${{ secrets.TIPOVACKA_REGISTRY_PASSWORD }}
 
@@ -38,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${CONTAINER_REGISTRY_NAME}.azurecr.io/${IMAGE_NAME}:${{ github.sha }}
+          tags: ${{ env.CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
           file: ./Dockerfile-api
           context: ./
 
@@ -57,5 +57,5 @@ jobs:
         with:
           inlineScript: |
             az config set extension.use_dynamic_install=yes_without_prompt
-            az containerapp registry set -n ${IMAGE_NAME} -g ${RESOURCE_GROUP_NAME} --server ${CONTAINER_REGISTRY_NAME}.azurecr.io --username  ${{ secrets.TIPOVACKA_REGISTRY_USERNAME }} --password ${{ secrets.TIPOVACKA_REGISTRY_PASSWORD }}
-            az containerapp update -n ${IMAGE_NAME} -g ${RESOURCE_GROUP_NAME} --image ${CONTAINER_REGISTRY_NAME}.azurecr.io/${IMAGE_NAME}:${{ github.s{ha} }}
+            az containerapp registry set -n ${{ env.IMAGE_NAME }} -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.CONTAINER_REGISTRY_NAME }}.azurecr.io --username  ${{ secrets.TIPOVACKA_REGISTRY_USERNAME }} --password ${{ secrets.TIPOVACKA_REGISTRY_PASSWORD }}
+            az containerapp update -n ${{ env.IMAGE_NAME }} -g ${{ env.RESOURCE_GROUP_NAME }} --image ${{ env.CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.s{ha} }}
