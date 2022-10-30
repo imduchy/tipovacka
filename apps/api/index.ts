@@ -14,75 +14,117 @@ import groups from './routes/groups';
 import users from './routes/users';
 import cors from 'cors';
 import helmet from 'helmet';
+import { SecretClient } from '@azure/keyvault-secrets';
+import { DefaultAzureCredential } from '@azure/identity';
 
 const app = express();
 const MongoStore = connectMongo(session);
+const credential = new DefaultAzureCredential();
 
-exportModels(mongoose);
-
-try {
-  if (!process.env.DB_CONNECTION_STRING) {
-    logger.error('Database connection string is undefined');
-    process.exit();
-  }
-  mongoose.connect(process.env.DB_CONNECTION_STRING).then(() => {
-    logger.info('Successfully connected to the database.');
-  });
-} catch (error) {
-  logger.error('Error while connecting to the database. Error: ' + error);
+// Check if all required environment variables are set.
+if (!process.env.KEY_VAULT_URL) {
+  logger.error('Value for the KEY_VAULT_URL is undefined.');
   process.exit();
 }
 
+if (!process.env.CONNECTION_STRING_SECRET) {
+  logger.error('Value for the CONNECTION_STRING_SECRET is undefined.');
+  process.exit();
+}
+
+if (!process.env.SESSION_SECRET) {
+  logger.error('Value for the SESSION_SECRET is undefined.');
+  process.exit();
+}
+
+if (!process.env.API_ADMIN_KEY_SECRET) {
+  logger.error('Value for the API_ADMIN_KEY is undefined.');
+  process.exit();
+}
+
+// Initialize Key Vault client and fetch secrets
+const vaultURL = process.env.KEY_VAULT_URL;
+const kvClient = new SecretClient(vaultURL, credential);
+kvClient.getSecret(process.env.CONNECTION_STRING_SECRET).then((secret) => {
+  if (!secret.value) {
+    logger.error('Database connection string is undefined.');
+    process.exit();
+  }
+
+  mongoose.connect(secret.value).then(() => {
+    logger.info('Successfully connected to the database.');
+  });
+});
+
+// Export mongoose models
+exportModels(mongoose);
+
+// Set admin API key
+kvClient.getSecret(process.env.API_ADMIN_KEY_SECRET).then((secret) => {
+  if (!secret.value) {
+    logger.error('API admin key string is undefined.');
+    process.exit();
+  }
+
+  process.env.ADMIN_API_TOKEN = secret.value;
+});
+
+// Configure passport strategy
 strategy(passport);
 app.set('trust proxy', 1);
 
-if (!process.env.SESSION_SECRET) {
-  logger.error('The session secret is undefined');
-  process.exit();
-}
+// Configure session store for cookies
+kvClient.getSecret(process.env.SESSION_SECRET).then((secret) => {
+  if (!secret.value) {
+    logger.error('Session secret string is undefined.');
+    process.exit();
+  }
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    cookie: {
-      maxAge: 172800000,
-      sameSite: 'lax',
-    },
-    resave: true,
-    saveUninitialized: true,
-    // Use MongoStore only in production. In development, use MemoryStore instead
-    store:
-      process.env.NODE_ENV === 'production'
-        ? new MongoStore({
-            mongooseConnection: mongoose.connection,
-            ttl: 24 * 60 * 60 * 1000,
-            autoRemove: 'internal',
-            autoRemoveInterval: 10,
-          })
-        : new session.MemoryStore(),
-  })
-);
+  app.use(
+    session({
+      secret: secret.value,
+      cookie: {
+        maxAge: 172800000,
+        sameSite: 'lax',
+      },
+      resave: true,
+      saveUninitialized: true,
+      // Use MongoStore only in production. In development, use MemoryStore instead
+      store:
+        process.env.NODE_ENV === 'production'
+          ? new MongoStore({
+              mongooseConnection: mongoose.connection,
+              ttl: 24 * 60 * 60 * 1000,
+              autoRemove: 'internal',
+              autoRemoveInterval: 10,
+            })
+          : new session.MemoryStore(),
+    })
+  );
+});
 
 // Enable secure response headers
 // https://hackernoon.com/nodejs-security-headers-101-mf9k24zn
-// app.use(
-//   helmet({
-//     dnsPrefetchControl: false,
-//     contentSecurityPolicy: {
-//       directives: {
-//         defaultSrc: ["'self'"],
-//         styleSrc: ["'self'"],
-//         scriptSrc: ["'self'", "'unsafe-inline'"],
-//       },
-//     },
-//   })
-// );
+app.use(
+  helmet({
+    dnsPrefetchControl: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  })
+);
 app.use(urlencoded({ extended: false }));
 app.use(json());
 
+// Configure passport session
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Configure CORS
 app.use(
   cors({
     origin: /\.onlinetipovacka\.sk$/,
