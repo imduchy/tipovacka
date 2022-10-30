@@ -65,32 +65,30 @@ app.use(
 
 // Enable secure response headers
 // https://hackernoon.com/nodejs-security-headers-101-mf9k24zn
-app.use(
-  helmet({
-    dnsPrefetchControl: false,
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-      },
-    },
-  })
-);
+// app.use(
+//   helmet({
+//     dnsPrefetchControl: false,
+//     contentSecurityPolicy: {
+//       directives: {
+//         defaultSrc: ["'self'"],
+//         styleSrc: ["'self'"],
+//         scriptSrc: ["'self'", "'unsafe-inline'"],
+//       },
+//     },
+//   })
+// );
 app.use(urlencoded({ extended: false }));
 app.use(json());
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-if (process.env.NODE_ENV === 'development') {
-  app.use(
-    cors({
-      origin: 'http://localhost:3000',
-      credentials: true,
-    })
-  );
-}
+app.use(
+  cors({
+    origin: /\.onlinetipovacka\.sk$/,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  })
+);
 
 app.use('/api/auth', auth);
 app.use('/api/admin', admin);

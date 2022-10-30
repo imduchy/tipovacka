@@ -3,7 +3,7 @@ name: 'Deploy API to Azure Web App'
 on:
   push:
     branches:
-      - 'master'
+      - 'blockmaster'
     paths:
       - 'apps/api/**'
       - 'packages/**'
