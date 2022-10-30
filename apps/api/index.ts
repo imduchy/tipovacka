@@ -75,6 +75,9 @@ app.use(
         scriptSrc: ["'self'", "'unsafe-inline'"],
       },
     },
+    crossOriginResourcePolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
   })
 );
 app.use(urlencoded({ extended: false }));
@@ -86,9 +89,7 @@ app.use(passport.session());
 app.use(
   cors({
     origin: /\.onlinetipovacka\.sk$/,
-    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    optionsSuccessStatus: 200,
   })
 );
 
