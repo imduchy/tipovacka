@@ -83,14 +83,14 @@ app.use(json());
 app.use(passport.initialize());
 app.use(passport.session());
 
-if (process.env.NODE_ENV === 'development') {
-  app.use(
-    cors({
-      origin: 'http://localhost:3000',
-      credentials: true,
-    })
-  );
-}
+app.use(
+  cors({
+    credentials: true,
+    preflightContinue: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    origin: process.env.CORS_ORIGIN,
+  })
+);
 
 app.use('/api/auth', auth);
 app.use('/api/admin', admin);
