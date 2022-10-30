@@ -83,18 +83,15 @@ app.use(json());
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use(
-//   cors({
-//     credentials: true,
-//     preflightContinue: true,
-//     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-//     origin: process.env.CORS_ORIGIN,
-//   })
-// );
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-app.options('*', cors());
+app.use(
+  cors({
+    credentials: true,
+    preflightContinue: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    origin: [process.env.CORS_ORIGIN || 'http://localhost:3000'],
+    optionsSuccessStatus: 200,
+  })
+);
 
 app.use('/api/auth', auth);
 app.use('/api/admin', admin);
