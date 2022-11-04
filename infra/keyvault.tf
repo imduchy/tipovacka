@@ -1,7 +1,9 @@
 resource "azurerm_key_vault" "this" {
-  name                       = "kv-${var.project_name}-${var.environment}"
-  location                   = var.region
-  resource_group_name        = azurerm_resource_group.this.name
+  name                = "kv-${var.project_name}-${var.environment}"
+  location            = var.region
+  resource_group_name = azurerm_resource_group.this.name
+  tags                = local.default_tags
+
   tenant_id                  = data.azuread_client_config.current.tenant_id
   soft_delete_retention_days = 7
   purge_protection_enabled   = true
@@ -62,13 +64,17 @@ resource "azurerm_key_vault_access_policy" "aca_client" {
 }
 
 resource "azurerm_key_vault_secret" "db_connection_string" {
-  name         = "DB-CONNECTION-STRING"
-  value        = data.azurerm_cosmosdb_account.this.primary_key
+  name = "DB-CONNECTION-STRING"
+  tags = local.default_tags
+
+  value        = "mongodb://${data.azurerm_cosmosdb_account.this.name}:${data.azurerm_cosmosdb_account.this.primary_key}@${data.azurerm_cosmosdb_account.this.name}.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@tipovacka-master@"
   key_vault_id = azurerm_key_vault.this.id
 }
 
 resource "azurerm_key_vault_secret" "football_api_key" {
-  name         = "FOOTBALL-API-KEY"
+  name = "FOOTBALL-API-KEY"
+  tags = local.default_tags
+
   value        = "replace-me"
   key_vault_id = azurerm_key_vault.this.id
 
@@ -85,7 +91,9 @@ resource "random_password" "session_secret" {
 }
 
 resource "azurerm_key_vault_secret" "api_session_secret" {
-  name         = "SESSION-SECRET"
+  name = "SESSION-SECRET"
+  tags = local.default_tags
+
   value        = random_password.session_secret.result
   key_vault_id = azurerm_key_vault.this.id
 }
@@ -96,7 +104,9 @@ resource "random_password" "admin_token" {
 }
 
 resource "azurerm_key_vault_secret" "api_admin_key" {
-  name         = "API-ADMIN-TOKEN"
+  name = "API-ADMIN-TOKEN"
+  tags = local.default_tags
+
   value        = random_password.session_secret.result
   key_vault_id = azurerm_key_vault.this.id
 }

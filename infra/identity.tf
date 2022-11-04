@@ -11,5 +11,11 @@ resource "azuread_service_principal" "this" {
 resource "azurerm_role_assignment" "this" {
   scope                = azurerm_resource_group.this.id
   principal_id         = azuread_service_principal.this.id
-  role_definition_name = "Contributor"
+  role_definition_name = "AcrPush"
+}
+
+resource "azurerm_role_assignment" "aca_api_identity_to_container_registry" {
+  scope                = azurerm_resource_group.this.id
+  principal_id         = azapi_resource.aca-api.identity[0].principal_id
+  role_definition_name = "AcrPull"
 }

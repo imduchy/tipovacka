@@ -65,10 +65,14 @@ resource "azapi_resource" "aca-api" {
           targetPort    = 3003
           transport     = "Auto"
         }
+        registries = [{
+          identity = "system"
+          server   = azurerm_container_registry.this.login_server
+        }]
       }
       template = {
         containers = [{
-          image = "node:14-alpine" # Just a placeholder image
+          image = "${azurerm_container_registry.this.login_server}/${var.project_name}-api:latest"
           name  = "${var.project_name}-api"
           env = [
             {
@@ -82,6 +86,22 @@ resource "azapi_resource" "aca-api" {
             {
               name  = "KEY_VAULT_URL"
               value = azurerm_key_vault.this.vault_uri
+            },
+            {
+              name  = "CONNECTION_STRING_SECRET_NAME"
+              value = azurerm_key_vault_secret.db_connection_string.name
+            },
+            {
+              name  = "SESSION_SECRET_NAME"
+              value = azurerm_key_vault_secret.api_session_secret.name
+            },
+            {
+              name  = "API_ADMIN_TOKEN_SECRET_NAME"
+              value = azurerm_key_vault_secret.api_admin_key.name
+            },
+            {
+              name  = "FOOTBALL_API_KEY_SECRET_NAME"
+              value = azurerm_key_vault_secret.football_api_key.name
             },
             {
               name  = "NODE_ENV"
@@ -106,7 +126,7 @@ resource "azapi_resource" "aca-api" {
     # so we're ignoring all changes. Hopefully this will be solved when
     # terraform's azurerm provider starts supporting Azure Container Apps
     ignore_changes = [
-      #   body
+      # body
     ]
   }
 }
@@ -131,10 +151,14 @@ resource "azapi_resource" "aca-client" {
           targetPort    = 3000
           transport     = "Auto"
         }
+        registries = [{
+          identity = "system"
+          server   = azurerm_container_registry.this.login_server
+        }]
       }
       template = {
         containers = [{
-          image = "node:14-alpine" # Just a placeholder image
+          image = "${azurerm_container_registry.this.login_server}/${var.project_name}-client:latest"
           name  = "${var.project_name}-client"
           env   = []
           resources = {
@@ -155,8 +179,7 @@ resource "azapi_resource" "aca-client" {
       # It's not possible to specify properties within the body attribute
       # so we're ignoring all changes. Hopefully this will be solved when
       # terraform's azurerm provider starts supporting Azure Container Apps
-      #   body
+      # body
     ]
   }
 }
-

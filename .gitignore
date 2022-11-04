@@ -20,6 +20,6 @@ __queuestorage__
 
 # Terraform
 .terraform
-.terraform.lock.hcl
+.terraform*
 terraform.tfstate*
 *.tfvars

@@ -27,25 +27,30 @@ if (!process.env.KEY_VAULT_URL) {
   process.exit();
 }
 
-if (!process.env.CONNECTION_STRING_SECRET) {
-  logger.error('Value for the CONNECTION_STRING_SECRET is undefined.');
+if (!process.env.CONNECTION_STRING_SECRET_NAME) {
+  logger.error('Value for the CONNECTION_STRING_SECRET_NAME is undefined.');
   process.exit();
 }
 
-if (!process.env.SESSION_SECRET) {
-  logger.error('Value for the SESSION_SECRET is undefined.');
+if (!process.env.SESSION_SECRET_NAME) {
+  logger.error('Value for the SESSION_SECRET_NAME is undefined.');
   process.exit();
 }
 
-if (!process.env.API_ADMIN_KEY_SECRET) {
-  logger.error('Value for the API_ADMIN_KEY is undefined.');
+if (!process.env.API_ADMIN_TOKEN_SECRET_NAME) {
+  logger.error('Value for the API_ADMIN_TOKEN_SECRET_NAME is undefined.');
+  process.exit();
+}
+
+if (!process.env.FOOTBALL_API_KEY_SECRET_NAME) {
+  logger.error('Value for the FOOTBALL_API_KEY_SECRET_NAME is undefined.');
   process.exit();
 }
 
 // Initialize Key Vault client and fetch secrets
 const vaultURL = process.env.KEY_VAULT_URL;
 const kvClient = new SecretClient(vaultURL, credential);
-kvClient.getSecret(process.env.CONNECTION_STRING_SECRET).then((secret) => {
+kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME).then((secret) => {
   if (!secret.value) {
     logger.error('Database connection string is undefined.');
     process.exit();
@@ -60,7 +65,7 @@ kvClient.getSecret(process.env.CONNECTION_STRING_SECRET).then((secret) => {
 exportModels(mongoose);
 
 // Set admin API key
-kvClient.getSecret(process.env.API_ADMIN_KEY_SECRET).then((secret) => {
+kvClient.getSecret(process.env.API_ADMIN_TOKEN_SECRET_NAME).then((secret) => {
   if (!secret.value) {
     logger.error('API admin key string is undefined.');
     process.exit();
@@ -69,12 +74,22 @@ kvClient.getSecret(process.env.API_ADMIN_KEY_SECRET).then((secret) => {
   process.env.ADMIN_API_TOKEN = secret.value;
 });
 
+// Set the football API key
+kvClient.getSecret(process.env.FOOTBALL_API_KEY_SECRET_NAME).then((secret) => {
+  if (!secret.value) {
+    logger.error('Football API key string is undefined.');
+    process.exit();
+  }
+
+  process.env.API_FOOTBALL_KEY = secret.value;
+});
+
 // Configure passport strategy
 strategy(passport);
 app.set('trust proxy', 1);
 
 // Configure session store for cookies
-kvClient.getSecret(process.env.SESSION_SECRET).then((secret) => {
+kvClient.getSecret(process.env.SESSION_SECRET_NAME).then((secret) => {
   if (!secret.value) {
     logger.error('Session secret string is undefined.');
     process.exit();
