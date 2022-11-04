@@ -8,10 +8,10 @@ resource "azuread_service_principal" "this" {
   owners         = [data.azuread_client_config.current.object_id]
 }
 
-resource "azurerm_role_assignment" "this" {
+resource "azurerm_role_assignment" "sp_to_container_registry_acrpush" {
   scope                = azurerm_resource_group.this.id
   principal_id         = azuread_service_principal.this.id
-  role_definition_name = "AcrPush"
+  role_definition_name = "Contributor"
 }
 
 resource "azurerm_role_assignment" "aca_api_identity_to_container_registry" {
