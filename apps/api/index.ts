@@ -70,7 +70,6 @@ kvClient.getSecret(process.env.API_ADMIN_TOKEN_SECRET_NAME).then((secret) => {
     logger.error('API admin key string is undefined.');
     process.exit();
   }
-
   process.env.ADMIN_API_TOKEN = secret.value;
 });
 
@@ -80,7 +79,6 @@ kvClient.getSecret(process.env.FOOTBALL_API_KEY_SECRET_NAME).then((secret) => {
     logger.error('Football API key string is undefined.');
     process.exit();
   }
-
   process.env.API_FOOTBALL_KEY = secret.value;
 });
 
