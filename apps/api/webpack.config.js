@@ -17,7 +17,7 @@ module.exports = {
       },
     ],
   },
-  externals: [nodeExternals()],
+  // externals: [nodeExternals()],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },

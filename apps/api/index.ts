@@ -14,8 +14,13 @@ import groups from './routes/groups';
 import users from './routes/users';
 import cors from 'cors';
 import helmet from 'helmet';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { v4 as uuidv4 } from 'uuid';
 import { SecretClient } from '@azure/keyvault-secrets';
 import { DefaultAzureCredential } from '@azure/identity';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const x = uuidv4();
 
 const app = express();
 const MongoStore = connectMongo(session);
