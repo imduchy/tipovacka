@@ -154,12 +154,12 @@ resource "azapi_resource" "aca-client" {
       }
       template = {
         containers = [{
-          image = "${azurerm_container_registry.this.login_server}/${var.project_name}-client:latest"
+          image = "${azurerm_container_registry.this.login_server}/${var.project_name}-client:daf98f31860b7e1db7b8a1028396cb5387134cb0"
           name  = "${var.project_name}-client"
           env = [
             {
-              name  = "BASE_URL"
-              value = "jsondecode(azapi_resource.aca-api.output).properties.defaultDomain"
+              name  = "BROWSER_BASE_URL"
+              value = "https://${jsondecode(azapi_resource.aca-api.output).properties.configuration.ingress.fqdn}"
             },
             {
               name  = "NODE_ENV"
@@ -184,32 +184,32 @@ resource "azapi_resource" "aca-client" {
       # It's not possible to specify properties within the body attribute
       # so we're ignoring all changes. Hopefully this will be solved when
       # terraform's azurerm provider starts supporting Azure Container Apps
-      body
+      # body
     ]
   }
 }
 
-resource "azapi_update_resource" "update_client" {
-  depends_on = [
-    azapi_resource.aca-api
-  ]
-  type        = "Microsoft.App/containerApps@2022-06-01-preview"
-  resource_id = azapi_resource.aca-client.id
+# resource "azapi_update_resource" "update_client" {
+#   depends_on = [
+#     azapi_resource.aca-api
+#   ]
+#   type        = "Microsoft.App/containerApps@2022-06-01-preview"
+#   resource_id = azapi_resource.aca-client.id
 
-  body = jsonencode({
-    template = {
-      containers = [{
-        env = [
-          {
-            name  = "BASE_URL"
-            value = jsondecode(azapi_resource.aca-api.output).properties.configuration.ingress.fqdn
-          },
-          {
-            name  = "NODE_ENV"
-            value = "production"
-          }
-        ]
-      }]
-    }
-  })
-}
+#   body = jsonencode({
+#     template = {
+#       containers = [{
+#         env = [
+#           {
+#             name  = "BASE_URL"
+#             value = jsondecode(azapi_resource.aca-api.output).properties.configuration.ingress.fqdn
+#           },
+#           {
+#             name  = "NODE_ENV"
+#             value = "production"
+#           }
+#         ]
+#       }]
+#     }
+#   })
+# }

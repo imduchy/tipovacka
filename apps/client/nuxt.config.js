@@ -117,11 +117,6 @@ export default {
     baseURL: 'http://localhost:3003/api',
     credentials: true,
   },
-  publicRuntimeConfig: {
-    axios: {
-      browserBaseURL: process.env.BROWSER_BASE_URL,
-    },
-  },
   privateRuntimeConfig: {
     axios: {
       baseURL: process.env.BASE_URL,
