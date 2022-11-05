@@ -56,7 +56,7 @@ resource "azapi_resource" "aca-api" {
       }
       template = {
         containers = [{
-          image = "${azurerm_container_registry.this.login_server}/${var.project_name}-api:a0204943edf1f4dbf524c53b7d19bf18d0edc651"
+          image = "${azurerm_container_registry.this.login_server}/${var.project_name}-api:latest"
           name  = "${var.project_name}-api"
           env = [
             {
@@ -104,6 +104,8 @@ resource "azapi_resource" "aca-api" {
       }
     }
   })
+
+  response_export_values = ["properties.configuration.ingress.fqdn"]
 
   lifecycle {
     # It's not possible to specify properties within the body attribute
@@ -154,7 +156,16 @@ resource "azapi_resource" "aca-client" {
         containers = [{
           image = "${azurerm_container_registry.this.login_server}/${var.project_name}-client:latest"
           name  = "${var.project_name}-client"
-          env   = []
+          env = [
+            {
+              name  = "BASE_URL"
+              value = "jsondecode(azapi_resource.aca-api.output).properties.defaultDomain"
+            },
+            {
+              name  = "NODE_ENV"
+              value = "production"
+            }
+          ]
           resources = {
             cpu    = 0.25
             memory = "0.5Gi"
@@ -173,58 +184,25 @@ resource "azapi_resource" "aca-client" {
       # It's not possible to specify properties within the body attribute
       # so we're ignoring all changes. Hopefully this will be solved when
       # terraform's azurerm provider starts supporting Azure Container Apps
-      # body
+      body
     ]
   }
 }
 
-resource "azapi_update_resource" "update_api" {
+resource "azapi_update_resource" "update_client" {
+  depends_on = [
+    azapi_resource.aca-api
+  ]
   type        = "Microsoft.App/containerApps@2022-06-01-preview"
-  resource_id = azapi_resource.aca-api.id
+  resource_id = azapi_resource.aca-client.id
 
   body = jsonencode({
-    configuration = {
-      secrets = [
-        {
-          name  = "session-secret"
-          value = random_password.session_secret.result
-        },
-        {
-          name  = "admin-token"
-          value = random_password.admin_token.result
-        }
-      ]
-    }
     template = {
       containers = [{
         env = [
           {
-            name  = "API_FOOTBALL_HOST"
-            value = "v3.football.api-sports.io"
-          },
-          {
-            name  = "API_FOOTBALL_URL"
-            value = "https://v3.football.api-sports.io"
-          },
-          {
-            name  = "KEY_VAULT_URL"
-            value = azurerm_key_vault.this.vault_uri
-          },
-          {
-            name  = "CONNECTION_STRING_SECRET_NAME"
-            value = azurerm_key_vault_secret.db_connection_string.name
-          },
-          {
-            name  = "FOOTBALL_API_KEY_SECRET_NAME"
-            value = azurerm_key_vault_secret.football_api_key.name
-          },
-          {
-            name      = "SESSION_SECRET"
-            secretRef = "session-secret"
-          },
-          {
-            name      = "API_ADMIN_TOKEN"
-            secretRef = "admin-token"
+            name  = "BASE_URL"
+            value = jsondecode(azapi_resource.aca-api.output).properties.configuration.ingress.fqdn
           },
           {
             name  = "NODE_ENV"
