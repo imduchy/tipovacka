@@ -32,18 +32,18 @@ if (!process.env.CONNECTION_STRING_SECRET_NAME) {
   process.exit();
 }
 
-if (!process.env.SESSION_SECRET_NAME) {
-  logger.error('Value for the SESSION_SECRET_NAME is undefined.');
-  process.exit();
-}
-
-if (!process.env.API_ADMIN_TOKEN_SECRET_NAME) {
-  logger.error('Value for the API_ADMIN_TOKEN_SECRET_NAME is undefined.');
-  process.exit();
-}
-
 if (!process.env.FOOTBALL_API_KEY_SECRET_NAME) {
   logger.error('Value for the FOOTBALL_API_KEY_SECRET_NAME is undefined.');
+  process.exit();
+}
+
+if (!process.env.SESSION_SECRET) {
+  logger.error('Value for the SESSION_SECRET is undefined.');
+  process.exit();
+}
+
+if (!process.env.API_ADMIN_TOKEN) {
+  logger.error('Value for the API_ADMIN_TOKEN is undefined.');
   process.exit();
 }
 
@@ -59,18 +59,9 @@ kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME).then((secret) => {
   mongoose.connect(secret.value).then(() => {
     logger.info('Successfully connected to the database.');
   });
-});
 
-// Export mongoose models
-exportModels(mongoose);
-
-// Set admin API key
-kvClient.getSecret(process.env.API_ADMIN_TOKEN_SECRET_NAME).then((secret) => {
-  if (!secret.value) {
-    logger.error('API admin key string is undefined.');
-    process.exit();
-  }
-  process.env.ADMIN_API_TOKEN = secret.value;
+  // Export mongoose models
+  exportModels(mongoose);
 });
 
 // Set the football API key
@@ -87,34 +78,27 @@ strategy(passport);
 app.set('trust proxy', 1);
 
 // Configure session store for cookies
-kvClient.getSecret(process.env.SESSION_SECRET_NAME).then((secret) => {
-  if (!secret.value) {
-    logger.error('Session secret string is undefined.');
-    process.exit();
-  }
-
-  app.use(
-    session({
-      secret: secret.value,
-      cookie: {
-        maxAge: 172800000,
-        sameSite: 'lax',
-      },
-      resave: true,
-      saveUninitialized: true,
-      // Use MongoStore only in production. In development, use MemoryStore instead
-      store:
-        process.env.NODE_ENV === 'production'
-          ? new MongoStore({
-              mongooseConnection: mongoose.connection,
-              ttl: 24 * 60 * 60 * 1000,
-              autoRemove: 'internal',
-              autoRemoveInterval: 10,
-            })
-          : new session.MemoryStore(),
-    })
-  );
-});
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    cookie: {
+      maxAge: 172800000,
+      sameSite: 'lax',
+    },
+    resave: true,
+    saveUninitialized: true,
+    // Use MongoStore only in production. In development, use MemoryStore instead
+    store:
+      process.env.NODE_ENV === 'production'
+        ? new MongoStore({
+            mongooseConnection: mongoose.connection,
+            ttl: 24 * 60 * 60 * 1000,
+            autoRemove: 'internal',
+            autoRemoveInterval: 10,
+          })
+        : new session.MemoryStore(),
+  })
+);
 
 // Enable secure response headers
 // https://hackernoon.com/nodejs-security-headers-101-mf9k24zn

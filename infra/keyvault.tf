@@ -84,29 +84,3 @@ resource "azurerm_key_vault_secret" "football_api_key" {
     ]
   }
 }
-
-resource "random_password" "session_secret" {
-  length  = 12
-  special = true
-}
-
-resource "azurerm_key_vault_secret" "api_session_secret" {
-  name = "SESSION-SECRET"
-  tags = local.default_tags
-
-  value        = random_password.session_secret.result
-  key_vault_id = azurerm_key_vault.this.id
-}
-
-resource "random_password" "admin_token" {
-  length  = 12
-  special = true
-}
-
-resource "azurerm_key_vault_secret" "api_admin_key" {
-  name = "API-ADMIN-TOKEN"
-  tags = local.default_tags
-
-  value        = random_password.session_secret.result
-  key_vault_id = azurerm_key_vault.this.id
-}
