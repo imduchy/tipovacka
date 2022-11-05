@@ -11,7 +11,7 @@ RUN npm install
 RUN npm run build-common
 RUN cd apps/client && npx nuxt build --standalone
 
-# Production stage
+# Production stage 
 FROM node:14-alpine
 
 WORKDIR /usr/src

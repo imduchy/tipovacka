@@ -17,6 +17,11 @@ module.exports = {
       },
     ],
   },
+  /**
+   * Commented out as it caused the application to fail, complaining the
+   * 'uuid' module was not found. This happened only when running the
+   * application in a container
+   */
   // externals: [nodeExternals()],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
