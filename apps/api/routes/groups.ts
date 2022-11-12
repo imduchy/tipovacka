@@ -13,22 +13,21 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   const user = req.user as IUserWithID | undefined;
 
-  const group = req.query.group;
-  if (!group) {
-    logger.warn("The query parameter 'group' wasn't specified.");
-    return res.status(400).send({
-      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
-      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
-    });
-  }
-
   // If req.headers contains the admin key, continue
   if (containsAdminKey(req)) {
     return next();
   }
 
-  if (isLoggedIn(req)) {
-    const user = req.user as IUser;
+  if (isLoggedIn(req) && user) {
+    const group = req.query.group;
+    if (!group) {
+      logger.warn("The query parameter 'group' wasn't specified.");
+      return res.status(400).send({
+        message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
+        code: ResponseErrorCodes.INVALID_REQUEST_BODY,
+      });
+    }
+
     // Only allow users to access Group document of a group they're part of
     if (user.groupId.equals(group.toString())) {
       return next();
