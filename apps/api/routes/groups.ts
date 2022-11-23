@@ -90,7 +90,7 @@ router.get('/users', authMiddleware, async (req, res) => {
     const query = User.find({ groupId: groupId }).populate({ path: 'bets.game' });
 
     if (season) {
-      query.$where('competitionScore.season').equals(season);
+      query.where('competitionScore.season').equals(season);
     }
 
     const users = await query;
