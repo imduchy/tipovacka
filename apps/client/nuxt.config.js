@@ -148,6 +148,7 @@ export default {
           warning: colors.orange,
           error: colors.red,
           success: colors.green,
+          card: colors.grey.darken3,
         },
       },
     },

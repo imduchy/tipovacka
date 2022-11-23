@@ -1,16 +1,16 @@
 <template>
   <v-row>
     <!-- Main view -->
-    <v-col cols="12" align-self="start" justify-self="start">
+    <v-col cols="10" align-self="start" justify-self="start">
       <!-- Upcoming game -->
-      <v-row>
-        <v-col cols="12" class="pb-0">
+      <v-row class="mb-4">
+        <v-col cols="12">
           <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
         </v-col>
       </v-row>
 
       <v-row class="mb-5">
-        <v-col cols="12" class="pt-0">
+        <v-col cols="12">
           <bet-input
             v-if="upcomingGame"
             :upcoming-game="upcomingGame"
@@ -80,6 +80,7 @@
         </v-col>
       </v-row>
     </v-col>
+    <v-col cols="2"></v-col>
   </v-row>
 </template>
 
@@ -165,9 +166,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<router>
-{
-    name: "Domov"
-}
-</router>

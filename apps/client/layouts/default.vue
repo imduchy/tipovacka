@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <navbar></navbar>
-    <v-main>
+    <v-main class="background mt-4">
       <!-- <v-system-bar height="30" color="warning">
         <v-spacer></v-spacer>
         <span class="font-weight-bold">
@@ -10,13 +10,9 @@
         </span>
         <v-spacer></v-spacer>
       </v-system-bar> -->
+
       <v-container align-start>
         <alert id="alert" />
-        <v-row>
-          <v-col class="py-0">
-            <div class="text-h5 font-weight-bold py-3 mt-3">{{ $nuxt.$route.name }}</div>
-          </v-col>
-        </v-row>
         <nuxt keep-alive />
       </v-container>
     </v-main>
@@ -37,6 +33,10 @@ export default Vue.extend({});
 </script>
 
 <style scoped>
+.background {
+  background-color: #212121;
+}
+
 #alert {
   position: absolute;
   width: 70%;
