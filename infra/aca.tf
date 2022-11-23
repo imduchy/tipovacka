@@ -19,6 +19,21 @@ resource "azapi_resource" "this" {
   })
 }
 
+resource "azapi_resource" "aca_client_certificate" {
+  name      = "me-cert-${var.project_name}-${var.environment}"
+  type      = "Microsoft.App/managedEnvironments/certificates@2022-03-01"
+  parent_id = azapi_resource.this.id
+  location  = var.region
+  tags      = local.default_tags
+
+  body = jsonencode({
+    properties = {
+      password = "GastonLyla69"
+      value    = filebase64("./client-cert.pfx")
+    }
+  })
+}
+
 resource "azapi_resource" "aca-api" {
   name      = "aca-${var.project_name}-api-${var.environment}"
   location  = var.region
@@ -38,6 +53,10 @@ resource "azapi_resource" "aca-api" {
           allowInsecure = false
           targetPort    = 3003
           transport     = "Auto"
+          # customDomains = [{
+          #   name          = "api.onlinetipovacka.sk"
+          #   certificateId = "todo"
+          # }]
         }
         registries = [{
           identity = "system"
@@ -146,6 +165,11 @@ resource "azapi_resource" "aca-client" {
           allowInsecure = false
           targetPort    = 3000
           transport     = "Auto"
+          customDomains = [{
+            bindingType   = "Disabled"
+            name          = "onlinetipovacka.sk"
+            certificateId = azapi_resource.aca_client_certificate.id
+          }]
         }
         registries = [{
           identity = "system"
@@ -184,32 +208,26 @@ resource "azapi_resource" "aca-client" {
       # It's not possible to specify properties within the body attribute
       # so we're ignoring all changes. Hopefully this will be solved when
       # terraform's azurerm provider starts supporting Azure Container Apps
-      # body
+      body
     ]
   }
 }
 
-# resource "azapi_update_resource" "update_client" {
-#   depends_on = [
-#     azapi_resource.aca-api
-#   ]
-#   type        = "Microsoft.App/containerApps@2022-06-01-preview"
-#   resource_id = azapi_resource.aca-client.id
+resource "azapi_update_resource" "update_client" {
+  type        = "Microsoft.App/containerApps@2022-06-01-preview"
+  resource_id = azapi_resource.aca-client.id
 
-#   body = jsonencode({
-#     template = {
-#       containers = [{
-#         env = [
-#           {
-#             name  = "BASE_URL"
-#             value = jsondecode(azapi_resource.aca-api.output).properties.configuration.ingress.fqdn
-#           },
-#           {
-#             name  = "NODE_ENV"
-#             value = "production"
-#           }
-#         ]
-#       }]
-#     }
-#   })
-# }
+  body = jsonencode({
+    template = {
+      configuration = {
+        ingress = {
+          customDomains = [{
+            bindingType   = "Disabled"
+            name          = "onlinetipovacka.sk"
+            certificateId = azapi_resource.aca_client_certificate.id
+          }]
+        }
+      }
+    }
+  })
+}

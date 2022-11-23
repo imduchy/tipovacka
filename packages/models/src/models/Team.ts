@@ -68,8 +68,8 @@ export interface ITotalAverageGoals {
 }
 
 const TotalAverageGoalsSchema = new Schema<ITotalAverageGoals>({
-  total: { type: HomeAwayTotalSchema },
-  average: { type: HomeAwayTotalSchema },
+  total: { type: new Schema(HomeAwayTotalSchema) },
+  average: { type: new Schema(HomeAwayTotalSchema) },
 });
 
 export interface ITeamStatisticsGoals {
@@ -79,11 +79,11 @@ export interface ITeamStatisticsGoals {
 
 const TeamStatisticsGoalsSchema = new Schema<ITeamStatisticsGoals>({
   for: {
-    type: TotalAverageGoalsSchema,
+    type: new Schema(TotalAverageGoalsSchema),
     required: true,
   },
   against: {
-    type: TotalAverageGoalsSchema,
+    type: new Schema(TotalAverageGoalsSchema),
     required: true,
   },
 });
@@ -103,13 +103,13 @@ export interface ITeamStatistics {
 const TeamStatisticsSchema = new Schema<ITeamStatistics>({
   _version: { type: Number, required: true, default: 2 },
   form: { type: String, required: true },
-  played: { type: HomeAwayTotalSchema, required: true },
-  wins: { type: HomeAwayTotalSchema, required: true },
-  draws: { type: HomeAwayTotalSchema, required: true },
-  loses: { type: HomeAwayTotalSchema, required: true },
-  goals: { type: TeamStatisticsGoalsSchema, required: true },
-  cleanSheet: { type: HomeAwayTotalSchema, required: true },
-  failedToScore: { type: HomeAwayTotalSchema, required: true },
+  played: { type: new Schema(HomeAwayTotalSchema), required: true },
+  wins: { type: new Schema(HomeAwayTotalSchema), required: true },
+  draws: { type: new Schema(HomeAwayTotalSchema), required: true },
+  loses: { type: new Schema(HomeAwayTotalSchema), required: true },
+  goals: { type: new Schema(TeamStatisticsGoalsSchema), required: true },
+  cleanSheet: { type: new Schema(HomeAwayTotalSchema), required: true },
+  failedToScore: { type: new Schema(HomeAwayTotalSchema), required: true },
 });
 
 export interface ICompetition {
@@ -127,9 +127,9 @@ const CompetitionSchema = new Schema<ICompetition>({
   apiId: { type: Number, required: true },
   name: { type: String, required: true },
   logo: { type: String, required: true },
-  standings: [{ type: CompetitionStandingRecordSchema, required: true }],
-  teamStatistics: { type: TeamStatisticsSchema, required: false },
-  players: [{ type: PlayerSchema, required: true, default: [] }],
+  standings: [{ type: new Schema(CompetitionStandingRecordSchema), required: true }],
+  teamStatistics: { type: new Schema(TeamStatisticsSchema), required: false },
+  players: [{ type: new Schema(PlayerSchema), required: true, default: [] }],
 });
 
 export interface ISeason {
@@ -141,7 +141,7 @@ export interface ISeason {
 const SeasonSchema = new Schema<ISeason>({
   _version: { type: Number, required: true, default: 2 },
   season: { type: Number, required: true },
-  competitions: [{ type: CompetitionSchema, required: true }],
+  competitions: [{ type: new Schema(CompetitionSchema), required: true }],
 });
 
 export interface IFollowedTeam {
@@ -158,6 +158,6 @@ export const FollowedTeamSchema = new Schema<IFollowedTeam>({
   apiId: { type: Number, required: true },
   name: { type: String, required: true },
   logo: { type: String, required: true },
-  seasons: [{ type: SeasonSchema, required: true }],
+  seasons: [{ type: new Schema(SeasonSchema), required: true }],
   rivals: [{ type: Number, required: true, default: [] }],
 });
