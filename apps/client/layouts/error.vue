@@ -7,7 +7,7 @@
           <div class="error-message">
             {{ getErrorMessage(error.statusCode) }}
           </div>
-          <v-btn nuxt color="secondary" x-large href="/">Domov</v-btn>
+          <v-btn nuxt color="primary" x-large href="/">Domov</v-btn>
         </div>
       </v-col>
     </v-row>

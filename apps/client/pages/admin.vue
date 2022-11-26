@@ -8,7 +8,7 @@
           <v-spacer></v-spacer>
           <v-dialog v-model="addUserDialog" max-width="800px" @click:outside="closeAddUserDialog">
             <template #activator="{ on, attrs }">
-              <v-btn color="secondary" dark class="ma-2" v-bind="attrs" v-on="on"> + Pridať </v-btn>
+              <v-btn color="primary" dark class="ma-2" v-bind="attrs" v-on="on"> + Pridať </v-btn>
             </template>
             <v-card class="pa-4">
               <v-card-title>
@@ -81,7 +81,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="grey" dark @click="closeAddUserDialog">Zrušiť</v-btn>
-                <v-btn color="secondary" @click="addUser">Uložiť</v-btn>
+                <v-btn color="primary" @click="addUser">Uložiť</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -134,7 +134,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="grey" dark @click="closeImportUsersDialog">Zrušiť</v-btn>
-                <v-btn color="secondary" @click="importUsers">Importovať</v-btn>
+                <v-btn color="primary" @click="importUsers">Importovať</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -188,7 +188,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="grey" dark @click="closeEditUserDialog">Zrušiť</v-btn>
-                <v-btn color="secondary" @click="editUser">Uložiť</v-btn>
+                <v-btn color="primary" @click="editUser">Uložiť</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -230,7 +230,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="grey" dark @click="closeUserPasswordDialog">Zrušiť</v-btn>
-                <v-btn color="secondary" @click="changeUserPassword">Uložiť</v-btn>
+                <v-btn color="primary" @click="changeUserPassword">Uložiť</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -286,7 +286,7 @@
                       @click="closeDeleteUserDialog"
                       >Zrušiť</v-btn
                     >
-                    <v-btn color="secondary" @click="deleteUser">Áno</v-btn>
+                    <v-btn color="primary" @click="deleteUser">Áno</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>

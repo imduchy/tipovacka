@@ -59,7 +59,7 @@
               </v-col>
             </v-row> -->
 
-            <v-btn class="my-8" color="secondary" type="submit" large rounded block>
+            <v-btn class="my-8" color="primary" type="submit" large rounded block>
               Prihlásiť sa
             </v-btn>
           </v-form>

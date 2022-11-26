@@ -1,5 +1,5 @@
 <template>
-  <v-card data-testid="bet-result" class="d-flex flex-column" height="120">
+  <v-card rounded="lg" data-testid="bet-result" class="d-flex flex-column" height="120">
     <v-row align="center" class="justify-space-around no-gutters">
       <v-col cols="3" align="center">
         <v-img alt="home team logo" :src="homeTeam.logo" min-width="50px" max-width="75px"></v-img

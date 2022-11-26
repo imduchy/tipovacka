@@ -78,7 +78,7 @@
               <!-- Additional menu -->
               <v-menu bottom offset-y>
                 <template #activator="{ on, attrs }">
-                  <v-avatar v-bind="attrs" color="accent" size="38" class="mr-3" v-on="on">
+                  <v-avatar v-bind="attrs" size="38" class="mr-3" v-on="on">
                     <img alt="Avatar" src="/user-icon.png" />
                   </v-avatar>
                 </template>
@@ -168,8 +168,8 @@ export default Vue.extend({
 
 <style scoped>
 .active-btn {
-  color: var(--v-secondary-base);
-  border-bottom: 2px solid var(--v-secondary-base);
+  color: var(--v-primary-base);
+  border-bottom: 2px solid var(--v-primary-base);
   font-weight: bold;
 }
 </style>

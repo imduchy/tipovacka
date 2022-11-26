@@ -17,7 +17,7 @@
       </v-container>
     </v-main>
 
-    <v-footer color="accent" absolute light app>
+    <v-footer color="white" absolute light app>
       <span class="text-caption"
         >&copy; {{ new Date().getFullYear() }}
         Vytvoril
@@ -34,7 +34,7 @@ export default Vue.extend({});
 
 <style scoped>
 .background {
-  background-color: #212121;
+  background-color: var(--background);
 }
 
 #alert {

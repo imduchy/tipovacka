@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <!-- Main view -->
-    <v-col cols="10" align-self="start" justify-self="start">
+    <v-col cols="12" md="9" align-self="start" justify-self="start">
       <!-- Upcoming game -->
       <v-row class="mb-4">
         <v-col cols="12">
@@ -80,7 +80,7 @@
         </v-col>
       </v-row>
     </v-col>
-    <v-col cols="2"></v-col>
+    <v-col cols="12" md="3" style="background-color: var(--v-card-base)"></v-col>
   </v-row>
 </template>
 
@@ -132,13 +132,6 @@ export default Vue.extend({
       return [...this.competition.players].sort(
         (a, b) => (b.statistics.goals.total || 0) - (a.statistics.goals.total || 0)
       );
-    },
-    alreadyStarted(): boolean {
-      if (!this.upcomingGame) {
-        return false;
-      }
-
-      return new Date().getTime() > new Date(this.upcomingGame.date).getTime();
     },
     evaluatedBets(): IBet[] {
       const bets: IBet[] = this.$auth.user.bets;

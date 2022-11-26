@@ -1,8 +1,8 @@
 <template>
-  <v-card color="card" class="pa-4">
+  <v-card rounded="lg" color="card">
     <v-row>
       <v-col cols="12">
-        <v-tabs hide-slider centered background-color="card" color="secondary" centerd dark>
+        <v-tabs hide-slider centered background-color="card" color="primary" centerd dark>
           <v-tab active-class="active-tab" class="text-capitalize text-subtitle-2" :ripple="false"
             >Tip</v-tab
           >
@@ -21,43 +21,92 @@
 
     <v-row>
       <v-col class="pa-0" cols="12" align="center">
-        <hr class="solid" />
+        <hr />
       </v-col>
     </v-row>
 
     <v-row>
       <v-col cols="12">
         <v-form ref="form" v-model="validInput" data-testid="bet-input">
-          <v-row>
-            <v-col cols="6">
-              <v-text-field
-                v-model="homeTeamScore"
-                outlined
-                type="number"
-                min="0"
-                max="99"
-                :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
-                :rules="[inputRules.minInput, inputRules.maxInput]"
-                :label="`${upcomingGame.homeTeam.name} skóre`"
-              ></v-text-field>
+          <v-row align="center">
+            <v-col align="right" class="d-none d-md-flex" cols="2">
+              <v-img
+                :src="upcomingGame.homeTeam.logo"
+                height="auto"
+                width="60%"
+                max-width="100px"
+                alt="home team logo"
+              />
             </v-col>
-            <v-col cols="6">
-              <v-text-field
-                v-model="awayTeamScore"
-                :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
-                outlined
-                type="number"
-                min="0"
-                max="99"
-                :rules="[inputRules.minInput, inputRules.maxInput]"
-                :label="`${upcomingGame.awayTeam.name} skóre`"
-              ></v-text-field>
+            <v-col cols="5" md="3">
+              <v-row no-gutters>
+                <v-col>
+                  <p class="white--text ma-0 caption">{{ upcomingGame.homeTeam.name }}</p>
+                </v-col>
+              </v-row>
+              <v-row no-gutters>
+                <v-col>
+                  <v-text-field
+                    v-model="homeTeamScore"
+                    hide-spin-buttons
+                    class="pt-0"
+                    dark
+                    rounded
+                    background-color="input"
+                    type="number"
+                    min="0"
+                    max="99"
+                    :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
+                    :rules="[inputRules.minInput, inputRules.maxInput]"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="2" align="center" justify="start">
+              <p class="primary--text subtitle-1">VS</p>
+            </v-col>
+            <v-col cols="5" md="3">
+              <v-row no-gutters>
+                <v-col align="right">
+                  <p class="white--text ma-0 caption">{{ upcomingGame.awayTeam.name }}</p>
+                </v-col>
+              </v-row>
+              <v-row no-gutters>
+                <v-col>
+                  <v-text-field
+                    v-model="awayTeamScore"
+                    hide-spin-buttons
+                    class="pt-0"
+                    dark
+                    rounded
+                    background-color="input"
+                    :disabled="hasAlreadyStarted || (currentUsersBet && !editingEnabled)"
+                    type="number"
+                    min="0"
+                    max="99"
+                    :rules="[inputRules.minInput, inputRules.maxInput]"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col class="d-none d-md-flex" cols="2">
+              <v-img
+                :src="upcomingGame.awayTeam.logo"
+                height="auto"
+                width="60%"
+                max-width="100px"
+                alt="away team logo"
+              />
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="12"
+            <v-col align="center" class="pb-0 offset-md-3" cols="12" md="6">
+              <p class="white--text ma-0 caption">Strelec zápasu</p>
+            </v-col>
+            <v-col class="py-0 offset-md-3" cols="12" md="6"
               ><v-select
                 v-model="scorer"
+                class="pt-0"
                 :disabled="
                   hasAlreadyStarted || (currentUsersBet && !editingEnabled) || emptyScorerRule
                 "
@@ -65,9 +114,10 @@
                 item-text="name"
                 item-value="apiId"
                 :menu-props="{ top: true, offsetY: true }"
-                outlined
+                dark
+                rounded
+                background-color="input"
                 return-object
-                label="Strelec gólu"
               >
                 <template #item="{ item, on, attrs }">
                   <v-list-item v-bind="attrs" v-on="on">
@@ -85,47 +135,47 @@
                 </template> </v-select
             ></v-col>
           </v-row>
-          <v-row v-if="currentUsersBet && !editingEnabled">
-            <v-col>
+          <v-row align="center" justify="center">
+            <v-col v-if="currentUsersBet && !editingEnabled" cols="6">
               <v-btn
                 ref="update-btn"
                 color="grey lighten-2"
-                light
-                large
-                block
+                v-bind="defaultButtonProps"
+                :dark="hasAlreadyStarted"
                 :disabled="hasAlreadyStarted"
                 @click="toggleEditing"
               >
                 Zmeniť tip
               </v-btn>
             </v-col>
-          </v-row>
-          <v-row v-else-if="currentUsersBet && editingEnabled" justify="center">
-            <v-col cols="6">
-              <v-btn color="grey lighten-2" light large block @click="editingEnabled = false">
-                Zrušiť
-              </v-btn>
-            </v-col>
-            <v-col cols="6">
-              <v-btn
-                color="secondary"
-                light
-                large
-                block
-                :disabled="hasAlreadyStarted || !validInput"
-                @click="updateBet"
-              >
-                Uložiť zmeny
-              </v-btn>
-            </v-col>
-          </v-row>
-          <v-row v-else>
-            <v-col align="center" cols="12" class="pb-8 pt-0">
+            <span v-else-if="currentUsersBet && editingEnabled">
+              <v-col cols="6">
+                <v-btn
+                  color="grey lighten-2"
+                  v-bind="defaultButtonProps"
+                  @click="editingEnabled = false"
+                >
+                  Zrušiť
+                </v-btn>
+              </v-col>
+              <v-col cols="6">
+                <v-btn
+                  color="primary"
+                  v-bind="defaultButtonProps"
+                  dark
+                  :disabled="hasAlreadyStarted || !validInput"
+                  @click="updateBet"
+                >
+                  Uložiť zmeny
+                </v-btn>
+              </v-col>
+            </span>
+            <v-col v-else cols="6">
               <v-btn
                 ref="submit-btn"
-                color="secondary"
-                large
-                block
+                color="primary"
+                v-bind="defaultButtonProps"
+                :dark="hasAlreadyStarted || !validInput || sendingRequest"
                 :disabled="hasAlreadyStarted || !validInput || sendingRequest"
                 @click="submitBet"
               >
@@ -159,6 +209,11 @@ export default Vue.extend({
   },
   data() {
     return {
+      defaultButtonProps: {
+        small: true,
+        block: true,
+        rounded: true,
+      },
       inputRules: {
         minInput: (value: string) =>
           (Number.isInteger(parseInt(value)) && parseInt(value) >= 0) ||
@@ -293,16 +348,14 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-hr.solid {
+hr {
   width: 90%;
   height: 2px;
-  /* color: var(--v-secondary-base);
-  background: var(--v-secondary-base); */
   background-image: linear-gradient(
     to right,
     transparent,
-    var(--v-secondary-base),
-    var(--v-secondary-base),
+    var(--v-primary-base),
+    var(--v-primary-base),
     transparent
   );
   font-size: 0;
@@ -311,6 +364,6 @@ hr.solid {
 
 .active-tab {
   font-weight: bold;
-  color: var(--v-secondary-base);
+  color: var(--v-primary-base);
 }
 </style>

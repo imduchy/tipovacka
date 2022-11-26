@@ -141,14 +141,15 @@ export default {
       dark: false,
       themes: {
         light: {
-          primary: '#00529F',
+          primary: '#FEBE10',
           secondary: '#FEBE10',
-          accent: colors.grey.lighten5,
           info: colors.blue,
           warning: colors.orange,
           error: colors.red,
           success: colors.green,
-          card: colors.grey.darken3,
+          background: '#121212',
+          card: '#262626',
+          input: '#383838',
         },
       },
     },

@@ -1,6 +1,6 @@
 <template>
-  <v-card color="#f5f5f5" class="pa-0" light height="400px">
-    <v-img class="card-background" src="stadium-background.png" />
+  <v-card rounded="lg" color="card" light height="400px">
+    <v-img class="card-background rounded-lg" src="stadium-background.png" />
     <v-row class="content" align="center" justify="center">
       <v-col v-if="upcomingGame">
         <v-row>
@@ -41,7 +41,7 @@
 
         <v-row>
           <v-col align="center" class="pa-2 pb-0">
-            <span class="secondary--text text-subtitle-1 font-weight-bold">
+            <span class="primary--text text-subtitle-1 font-weight-bold">
               {{ upcomingGame.competitionName }}
             </span>
           </v-col>
@@ -57,7 +57,7 @@
 
         <v-row>
           <v-col align="center" class="pa-2 pt-0">
-            <span class="secondary--text text-subtitle-1">
+            <span class="primary--text text-subtitle-1">
               {{ upcomingGame.venue }}
             </span>
           </v-col>
@@ -87,7 +87,7 @@
             <div class="text-subtitle-1 text-sm-h5 text-md-h4 font-weight-light pr-1">
               {{ upcomingGame ? formatedDate : 'Koniec sezóny' }}
             </div>
-            <div class="text-subtitle-1 secondary--text text-sm-h5 text-md-h4 font-weight-black">
+            <div class="text-subtitle-1 primary--text text-sm-h5 text-md-h4 font-weight-black">
               {{ upcomingGame ? formatedTime : '' }}
             </div>
           </v-col>
@@ -175,8 +175,6 @@ export default Vue.extend({
   left: 0;
   right: 0;
   z-index: 2;
-  margin-left: 20px;
-  margin-right: 20px;
   height: 400px;
   padding: 0px;
   margin: 0px;
