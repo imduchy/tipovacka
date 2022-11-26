@@ -1,6 +1,6 @@
 <template>
-  <v-card rounded="lg" color="card">
-    <v-row>
+  <v-card class="pa-4" rounded="lg" color="card">
+    <v-row no-gutters>
       <v-col cols="12">
         <v-tabs hide-slider centered background-color="card" color="primary" centerd dark>
           <v-tab active-class="active-tab" class="text-capitalize text-subtitle-2" :ripple="false"
@@ -19,22 +19,22 @@
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-col class="pa-0" cols="12" align="center">
+    <v-row no-gutters class="my-4">
+      <v-col cols="12" align="center">
         <hr />
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row no-gutters>
       <v-col cols="12">
         <v-form ref="form" v-model="validInput" data-testid="bet-input">
-          <v-row align="center">
+          <v-row no-gutters align="center">
             <v-col align="right" class="d-none d-md-flex" cols="2">
               <v-img
+                class="mx-auto"
                 :src="upcomingGame.homeTeam.logo"
                 height="auto"
-                width="60%"
-                max-width="100px"
+                max-width="80px"
                 alt="home team logo"
               />
             </v-col>
@@ -91,15 +91,15 @@
             </v-col>
             <v-col class="d-none d-md-flex" cols="2">
               <v-img
+                class="mx-auto"
                 :src="upcomingGame.awayTeam.logo"
                 height="auto"
-                width="60%"
-                max-width="100px"
+                max-width="80px"
                 alt="away team logo"
               />
             </v-col>
           </v-row>
-          <v-row>
+          <v-row no-gutters>
             <v-col align="center" class="pb-0 offset-md-3" cols="12" md="6">
               <p class="white--text ma-0 caption">Strelec zápasu</p>
             </v-col>
@@ -135,7 +135,7 @@
                 </template> </v-select
             ></v-col>
           </v-row>
-          <v-row align="center" justify="center">
+          <v-row no-gutters class="mb-4" align="center" justify="center">
             <v-col v-if="currentUsersBet && !editingEnabled" cols="6">
               <v-btn
                 ref="update-btn"
