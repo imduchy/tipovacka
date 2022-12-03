@@ -28,6 +28,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 router.get('/user', (req, res) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
   const user = req.user;
+  logger.info('Returning user ' + user);
 
   // For some reason, when submiting a bet in production, the requests arrive
   // with the scorer field as a string. E.g., instead 256, the value is "256".

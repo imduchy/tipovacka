@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pa-4" rounded="lg" color="card">
+  <v-card raised class="pa-4" rounded="lg" color="card">
     <v-row no-gutters>
       <v-col cols="12">
         <v-tabs hide-slider centered background-color="card" color="primary" centerd dark>
@@ -101,7 +101,7 @@
           </v-row>
           <v-row no-gutters>
             <v-col align="center" class="pb-0 offset-md-3" cols="12" md="6">
-              <p class="white--text ma-0 caption">Strelec zápasu</p>
+              <p class="white--text ma-0 caption">Strelec gólu</p>
             </v-col>
             <v-col class="py-0 offset-md-3" cols="12" md="6"
               ><v-select

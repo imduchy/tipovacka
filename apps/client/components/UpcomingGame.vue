@@ -1,5 +1,5 @@
 <template>
-  <v-card rounded="lg" color="card" light height="400px">
+  <v-card raised rounded="lg" color="card" light height="400px">
     <v-img class="card-background rounded-lg" src="stadium-background.png" />
     <v-row class="content" align="center" justify="center">
       <v-col v-if="upcomingGame">
