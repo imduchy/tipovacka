@@ -27,6 +27,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
 router.get('/user', (req, res) => {
   logger.info(`[${req.method}] ${req.baseUrl}${req.path} from ${req.ip}.`);
+  logger.info(req);
   const user = req.user;
   logger.info('Returning user ' + user);
 

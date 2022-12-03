@@ -11,6 +11,7 @@ export default (passport: PassportStatic) => {
       (username: string, password: string, done: any) => {
         User.findOne({ username })
           .then((user) => {
+            logger.info('Fetched user ' + user + ' from the database.');
             if (!user) {
               return done(null, false, {
                 message: `A user with username ${username} is not registered.`,
@@ -21,8 +22,10 @@ export default (passport: PassportStatic) => {
               if (err) throw err;
 
               if (isMatch) {
+                logger.info('Passwords match.');
                 return done(null, user);
               } else {
+                logger.info('Password is incorrect.');
                 return done(null, false, { message: 'Password incorrect' });
               }
             });
@@ -38,11 +41,13 @@ export default (passport: PassportStatic) => {
 
   passport.serializeUser((user, done) => {
     const userWithId = user as IUser & { id: string };
+    logger.info('Serializing user ' + userWithId);
     done(null, userWithId.id);
   });
 
   passport.deserializeUser((id, done) => {
     User.findById(id, {}, {}, (err, user) => {
+      logger.info('Deserializing user ' + user);
       done(err, user);
     }).populate({
       path: 'bets',
