@@ -1,87 +1,88 @@
 <template>
-  <v-row>
-    <!-- Main view -->
-    <v-col cols="12" md="9" align-self="start" justify-self="start">
-      <!-- Upcoming game -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
-        </v-col>
-      </v-row>
+  <div>
+    <v-row>
+      <!-- Main view -->
+      <v-col cols="12" md="9" align-self="start" justify-self="start">
+        <!-- Upcoming game -->
+        <v-row>
+          <v-col cols="12">
+            <upcoming-game :upcoming-game="upcomingGame"></upcoming-game>
+          </v-col>
+        </v-row>
 
-      <v-row class="mb-5">
-        <v-col cols="12">
-          <bet-input
-            v-if="upcomingGame"
-            :upcoming-game="upcomingGame"
-            :players="players"
-            :current-users-bet="currentUsersBet"
-          ></bet-input>
-        </v-col>
-      </v-row>
+        <v-row>
+          <v-col cols="12">
+            <bet-input
+              v-if="upcomingGame"
+              :upcoming-game="upcomingGame"
+              :players="players"
+              :current-users-bet="currentUsersBet"
+            ></bet-input>
+          </v-col>
+        </v-row>
+      </v-col>
 
-      <!-- Last bets -->
-      <v-row>
-        <v-col cols="12">
-          <div class="text-h5">
-            Posledné tipy
+      <!-- Side panel -->
+      <v-col cols="12" md="3" align-self="start" justify-self="start">
+        <v-card raised class="pa-4" rounded="lg" color="card">
+          <v-row>
+            <v-col cols="12">
+              <span class="white--text text-subtitle-1 font-weight-bold"> Posledné zápasy </span>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" align="center">
+              <hr />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <span class="white--text text-subtitle-1 font-weight-bold"> Najlepšie tipy </span>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-col>
+    </v-row>
 
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
-                <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
-                  mdi-information-outline
-                </v-icon>
-              </template>
-              <span>Tvoj tip je v zátvorkách vedľa výsledku zápasu</span>
-            </v-tooltip>
-          </div>
-        </v-col>
-      </v-row>
+    <!-- Last bets -->
+    <v-row>
+      <v-col cols="12">
+        <v-card raised class="pa-4" rounded="lg" color="card">
+          <v-row no-gutters>
+            <v-col cols="12">
+              <span class="white--text text-subtitle-1 font-weight-bold">
+                Tvoje posledné tipy
 
-      <v-row class="mt-0">
-        <v-col v-if="evaluatedBets[0]" cols="12" lg="4">
-          <user-bet :bet="evaluatedBets[0]" :players="players"></user-bet>
-        </v-col>
-        <v-col v-if="evaluatedBets[1]" cols="12" lg="4">
-          <user-bet :bet="evaluatedBets[1]" :players="players"></user-bet>
-        </v-col>
-        <v-col v-if="evaluatedBets[2]" cols="12" lg="4">
-          <user-bet :bet="evaluatedBets[2]" :players="players"></user-bet>
-        </v-col>
-      </v-row>
+                <v-tooltip bottom>
+                  <template #activator="{ on, attrs }">
+                    <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
+                      mdi-information-outline
+                    </v-icon>
+                  </template>
+                  <span>Tvoj tip je v zátvorkách vedľa výsledku zápasu</span>
+                </v-tooltip>
+              </span>
+            </v-col>
+          </v-row>
 
-      <!-- Best bets -->
-      <v-row v-if="bestBets.length > 0">
-        <v-col cols="12">
-          <div class="text-h5">
-            Najlepšie tipy kola
-
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
-                <v-icon color="grey darken-2" medium v-bind="attrs" v-on="on">
-                  mdi-information-outline
-                </v-icon>
-              </template>
-              <span>Užívateľov tip je v zátvorkách vedľa výsledku zápasu</span>
-            </v-tooltip>
-          </div>
-        </v-col>
-      </v-row>
-
-      <v-row v-if="bestBets.length > 0" class="mt-0">
-        <v-col v-if="bestBets[0]" cols="12" lg="4">
-          <bet-result :user="bestBets[0]" :players="players"></bet-result>
-        </v-col>
-        <v-col v-if="bestBets[1]" cols="12" lg="4">
-          <bet-result :user="bestBets[1]" :players="players"></bet-result>
-        </v-col>
-        <v-col v-if="bestBets[2]" cols="12" lg="4">
-          <bet-result :user="bestBets[2]" :players="players"></bet-result>
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col cols="12" md="3" style="background-color: var(--v-card-base)"></v-col>
-  </v-row>
+          <v-row>
+            <v-col v-if="evaluatedBets[0]" cols="12" sm="6" md="4" lg="3">
+              <bet-result-card :bet="evaluatedBets[0]" :players="players"></bet-result-card>
+            </v-col>
+            <v-col v-if="evaluatedBets[1]" cols="12" sm="6" md="4" lg="3">
+              <bet-result-card :bet="evaluatedBets[1]" :players="players"></bet-result-card>
+            </v-col>
+            <v-col v-if="evaluatedBets[2]" cols="12" sm="6" md="4" lg="3">
+              <bet-result-card :bet="evaluatedBets[2]" :players="players"></bet-result-card>
+            </v-col>
+            <v-col v-if="evaluatedBets[2]" cols="12" sm="6" md="4" lg="3">
+              <bet-result-card :bet="evaluatedBets[2]" :players="players"></bet-result-card>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script lang="ts">
