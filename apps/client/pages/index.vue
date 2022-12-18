@@ -193,10 +193,10 @@ export default Vue.extend({
       return bets.find((bet) => (bet.game as IGame & { _id: string })._id === upcomingGame);
     },
   },
-  // activated() {
-  //   if (this.$fetchState.timestamp <= Date.now() - 30000) {
-  //     this.$fetch();
-  //   }
-  // },
+  activated() {
+    if (this.$fetchState.timestamp <= Date.now() - 30000) {
+      this.$fetch();
+    }
+  },
 });
 </script>
