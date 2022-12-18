@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row class="white--text">
     <v-col no-gutters>
       <v-row align="center" no-gutters>
         <v-col self-justify="start" cols="12" md="6">
@@ -51,8 +51,8 @@
         <v-col cols="12" md="6">
           <div class="text-h4 font-weight-bold pb-3">Ceny pre víťazov</div>
           <v-row>
-            <v-col cols="12"
-              ><v-card>
+            <v-col cols="12">
+              <v-card dark raised class="pa-4" rounded="lg" color="card">
                 <v-card-title>
                   <v-icon left color="yellow darken-1"> mdi-medal </v-icon>
                   <span class="text-subtitle-1">1. Miesto</span>
@@ -65,10 +65,10 @@
                     </li>
                   </ul></v-card-text
                 >
-              </v-card></v-col
-            >
-            <v-col cols="12"
-              ><v-card>
+              </v-card>
+            </v-col>
+            <v-col cols="12">
+              <v-card dark raised class="pa-4" rounded="lg" color="card">
                 <v-card-title>
                   <v-icon
                     left
@@ -89,8 +89,8 @@
                 >
               </v-card></v-col
             >
-            <v-col cols="12"
-              ><v-card>
+            <v-col cols="12">
+              <v-card dark raised class="pa-4" rounded="lg" color="card">
                 <v-card-title>
                   <v-icon
                     left

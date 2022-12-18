@@ -3,6 +3,7 @@
     <loading-bar v-if="$fetchState.pending" />
     <v-col v-else cols="12">
       <v-data-table
+        dark
         :headers="[
           { text: 'Poradie', value: 'rank' },
           { text: 'Meno', value: 'username' },
@@ -14,7 +15,7 @@
         :sort-desc="[true]"
         :items-per-page="30"
         mobile-breakpoint="0"
-        class="elevation-1 custom-header"
+        class="elevation-1"
         :footer-props="{
           itemsPerPageOptions: [10, 20, 30, -1],
           itemsPerPageAllText: 'Všetky',
@@ -66,15 +67,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style>
-.custom-header div table thead {
-  background-color: #f5f5f5;
-}
-</style>
-
-<router>
-{
-    name: "Tabuľka"
-}
-</router>
