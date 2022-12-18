@@ -4,7 +4,7 @@
       <v-col cols="12" align="center">
         <div class="d-flex justify-center text-caption white--text">
           <div class="pr-2">
-            <b>⭐️ {{ $auth.user.username }} </b>
+            <b>⭐️ {{ user }} </b>
           </div>
           <div>+{{ bet.points }} b.</div>
         </div>
@@ -53,6 +53,10 @@ import { IBet, IGame, IPlayer, ITeam, FixtureEventDetail } from '@tipovacka/mode
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
+    user: {
+      type: String,
+      required: true,
+    },
     bet: {
       type: Object as PropType<IBet>,
       default: {} as IBet,
@@ -70,7 +74,7 @@ export default Vue.extend({
         const playerId = this.bet.scorer;
 
         const scorer = this.players.find((p: IPlayer) => p.apiId === playerId);
-        return scorer ? scorer.lastName : undefined;
+        return scorer ? scorer.name : undefined;
       }
     },
     formatedDate(): string {

@@ -29,6 +29,9 @@
             <v-col cols="12">
               <span class="white--text text-subtitle-1 font-weight-bold"> Posledné zápasy </span>
             </v-col>
+            <v-col v-if="bestBets[0]" cols="12">
+              <game-result-card :game="bestBets[0].bets[0].game"></game-result-card>
+            </v-col>
           </v-row>
           <v-row>
             <v-col cols="12" align="center">
@@ -38,6 +41,27 @@
           <v-row>
             <v-col cols="12">
               <span class="white--text text-subtitle-1 font-weight-bold"> Najlepšie tipy </span>
+            </v-col>
+            <v-col v-if="bestBets[0]" cols="12">
+              <bet-result-card
+                :bet="bestBets[0].bets[0]"
+                :players="players"
+                :user="bestBets[0].username"
+              ></bet-result-card>
+            </v-col>
+            <v-col v-if="bestBets[1]" cols="12">
+              <bet-result-card
+                :bet="bestBets[1].bets[0]"
+                :players="players"
+                :user="bestBets[1].username"
+              ></bet-result-card>
+            </v-col>
+            <v-col v-if="bestBets[2]" cols="12">
+              <bet-result-card
+                :bet="bestBets[2].bets[0]"
+                :players="players"
+                :user="bestBets[2].username"
+              ></bet-result-card>
             </v-col>
           </v-row>
         </v-card>
@@ -67,16 +91,32 @@
 
           <v-row>
             <v-col v-if="evaluatedBets[0]" cols="12" sm="6" md="4" lg="3">
-              <bet-result-card :bet="evaluatedBets[0]" :players="players"></bet-result-card>
+              <bet-result-card
+                :bet="evaluatedBets[0]"
+                :players="players"
+                :user="$auth.user.username"
+              ></bet-result-card>
             </v-col>
             <v-col v-if="evaluatedBets[1]" cols="12" sm="6" md="4" lg="3">
-              <bet-result-card :bet="evaluatedBets[1]" :players="players"></bet-result-card>
+              <bet-result-card
+                :bet="evaluatedBets[1]"
+                :players="players"
+                :user="$auth.user.username"
+              ></bet-result-card>
             </v-col>
             <v-col v-if="evaluatedBets[2]" cols="12" sm="6" md="4" lg="3">
-              <bet-result-card :bet="evaluatedBets[2]" :players="players"></bet-result-card>
+              <bet-result-card
+                :bet="evaluatedBets[2]"
+                :players="players"
+                :user="$auth.user.username"
+              ></bet-result-card>
             </v-col>
             <v-col v-if="evaluatedBets[2]" cols="12" sm="6" md="4" lg="3">
-              <bet-result-card :bet="evaluatedBets[2]" :players="players"></bet-result-card>
+              <bet-result-card
+                :bet="evaluatedBets[2]"
+                :players="players"
+                :user="$auth.user.username"
+              ></bet-result-card>
             </v-col>
           </v-row>
         </v-card>
@@ -153,10 +193,10 @@ export default Vue.extend({
       return bets.find((bet) => (bet.game as IGame & { _id: string })._id === upcomingGame);
     },
   },
-  activated() {
-    if (this.$fetchState.timestamp <= Date.now() - 30000) {
-      this.$fetch();
-    }
-  },
+  // activated() {
+  //   if (this.$fetchState.timestamp <= Date.now() - 30000) {
+  //     this.$fetch();
+  //   }
+  // },
 });
 </script>

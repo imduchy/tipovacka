@@ -286,7 +286,6 @@ router.get('/top', authMiddleware, async (req, res) => {
     // TODO: This should be idealy moved to the aggregation pipeline
     users.forEach((user) => (user.bets = [user.bets]));
     users.forEach((user) => (user.bets[0].game = user.bets[0].game[0]));
-    logger.info('Aggregation result: ' + users);
 
     // Returns
     // [{ username, ..., bets: [{}] }, { username, ..., bets: [{}] }, { username, ..., bets: [{}] }]
