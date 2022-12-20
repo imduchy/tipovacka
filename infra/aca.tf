@@ -19,21 +19,6 @@ resource "azapi_resource" "this" {
   })
 }
 
-resource "azapi_resource" "aca_client_certificate" {
-  name      = "me-cert-${var.project_name}-${var.environment}"
-  type      = "Microsoft.App/managedEnvironments/certificates@2022-03-01"
-  parent_id = azapi_resource.this.id
-  location  = var.region
-  tags      = local.default_tags
-
-  body = jsonencode({
-    properties = {
-      password = "GastonLyla69"
-      value    = filebase64("./client-cert.pfx")
-    }
-  })
-}
-
 resource "azapi_resource" "aca-api" {
   name      = "aca-${var.project_name}-api-${var.environment}"
   location  = var.region
@@ -165,11 +150,6 @@ resource "azapi_resource" "aca-client" {
           allowInsecure = false
           targetPort    = 3000
           transport     = "Auto"
-          customDomains = [{
-            bindingType   = "Disabled"
-            name          = "onlinetipovacka.sk"
-            certificateId = azapi_resource.aca_client_certificate.id
-          }]
         }
         registries = [{
           identity = "system"
@@ -211,23 +191,4 @@ resource "azapi_resource" "aca-client" {
       body
     ]
   }
-}
-
-resource "azapi_update_resource" "update_client" {
-  type        = "Microsoft.App/containerApps@2022-06-01-preview"
-  resource_id = azapi_resource.aca-client.id
-
-  body = jsonencode({
-    template = {
-      configuration = {
-        ingress = {
-          customDomains = [{
-            bindingType   = "Disabled"
-            name          = "onlinetipovacka.sk"
-            certificateId = azapi_resource.aca_client_certificate.id
-          }]
-        }
-      }
-    }
-  })
 }

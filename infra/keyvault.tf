@@ -67,7 +67,7 @@ resource "azurerm_key_vault_secret" "db_connection_string" {
   name = "DB-CONNECTION-STRING"
   tags = local.default_tags
 
-  value        = "mongodb://${data.azurerm_cosmosdb_account.this.name}:${data.azurerm_cosmosdb_account.this.primary_key}@${data.azurerm_cosmosdb_account.this.name}.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@tipovacka-master@"
+  value        = "mongodb://${data.azurerm_cosmosdb_account.this.name}:${data.azurerm_cosmosdb_account.this.primary_key}@${data.azurerm_cosmosdb_account.this.name}.mongo.cosmos.azure.com:10255/tipovacka?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@tipovacka-master@"
   key_vault_id = azurerm_key_vault.this.id
 }
 
