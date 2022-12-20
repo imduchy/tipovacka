@@ -52,17 +52,6 @@ resource "azurerm_key_vault_access_policy" "aca_api" {
   ]
 }
 
-resource "azurerm_key_vault_access_policy" "aca_client" {
-  key_vault_id = azurerm_key_vault.this.id
-  tenant_id    = data.azuread_client_config.current.tenant_id
-  object_id    = azapi_resource.aca-client.identity[0].principal_id
-
-  secret_permissions = [
-    "Get",
-    "List"
-  ]
-}
-
 resource "azurerm_key_vault_secret" "db_connection_string" {
   name = "DB-CONNECTION-STRING"
   tags = local.default_tags
