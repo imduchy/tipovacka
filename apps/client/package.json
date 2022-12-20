@@ -4,6 +4,9 @@
   "author": "Jakub Duchon",
   "license": "ISC",
   "private": true,
+  "engines": {
+    "node": ">=14.18.1 <15"
+  },
   "description": "Nuxt.JS application for Tipovacka project",
   "scripts": {
     "dev": "nuxt",
