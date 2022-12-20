@@ -2,7 +2,7 @@ name: Deploy Client to Azure Container Apps
 
 on:
   push:
-    branches: [master]
+    branches: [disabled]
     paths:
       - 'Dockerfile-client'
       - 'apps/client/**'
