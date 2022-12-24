@@ -23,3 +23,11 @@ resource "azurerm_log_analytics_workspace" "this" {
   sku               = "PerGB2018" # Default
   retention_in_days = 30
 }
+
+resource "azurerm_application_insights" "this" {
+  name                = "appi-${var.project_name}-shared"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  application_type    = "web"
+}
+
