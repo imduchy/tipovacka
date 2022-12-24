@@ -1,0 +1,10 @@
+{
+  "bindings": [
+    {
+      "name": "groupId",
+      "type": "activityTrigger",
+      "direction": "in"
+    }
+  ],
+  "scriptFile": "../dist/updateGame/index.js"
+}

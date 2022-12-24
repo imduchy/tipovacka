@@ -1,0 +1,17 @@
+{
+  "bindings": [
+    {
+      "authLevel": "function",
+      "name": "timer",
+      "type": "timerTrigger",
+      "schedule": "01:00:00",
+      "direction": "in"
+    },
+    {
+      "name": "starter",
+      "type": "orchestrationClient",
+      "direction": "in"
+    }
+  ],
+  "scriptFile": "../dist/timerStarter/index.js"
+}
