@@ -2,7 +2,7 @@
   <v-row :class="{ 'align-self-center': $fetchState.pending }">
     <loading-bar v-if="$fetchState.pending" />
     <v-col v-else cols="12">
-      <v-card color="#f5f5f5">
+      <v-card raised rounded="lg" color="card" dark>
         <v-card-title>
           Užívatelia
           <v-spacer></v-spacer>
@@ -236,6 +236,7 @@
           </v-dialog>
         </v-card-title>
         <v-data-table
+          dark
           :headers="[
             { text: 'Meno', value: 'username' },
             { text: 'Email', value: 'email' },
@@ -256,13 +257,12 @@
           }"
         >
           <template #top>
-            <v-toolbar color="#f5f5f5" flat>
+            <v-toolbar color="card" dark flat>
               <v-text-field
                 v-model="search"
                 prepend-inner-icon="mdi-magnify"
                 label="Hľadať"
                 outlined
-                background-color="white"
                 dense
                 single-line
                 hide-details
@@ -540,7 +540,7 @@ export default Vue.extend({
 
 <style>
 .custom-header div table thead {
-  background-color: #f5f5f5;
+  background-color: var(--v-card-base);
 }
 
 #disabled-icon-success > div > i {

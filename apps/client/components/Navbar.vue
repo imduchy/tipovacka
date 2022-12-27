@@ -74,6 +74,9 @@
           <v-spacer></v-spacer>
 
           <template v-if="$auth.loggedIn">
+            <div id="username" class="text-right text-subtitle-2 pr-2">
+              {{ $auth.user.username }}
+            </div>
             <span class="hidden-sm-and-down">
               <!-- Additional menu -->
               <v-menu bottom offset-y>
@@ -171,5 +174,13 @@ export default Vue.extend({
   color: var(--v-primary-base);
   border-bottom: 2px solid var(--v-primary-base);
   font-weight: bold;
+}
+
+#username {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 120px;
+  max-width: 120px;
 }
 </style>
