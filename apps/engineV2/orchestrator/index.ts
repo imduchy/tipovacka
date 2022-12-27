@@ -11,7 +11,10 @@ const orchestrator = df.orchestrator(function* (context) {
 
   if (updateGameResponse.code === ReturnCodes.GAME_FINISHED) {
     context.log('Executing the evaluate bets activity function.');
-    const evaluateBetsResponse = yield context.df.callActivity('evaluateBets', groupId);
+    const evaluateBetsResponse = yield context.df.callActivity('evaluateBets', [
+      groupId,
+      updateGameResponse.data,
+    ]);
 
     context.log(`The evaluate bets activity returned with ${JSON.stringify(evaluateBetsResponse)}`);
   }

@@ -1,0 +1,10 @@
+{
+  "bindings": [
+    {
+      "name": "data",
+      "type": "activityTrigger",
+      "direction": "in"
+    }
+  ],
+  "scriptFile": "../dist/evaluateBets/index.js"
+}
