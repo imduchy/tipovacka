@@ -111,9 +111,9 @@
                 :user="$auth.user.username"
               ></bet-result-card>
             </v-col>
-            <v-col v-if="evaluatedBets[2]" cols="12" sm="6" md="4" lg="3">
+            <v-col v-if="evaluatedBets[3]" cols="12" sm="6" md="4" lg="3">
               <bet-result-card
-                :bet="evaluatedBets[2]"
+                :bet="evaluatedBets[3]"
                 :players="players"
                 :user="$auth.user.username"
               ></bet-result-card>
