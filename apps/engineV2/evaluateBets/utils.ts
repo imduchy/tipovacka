@@ -70,7 +70,7 @@ export function evaluatePoints(bet: IBet, game: IGame, isDerby: boolean): number
   // In the future, a config file can be used to control what
   // bets should be evaluated. E.g., some groups might want
   // to only evaluate bets on results, while others might want
-  // to evaluate all bets.
+  // to evaluate all bets
   points += evaluateResultBet(bet, game);
 
   if (bet.scorer) {

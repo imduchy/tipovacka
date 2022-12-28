@@ -5,12 +5,12 @@ on:
     branches:
       - 'master'
     paths:
-      - 'apps/engine/**'
+      - 'apps/engineV2/**'
       - 'packages/**'
 
 env:
-  AZURE_FUNCTIONAPP_NAME: tipovacka-utils
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: ./apps/engine
+  AZURE_FUNCTIONAPP_NAME: func-tipovacka-engine-prod
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: ./apps/engineV2
   NODE_VERSION: 14.x
 
 jobs:
