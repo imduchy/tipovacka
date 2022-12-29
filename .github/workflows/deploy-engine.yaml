@@ -34,10 +34,10 @@ jobs:
       - name: 'Build the application'
         run: |
           npm run build-common
-          npm run build --workspace=@tipovacka/engine
+          npm run build --workspace=@tipovacka/enginev2
 
       - name: 'Run tests'
-        run: npm run test --workspace=@tipovacka/engine
+        run: npm run test --workspace=@tipovacka/enginev2
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
