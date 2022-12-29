@@ -9,11 +9,11 @@ import { HydratedDocument, Types } from 'mongoose';
 
 const activityFunction: AzureFunction = async function (
   context: Context,
-  data: Array<string | IGameWithID>
+  params: Array<string | IGameWithID>
 ): Promise<ReturnObject> {
-  context.log(`Received the array ${data}`);
-  const groupId = data[0] as string;
-  const game = Game.hydrate(data[1]);
+  context.log(`Received the array ${params}`);
+  const groupId = params[0] as string;
+  const game = Game.hydrate(params[1]);
 
   const keyVaultUrl = process.env.KEY_VAULT_URL;
   const credentials = new DefaultAzureCredential();
