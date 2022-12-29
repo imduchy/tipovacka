@@ -3,12 +3,12 @@ var path = require("path");
 
 module.exports = {
   entry: {
-    Orchestrator: './orchestrator/index.ts',
-    TimerStarter: './timerStarter/index.ts',
-    UpdateGame: './updateGame/index.ts',
+    orchestrator: './orchestrator/index.ts',
+    timerStarter: './timerStarter/index.ts',
+    updateGame: './updateGame/index.ts',
     // UpdateCompetition: './UpdateCompetition/index.ts',
     // GetUpcomingGame: './GetUpcomingGame/index.ts',
-    EvaluateBets: './evaluateBets/index.ts'
+    evaluateBets: './evaluateBets/index.ts'
   },
   mode: "production",
   target: 'node',
