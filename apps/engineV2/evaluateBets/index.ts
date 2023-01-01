@@ -11,9 +11,9 @@ const activityFunction: AzureFunction = async function (
   context: Context,
   params: Array<string | IGameWithID>
 ): Promise<ReturnObject> {
-  context.log(`Received the array ${params}`);
-  const groupId = params[0] as string;
-  const game = Game.hydrate(params[1]);
+  context.log(
+    `Received an array with group ID ${params[0]}, and game object ${JSON.stringify(params[1])}`
+  );
 
   const keyVaultUrl = process.env.KEY_VAULT_URL;
   const credentials = new DefaultAzureCredential();
@@ -24,6 +24,9 @@ const activityFunction: AzureFunction = async function (
 
   context.log('Getting the database object.');
   await getDatabase(connectionStringSecret.value);
+
+  const groupId = params[0] as string;
+  const game = Game.hydrate(params[1]);
 
   context.log('Retrieving the group object from the database.');
   const group = await Group.findById(groupId).populate('users');
