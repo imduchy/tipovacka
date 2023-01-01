@@ -45,5 +45,14 @@ resource "azurerm_linux_function_app" "example" {
 
   app_settings = {
     API_FOOTBALL_HOST = "v3.football.api-sports.io"
+    KEY_VAULT_URL     = azurerm_key_vault.this.vault_uri
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags["hidden-link: /app-insights-instrumentation-key"],
+      tags["hidden-link: /app-insights-resource-id"],
+      tags["hidden-link: /app-insights-conn-string"]
+    ]
   }
 }

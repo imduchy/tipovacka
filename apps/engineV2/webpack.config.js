@@ -6,8 +6,8 @@ module.exports = {
     orchestrator: './orchestrator/index.ts',
     timerStarter: './timerStarter/index.ts',
     updateGame: './updateGame/index.ts',
-    // UpdateCompetition: './UpdateCompetition/index.ts',
-    // GetUpcomingGame: './GetUpcomingGame/index.ts',
+    updateCompetition: './updateCompetition/index.ts',
+    getUpcomingGame: './getUpcomingGame/index.ts',
     evaluateBets: './evaluateBets/index.ts'
   },
   mode: "production",
