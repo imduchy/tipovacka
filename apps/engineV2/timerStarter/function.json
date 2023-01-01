@@ -4,7 +4,7 @@
       "authLevel": "function",
       "name": "timer",
       "type": "timerTrigger",
-      "schedule": "01:00:00",
+      "schedule": "0 0 * * * *",
       "direction": "in"
     },
     {
