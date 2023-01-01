@@ -1,7 +1,6 @@
 {
   "bindings": [
     {
-      "authLevel": "function",
       "name": "timer",
       "type": "timerTrigger",
       "schedule": "0 0 * * * *",
