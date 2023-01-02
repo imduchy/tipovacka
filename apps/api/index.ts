@@ -14,12 +14,26 @@ import groups from './routes/groups';
 import users from './routes/users';
 import cors from 'cors';
 import helmet from 'helmet';
+import appInsights from 'applicationinsights';
 import { SecretClient } from '@azure/keyvault-secrets';
 import { DefaultAzureCredential } from '@azure/identity';
 
 const app = express();
 const MongoStore = connectMongo(session);
 const credential = new DefaultAzureCredential();
+
+// Start collecting telemetry and send it to Application Insights
+appInsights
+  .setup()
+  .setAutoDependencyCorrelation(true)
+  .setAutoCollectRequests(true)
+  .setAutoCollectPerformance(true, true)
+  .setAutoCollectExceptions(true)
+  .setAutoCollectDependencies(true)
+  .setAutoCollectConsole(true)
+  .setSendLiveMetrics(false)
+  .setDistributedTracingMode(appInsights.DistributedTracingModes.AI)
+  .start();
 
 // Check if all required environment variables are set.
 if (!process.env.KEY_VAULT_URL) {
