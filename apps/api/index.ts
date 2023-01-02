@@ -1,28 +1,28 @@
+import { DefaultAzureCredential } from '@azure/identity';
+import { SecretClient } from '@azure/keyvault-secrets';
 import { exportModels } from '@tipovacka/models';
+import * as appInsights from 'applicationinsights';
 import connectMongo from 'connect-mongo';
+import cors from 'cors';
 import express, { json, urlencoded } from 'express';
 import session from 'express-session';
+import helmet from 'helmet';
 import mongoose from 'mongoose';
 import passport from 'passport';
-import strategy from './utils/passport';
-import logger from './utils/logger';
 import admin from './routes/admin';
 import auth from './routes/auth';
 import bets from './routes/bets';
 import games from './routes/games';
 import groups from './routes/groups';
 import users from './routes/users';
-import cors from 'cors';
-import helmet from 'helmet';
-import * as appInsights from 'applicationinsights';
-import { SecretClient } from '@azure/keyvault-secrets';
-import { DefaultAzureCredential } from '@azure/identity';
+import logger from './utils/logger';
+import strategy from './utils/passport';
 
 const app = express();
 const MongoStore = connectMongo(session);
 const credential = new DefaultAzureCredential();
 
-// Start collecting telemetry and send it to Application Insights
+// Configure an Application Insights client
 appInsights
   .setup()
   .setAutoDependencyCorrelation(true)
@@ -32,8 +32,15 @@ appInsights
   .setAutoCollectDependencies(true)
   .setAutoCollectConsole(true)
   .setSendLiveMetrics(false)
-  .setDistributedTracingMode(appInsights.DistributedTracingModes.AI)
-  .start();
+  .setDistributedTracingMode(appInsights.DistributedTracingModes.AI);
+
+const appInsightsContext = appInsights.defaultClient.context;
+
+// Configure the role name
+appInsightsContext.tags[appInsightsContext.keys.cloudRole] = 'aca-tipovacka-api-prod';
+
+// Start the collecting telemetry and send it to Application Insights
+appInsights.start();
 
 // Check if all required environment variables are set.
 if (!process.env.KEY_VAULT_URL) {
