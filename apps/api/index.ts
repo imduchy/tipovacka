@@ -16,7 +16,16 @@ import games from './routes/games';
 import groups from './routes/groups';
 import users from './routes/users';
 import logger from './utils/logger';
+import { validateEnvVars } from './utils/misc';
 import strategy from './utils/passport';
+
+const requiredEnvVars = {
+  KEY_VAULT_URL: process.env.KEY_VAULT_URL,
+  CONNECTION_STRING_SECRET_NAME: process.env.CONNECTION_STRING_SECRET_NAME,
+  FOOTBALL_API_KEY_SECRET_NAME: process.env.FOOTBALL_API_KEY_SECRET_NAME,
+  SESSION_SECRET: process.env.SESSION_SECRET,
+  API_ADMIN_TOKEN: process.env.API_ADMIN_TOKEN,
+};
 
 const app = express();
 const MongoStore = connectMongo(session);
@@ -42,36 +51,20 @@ appInsightsContext.tags[appInsightsContext.keys.cloudRole] = 'aca-tipovacka-api-
 // Start the collecting telemetry and send it to Application Insights
 appInsights.start();
 
-// Check if all required environment variables are set.
-if (!process.env.KEY_VAULT_URL) {
-  logger.error('Value for the KEY_VAULT_URL is undefined.');
-  process.exit();
-}
+const undefinedRequiredEnv = validateEnvVars(requiredEnvVars);
 
-if (!process.env.CONNECTION_STRING_SECRET_NAME) {
-  logger.error('Value for the CONNECTION_STRING_SECRET_NAME is undefined.');
-  process.exit();
-}
-
-if (!process.env.FOOTBALL_API_KEY_SECRET_NAME) {
-  logger.error('Value for the FOOTBALL_API_KEY_SECRET_NAME is undefined.');
-  process.exit();
-}
-
-if (!process.env.SESSION_SECRET) {
-  logger.error('Value for the SESSION_SECRET is undefined.');
-  process.exit();
-}
-
-if (!process.env.API_ADMIN_TOKEN) {
-  logger.error('Value for the API_ADMIN_TOKEN is undefined.');
+if (undefinedRequiredEnv.length > 0) {
+  logger.error(
+    `The following required environment variables are undefined: ${undefinedRequiredEnv}.`
+  );
   process.exit();
 }
 
 // Initialize Key Vault client and fetch secrets
-const vaultURL = process.env.KEY_VAULT_URL;
+const vaultURL = process.env.KEY_VAULT_URL as string;
 const kvClient = new SecretClient(vaultURL, credential);
-kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME).then((secret) => {
+
+kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME as string).then((secret) => {
   if (!secret.value) {
     logger.error('Database connection string is undefined.');
     process.exit();
@@ -86,7 +79,7 @@ kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME).then((secret) => {
 });
 
 // Set the football API key
-kvClient.getSecret(process.env.FOOTBALL_API_KEY_SECRET_NAME).then((secret) => {
+kvClient.getSecret(process.env.FOOTBALL_API_KEY_SECRET_NAME as string).then((secret) => {
   if (!secret.value) {
     logger.error('Football API key string is undefined.');
     process.exit();
@@ -101,7 +94,7 @@ app.set('trust proxy', 1);
 // Configure session store for cookies
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET as string,
     cookie: {
       maxAge: 172800000,
       sameSite: 'lax',
