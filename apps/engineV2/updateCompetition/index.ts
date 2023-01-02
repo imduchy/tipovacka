@@ -13,9 +13,12 @@ const activityFunction: AzureFunction = async function (
   params: any
 ): Promise<ReturnObject> {
   context.log(`Received the array ${params}`);
-  const groupId = params[0] as string;
-  const competitionId = params[1] as number;
-  const season = params[2] as number;
+  // const groupId = params[0] as string;
+  const groupId = params as string;
+  // const competitionId = params[1] as number;
+  const competitionId = 140;
+  // const season = params[2] as number;
+  const season = 2022;
 
   const apiHost = process.env.API_FOOTBALL_HOST;
   const keyVaultUrl = process.env.KEY_VAULT_URL;
