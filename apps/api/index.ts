@@ -14,7 +14,7 @@ import groups from './routes/groups';
 import users from './routes/users';
 import cors from 'cors';
 import helmet from 'helmet';
-import appInsights from 'applicationinsights';
+import * as appInsights from 'applicationinsights';
 import { SecretClient } from '@azure/keyvault-secrets';
 import { DefaultAzureCredential } from '@azure/identity';
 
