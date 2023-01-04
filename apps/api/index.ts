@@ -121,7 +121,7 @@ app.use(passport.session());
 // Configure CORS
 app.use(
   cors({
-    origin: [/localhost/, /\.onlinetipovacka\.sk$/, /\.westeurope\.azurecontainerapps\.io$/],
+    origin: [/localhost/, /\.onlinetipovacka\.sk$/],
     credentials: true,
   })
 );
