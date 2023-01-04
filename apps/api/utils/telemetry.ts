@@ -13,11 +13,22 @@ export const initializeTelemetry = () => {
     .setSendLiveMetrics(false)
     .setDistributedTracingMode(appInsights.DistributedTracingModes.AI);
 
-  const appInsightsContext = appInsights.defaultClient.context;
-
+  const defaultClientContext = appInsights.defaultClient.context;
   // Configure the role name
-  appInsightsContext.tags[appInsightsContext.keys.cloudRole] = 'aca-tipovacka-api-prod';
+  defaultClientContext.tags[defaultClientContext.keys.cloudRole] = 'aca-tipovacka-api-prod';
 
   // Start the collecting telemetry and send it to Application Insights
   appInsights.start();
+
+  appInsights.defaultClient.addTelemetryProcessor((envelope, context) => {
+    if (context) {
+      const req = context['http.ServerRequest'];
+
+      if (req && req.user) {
+        envelope.tags['ai.user.authUserId'] = req.user.username;
+      }
+    }
+
+    return true;
+  });
 };
