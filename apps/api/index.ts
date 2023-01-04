@@ -1,7 +1,6 @@
 import { DefaultAzureCredential } from '@azure/identity';
 import { SecretClient } from '@azure/keyvault-secrets';
 import { exportModels } from '@tipovacka/models';
-import * as appInsights from 'applicationinsights';
 import connectMongo from 'connect-mongo';
 import cors from 'cors';
 import express, { json, urlencoded } from 'express';
@@ -18,6 +17,7 @@ import users from './routes/users';
 import logger from './utils/logger';
 import { validateEnvVars } from './utils/misc';
 import strategy from './utils/passport';
+import { initializeTelemetry } from './utils/telemetry';
 
 const requiredEnvVars = {
   KEY_VAULT_URL: process.env.KEY_VAULT_URL,
@@ -31,26 +31,10 @@ const app = express();
 const MongoStore = connectMongo(session);
 const credential = new DefaultAzureCredential();
 
-// Configure an Application Insights client
-appInsights
-  .setup()
-  .setAutoDependencyCorrelation(true)
-  .setAutoCollectRequests(true)
-  .setAutoCollectPerformance(true, true)
-  .setAutoCollectExceptions(true)
-  .setAutoCollectDependencies(true)
-  .setAutoCollectConsole(true)
-  .setSendLiveMetrics(false)
-  .setDistributedTracingMode(appInsights.DistributedTracingModes.AI);
+// Initialize Application Insights telemetry
+initializeTelemetry();
 
-const appInsightsContext = appInsights.defaultClient.context;
-
-// Configure the role name
-appInsightsContext.tags[appInsightsContext.keys.cloudRole] = 'aca-tipovacka-api-prod';
-
-// Start the collecting telemetry and send it to Application Insights
-appInsights.start();
-
+// Don't start the server without all required env variables
 const undefinedRequiredEnv = validateEnvVars(requiredEnvVars);
 
 if (undefinedRequiredEnv.length > 0) {
@@ -60,7 +44,6 @@ if (undefinedRequiredEnv.length > 0) {
   process.exit();
 }
 
-// Initialize Key Vault client and fetch secrets
 const vaultURL = process.env.KEY_VAULT_URL as string;
 const kvClient = new SecretClient(vaultURL, credential);
 
