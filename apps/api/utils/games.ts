@@ -1,6 +1,8 @@
 import { FixtureResponse, GameStatus, IGame } from '@tipovacka/models';
-import logger from './logger';
 import { getFixture } from './footballApi';
+import getLogger from './logger';
+
+const logger = getLogger();
 
 /**
  * Fetches an upcoming game for each of specified leagues from an API

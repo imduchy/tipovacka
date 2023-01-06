@@ -5,8 +5,9 @@ import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../uti
 import { alreadyBet } from '../utils/bets';
 import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import { getLatestSeason } from '../utils/groups';
-import logger from '../utils/logger';
+import getLogger from '../utils/logger';
 
+const logger = getLogger();
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {

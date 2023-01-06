@@ -2,8 +2,9 @@ import { IUserWithID, User } from '@tipovacka/models';
 import express, { NextFunction, Request, Response } from 'express';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
-import logger from '../utils/logger';
+import getLogger from '../utils/logger';
 
+const logger = getLogger();
 const router = express.Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {

@@ -13,14 +13,13 @@ import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
 import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
-import logger from '../utils/logger';
+import getLogger from '../utils/logger';
 import { emptyStatisticsObject } from '../utils/teams';
 
 const router = Router();
+const logger = getLogger();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  infoAuditLog(req);
-
   const user = req.user as IUserWithID | undefined;
 
   if (containsAdminKey(req)) {

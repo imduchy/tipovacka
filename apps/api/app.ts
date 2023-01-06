@@ -14,10 +14,12 @@ import bets from './routes/bets';
 import games from './routes/games';
 import groups from './routes/groups';
 import users from './routes/users';
-import logger from './utils/logger';
+import getLogger from './utils/logger';
 import { validateEnvVars } from './utils/misc';
 import strategy from './utils/passport';
 import { initializeTelemetry } from './utils/telemetry';
+
+const logger = getLogger();
 
 const requiredEnvVars = {
   KEY_VAULT_URL: process.env.KEY_VAULT_URL,

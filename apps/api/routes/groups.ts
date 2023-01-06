@@ -1,11 +1,12 @@
-import { Group, ICompetition, IGameWithID, IUser, IUserWithID, User } from '@tipovacka/models';
+import { Group, ICompetition, IGameWithID, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import { getLatestSeason } from '../utils/groups';
-import logger from '../utils/logger';
+import getLogger from '../utils/logger';
 
+const logger = getLogger();
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
