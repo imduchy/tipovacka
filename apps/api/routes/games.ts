@@ -1,22 +1,17 @@
-import { Game, IUserWithID } from '@tipovacka/models';
+import { Game } from '@tipovacka/models';
 import express, { NextFunction, Request, Response } from 'express';
-import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
-import logger from '../utils/logger';
+import { ApiError } from '../errors/customErrors';
+import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 
 const router = express.Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  infoAuditLog(req);
-
-  const user = req.user as IUserWithID | undefined;
-
   // If req.headers contains the admin key, continue
-  if (containsAdminKey(req) || isLoggedIn(req)) {
+  if (containsAdminKey(req) || !isLoggedIn(req)) {
     return next();
   }
 
-  warnAuditLog(req, user);
   return res.status(401).json({
     message: ResponseMessages.UNAUTHORIZED_REQUEST,
     code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
@@ -24,33 +19,41 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 };
 
 /**
- * Get a game
+ * Get a game object from the database, based on the provided ObjectId
  *
  * Access: Protected (Logged-in)
  *
- * @param game ObjectId of the game to fetch
+ * @param gameId An ObjectId of the game
  */
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
   const gameId = req.query.game;
 
   try {
     const game = await Game.findById(gameId);
+
     if (!game) {
-      logger.warn(`Game with _id ${gameId} doesn't exist.`);
       res.status(404).json({
         message: ResponseMessages.GAME_ID_DOESNT_EXIST,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
-      return;
+
+      return next(
+        new ApiError(
+          `A user has specified a game ID '${gameId}' in the query parameter. A game object with the provided ID doesn't exist in the database.`,
+          `${req.method} /games`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
-    res.status(200).json(game);
+    return res.status(ResponseStatusCodes.OK).json(game);
   } catch (error) {
-    logger.error(`Couldn't fetch a game with id ${gameId}. Error: ${error}`);
-    res.status(500).json({
+    res.status(ResponseStatusCodes.INTERNAL_SERVER_ERROR).json({
       message: ResponseMessages.INTERNAL_SERVER_ERROR,
       code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
+
+    return next(error);
   }
 });
 

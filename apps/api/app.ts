@@ -5,9 +5,10 @@ import connectMongo from 'connect-mongo';
 import cors from 'cors';
 import express, { json, urlencoded } from 'express';
 import session from 'express-session';
-import helmet from 'helmet';
 import mongoose from 'mongoose';
 import passport from 'passport';
+import { errorHandler, errorMiddleware } from './middleware/errorMiddleware';
+import { securityHeadersMiddleware } from './middleware/headersMiddleware';
 import admin from './routes/admin';
 import auth from './routes/auth';
 import bets from './routes/bets';
@@ -124,5 +125,17 @@ app.use('/api/users', users);
 app.use('/api/groups', groups);
 app.use('/api/games', games);
 app.use('/api/bets', bets);
+
+app.use(errorMiddleware);
+
+process.on('uncaughtException', async (error: Error) => {
+  await errorHandler.handleError(error);
+
+  if (!errorHandler.isTrustedError(error)) process.exit(1);
+});
+
+process.on('unhandledRejection', (error: Error) => {
+  throw error;
+});
 
 export default app;

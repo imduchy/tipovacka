@@ -3,13 +3,9 @@ import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
 import multer from 'multer';
 import xlsx from 'node-xlsx';
-import {
-  containsAdminKey,
-  hasAdminRole,
-  infoAuditLog,
-  warnAuditLog,
-} from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
+import { ApiError } from '../errors/customErrors';
+import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
 import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
@@ -30,8 +26,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     return next();
   }
 
-  warnAuditLog(req, user);
-  return res.status(401).json({
+  return res.status(ResponseStatusCodes.UNAUTHORIZED).json({
     message: ResponseMessages.UNAUTHORIZED_REQUEST,
     code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
   });
@@ -46,14 +41,25 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  * @param team an API ID of the followed team for which upcoming games should be fetched
  * @param amount number of upcoming games that should be fetched (e.g., next 3 games of the team)
  */
-router.post('/groups/competition', authMiddleware, async (req, res) => {
+router.post('/groups/competition', authMiddleware, async (req, res, next) => {
   const { group: groupId, team: teamId, competition: competitionId, season } = req.body;
 
   try {
-    logger.info('Fetching the group with id ' + groupId);
     const group = await Group.findById(groupId);
+
     if (!group) {
-      throw new Error(`Group with id ${groupId} doesn't exist.`);
+      res.status(ResponseStatusCodes.NOT_FOUND).json({
+        message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
+        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+      });
+
+      return next(
+        new ApiError(
+          `A user has specified a group ID '${groupId}' in the query parameter. A group object with the provided ID doesn't exist in the database.`,
+          `${req.method} /groups/competition`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     // The API doesn't track competition standings before the season starts.
