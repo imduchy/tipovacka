@@ -18,7 +18,7 @@
         <v-row justify="center" class="no-gutters">
           <v-col cols="12">
             <div class="white--text text-caption">
-              {{ bet.game.homeTeamScore }} : {{ bet.game.awayTeamScore }}
+              {{ bet.homeTeamScore }} : {{ bet.awayTeamScore }}
             </div>
           </v-col>
           <v-col cols="12">
