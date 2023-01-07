@@ -4,7 +4,7 @@ let loggerInstance: pino.Logger;
 
 const getLogger = (): pino.Logger => {
   if (!loggerInstance) {
-    if (process.env.ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production') {
       loggerInstance = pino({
         transport: {
           levels: 'debug',

@@ -56,7 +56,7 @@ router.get('/logout', (req, res) => {
       );
     }
 
-    if (process.env.ENVIRONMENT === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       const Sessions = mongoose.connection.collection('sessions');
       await Sessions.findOneAndDelete({ _id: new mongoose.Types.ObjectId(req.sessionID) }).catch(
         (err) => {
