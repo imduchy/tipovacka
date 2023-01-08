@@ -9,6 +9,8 @@ import mongoose from 'mongoose';
 import passport from 'passport';
 import { errorHandler, errorMiddleware } from './middleware/errorMiddleware';
 import { securityHeadersMiddleware } from './middleware/headersMiddleware';
+import initializeAuthenticator from './middleware/passportAuthenticator';
+import sessionMiddleware from './middleware/sessionMiddleware';
 import admin from './routes/admin';
 import auth from './routes/auth';
 import bets from './routes/bets';
@@ -17,7 +19,6 @@ import groups from './routes/groups';
 import users from './routes/users';
 import getLogger from './utils/logger';
 import { validateEnvVars } from './utils/misc';
-import strategy from './utils/passport';
 import { initializeTelemetry } from './utils/telemetry';
 
 const logger = getLogger();
@@ -31,7 +32,6 @@ const requiredEnvVars = {
 };
 
 const app = express();
-const MongoStore = connectMongo(session);
 const credential = new DefaultAzureCredential();
 
 // Initialize Application Insights telemetry
@@ -73,37 +73,32 @@ kvClient.getSecret(process.env.FOOTBALL_API_KEY_SECRET_NAME as string).then((sec
   process.env.API_FOOTBALL_KEY = secret.value;
 });
 
-// Configure passport strategy
-strategy(passport);
-app.set('trust proxy', 1);
+// Configure authentication strategy
+initializeAuthenticator(passport);
+// app.set('trust proxy', 1);
 
 // Configure session store for cookies
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET as string,
-    cookie: {
-      maxAge: 172800000,
-      sameSite: 'lax',
-    },
-    resave: true,
-    saveUninitialized: true,
-    // Use MongoStore only in production. In development, use MemoryStore instead
-    store:
-      process.env.NODE_ENV === 'production'
-        ? new MongoStore({
-            mongooseConnection: mongoose.connection,
-            ttl: 24 * 60 * 60 * 1000,
-            autoRemove: 'internal',
-            autoRemoveInterval: 10,
-          })
-        : new session.MemoryStore(),
-  })
-);
+let sessionStore = undefined;
+
+if (process.env.NODE_ENV === 'production') {
+  const mongoStore = connectMongo(session);
+  sessionStore = new mongoStore({
+    mongooseConnection: mongoose.connection,
+    ttl: 24 * 60 * 60 * 1000,
+    autoRemove: 'internal',
+    autoRemoveInterval: 10,
+  });
+} else {
+  sessionStore = new session.MemoryStore();
+}
+
+app.use(sessionMiddleware(sessionStore));
 
 // Enable secure response headers
 // https://hackernoon.com/nodejs-security-headers-101-mf9k24zn
 app.use(securityHeadersMiddleware);
 
+// Enable body parser
 app.use(urlencoded({ extended: false }));
 app.use(json());
 
@@ -119,6 +114,7 @@ app.use(
   })
 );
 
+// Routes
 app.use('/api/auth', auth);
 app.use('/api/admin', admin);
 app.use('/api/users', users);
@@ -126,16 +122,17 @@ app.use('/api/groups', groups);
 app.use('/api/games', games);
 app.use('/api/bets', bets);
 
+// Centralised error handling
 app.use(errorMiddleware);
+
+process.on('unhandledRejection', (error: Error) => {
+  throw error;
+});
 
 process.on('uncaughtException', async (error: Error) => {
   await errorHandler.handleError(error);
 
   if (!errorHandler.isTrustedError(error)) process.exit(1);
-});
-
-process.on('unhandledRejection', (error: Error) => {
-  throw error;
 });
 
 export default app;

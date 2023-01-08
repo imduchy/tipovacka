@@ -26,7 +26,7 @@
           <div class="text-h4 font-weight-bold pb-3">Bodovanie</div>
           <ul>
             <li class="py-1">Správny výsledok zápasu (1/X/2) = <b>1 bod</b></li>
-            <li class="py-1">Presné skóre zápasu = <b>3 bod</b></li>
+            <li class="py-1">Presné skóre zápasu = <b>3 body</b></li>
             <li class="py-1">Správny strelec gólu = <b>1 bod</b></li>
           </ul>
           <v-divider class="my-3"></v-divider>

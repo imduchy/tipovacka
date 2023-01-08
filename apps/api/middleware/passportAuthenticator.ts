@@ -2,7 +2,7 @@ import { IUser, User } from '@tipovacka/models';
 import bcrypt from 'bcryptjs';
 import { PassportStatic } from 'passport';
 import { Strategy } from 'passport-local';
-import getLogger from './logger';
+import getLogger from '../utils/logger';
 
 const logger = getLogger();
 
