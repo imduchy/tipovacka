@@ -60,6 +60,7 @@ export default {
     '@nuxtjs/vuetify',
     '@nuxtjs/svg',
     '@nuxtjs/router-extras',
+    '@nuxtjs/composition-api/module',
   ],
   /*
    ** Nuxt.js modules

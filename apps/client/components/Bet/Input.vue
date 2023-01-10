@@ -39,7 +39,10 @@
               :current-users-bet="currentUsersBet"
             />
           </v-tab-item>
-          <v-tab-item v-for="n in 3" :key="n" class="align-center justify-center">
+          <v-tab-item>
+            <bet-input-standings :competition="competition"></bet-input-standings>
+          </v-tab-item>
+          <v-tab-item v-for="n in 2" :key="n" class="align-center justify-center">
             <v-col align="center" justify="center">
               <h4 class="white--text">Pripravujeme...</h4>
             </v-col>
@@ -51,13 +54,17 @@
 </template>
 
 <script lang="ts">
-import { IBet, IGame, IPlayer } from '@tipovacka/models';
+import { IBet, ICompetition, IGame, IPlayer } from '@tipovacka/models';
 import Vue, { PropType } from 'vue';
 export default Vue.extend({
   props: {
     upcomingGame: {
       type: Object as PropType<IGame & { _id: string }>,
       default: {} as IGame & { _id: string },
+    },
+    competition: {
+      type: Object as PropType<ICompetition>,
+      required: true,
     },
     players: {
       type: Array as PropType<IPlayer[]>,

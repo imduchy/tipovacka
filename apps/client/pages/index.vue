@@ -15,6 +15,7 @@
             <bet-input
               v-if="upcomingGame"
               :upcoming-game="upcomingGame"
+              :competition="competition"
               :players="players"
               :current-users-bet="currentUsersBet"
             ></bet-input>
