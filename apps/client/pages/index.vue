@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <!-- Main view -->
-      <v-col cols="12" md="9" align-self="start" justify-self="start">
+      <v-col cols="12" lg="9" align-self="start" justify-self="start">
         <!-- Upcoming game -->
         <v-row>
           <v-col cols="12">
@@ -24,7 +24,7 @@
       </v-col>
 
       <!-- Side panel -->
-      <v-col cols="12" md="3" align-self="start" justify-self="start">
+      <v-col cols="12" lg="3" align-self="start" justify-self="start">
         <v-card raised class="pa-4" rounded="lg" color="card">
           <v-row>
             <v-col cols="12">
@@ -43,25 +43,12 @@
             <v-col cols="12">
               <span class="white--text text-subtitle-1 font-weight-bold"> Najlepšie tipy </span>
             </v-col>
-            <v-col v-if="bestBets[0]" cols="12">
+            <v-col v-for="n in 3" :key="n" cols="12" sm="6" md="4" lg="12">
               <bet-result-card
-                :bet="bestBets[0].bets[0]"
+                v-if="bestBets[n]"
+                :bet="bestBets[n].bets[0]"
                 :players="players"
-                :user="bestBets[0].username"
-              ></bet-result-card>
-            </v-col>
-            <v-col v-if="bestBets[1]" cols="12">
-              <bet-result-card
-                :bet="bestBets[1].bets[0]"
-                :players="players"
-                :user="bestBets[1].username"
-              ></bet-result-card>
-            </v-col>
-            <v-col v-if="bestBets[2]" cols="12">
-              <bet-result-card
-                :bet="bestBets[2].bets[0]"
-                :players="players"
-                :user="bestBets[2].username"
+                :user="bestBets[n].username"
               ></bet-result-card>
             </v-col>
           </v-row>
