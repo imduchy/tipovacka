@@ -17,8 +17,15 @@
             active-class="active-tab"
             class="text-capitalize text-subtitle-2"
             :ripple="false"
-            >{{ item }}</v-tab
           >
+            <v-badge v-if="item === 'Tabuľka'" color="red" dot>
+              {{ item }}
+            </v-badge>
+
+            <div v-else>
+              {{ item }}
+            </div>
+          </v-tab>
         </v-tabs>
       </v-col>
     </v-row>
