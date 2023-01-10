@@ -8,14 +8,14 @@
     :headers="headers"
     :items="competition.standings"
   >
-    <template #item.teamName="{ item }">
+    <template #[`item.teamName`]="{ item }">
       <v-avatar class="float-left mr-2" tile size="18px">
         <v-img :src="item.teamLogo"> </v-img>
       </v-avatar>
       <div class="pl-2">{{ item.teamName }}</div>
     </template>
 
-    <template #item.form="{ item }">
+    <template #[`item.form`]="{ item }">
       <v-chip
         v-for="(result, index) in item.form"
         :key="index"
