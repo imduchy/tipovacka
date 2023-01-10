@@ -6,7 +6,7 @@ import { getDatabase } from '../utils/database';
 import { FootballApi } from '../utils/footballApi';
 import { ReturnCodes, ReturnObject } from '../utils/returnCodes';
 import { getCompetition } from '../utils/utils';
-import { mapPlayersResponse } from './utils';
+import { mapPlayersResponse, mapStandingsResponse } from './utils';
 
 const activityFunction: AzureFunction = async function (
   context: Context,
@@ -50,22 +50,21 @@ const activityFunction: AzureFunction = async function (
     season: season,
   });
 
-  // context.log("Fetching competition standings from the API.");
-  // const standingsResponse = await FootballApi.getStandings(context.log, {
-  //   league: competition.apiId,
-  //   season: upcomingGame.season,
-  // }).catch((err) => {
-  //   context.log.error("Couldn't fetch standings from the API. Error:", err);
-  //   throw err;
-  // });
-
   const players = playersResponse.data.response;
-  // const standings = standingsResponse.data.response;
 
   context.log('Mapping players from the response to the expected format.');
   competition.players = mapPlayersResponse(players);
-  // context.log("Mapping the standings response to the expected format.");
-  // competition.standings = mapStandingsResponse(standings);
+
+  context.log('Fetching competition standings from the external API.');
+  const standingsResponse = await footballApi.getStandings({
+    league: competition.apiId.toString(),
+    season: season.toString(),
+  });
+
+  const standings = standingsResponse.data.response;
+
+  context.log('Mapping the standings response to the expected format.');
+  competition.standings = mapStandingsResponse(standings);
 
   // At the moment we don't utilize detailed team statistics, so this is not
   // yet implemented. We can enable it in the future, if needed.
