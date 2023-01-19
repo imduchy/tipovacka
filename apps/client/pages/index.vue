@@ -31,7 +31,14 @@
               <span class="white--text text-subtitle-1 font-weight-bold"> Posledné zápasy </span>
             </v-col>
             <v-col v-if="bestBets[0]" cols="12">
-              <game-result-card :game="bestBets[0].bets[0].game"></game-result-card>
+              <game-result-card :game="bestBets[0].bets[lastGamePage].game"></game-result-card>
+              <v-pagination
+                v-model="lastGamePage"
+                class="mt-2"
+                dark
+                disabled
+                :length="bestBets[0].bets.length"
+              ></v-pagination>
             </v-col>
           </v-row>
           <v-row>
@@ -41,7 +48,9 @@
           </v-row>
           <v-row>
             <v-col cols="12">
-              <span class="white--text text-subtitle-1 font-weight-bold"> Najlepšie tipy </span>
+              <span class="white--text text-subtitle-1 font-weight-bold">
+                Najlepšie tipy kola
+              </span>
             </v-col>
             <v-col v-for="n in 3" :key="n" cols="12" sm="6" md="4" lg="12">
               <bet-result-card
@@ -49,6 +58,7 @@
                 :bet="bestBets[n].bets[0]"
                 :players="players"
                 :user="bestBets[n].username"
+                :display-date="false"
               ></bet-result-card>
             </v-col>
           </v-row>
@@ -126,6 +136,7 @@ export default Vue.extend({
       competition: {} as ICompetition,
       bestBets: [] as IBet[],
       user: this.$auth.user,
+      lastGamePage: 0,
     };
   },
   // @ts-ignore

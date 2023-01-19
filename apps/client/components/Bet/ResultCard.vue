@@ -10,7 +10,7 @@
         </div>
       </v-col>
     </v-row>
-    <v-row align="center" no-gutters>
+    <v-row align="center" :class="{ 'mt-3': !displayDate }" no-gutters>
       <v-col cols="3" align="center">
         <v-img alt="home team logo" :src="homeTeam.logo" min-width="50px" max-width="60px"></v-img
       ></v-col>
@@ -38,7 +38,7 @@
         <v-img alt="away team logo" :src="awayTeam.logo" min-width="50px" max-width="60px"></v-img
       ></v-col>
     </v-row>
-    <v-row align="center" no-gutters>
+    <v-row v-if="displayDate" align="center" no-gutters>
       <v-col cols="12" align="center">
         <div class="text-caption font-weight-light white--text">
           {{ formatedDate }} {{ formatedTime }}
@@ -64,6 +64,11 @@ export default Vue.extend({
     players: {
       type: Array as PropType<IPlayer[]>,
       default: [] as IPlayer[],
+    },
+    displayDate: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   computed: {
