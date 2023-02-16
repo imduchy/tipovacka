@@ -1,7 +1,8 @@
 import { IUserWithID, User } from '@tipovacka/models';
 import express, { NextFunction, Request, Response } from 'express';
+import { ApiError } from '../errors/customErrors';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import getLogger from '../utils/logger';
 
 const logger = getLogger();
@@ -40,7 +41,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  *
  * @param user ObjectId of the user to fetch
  */
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res, next) => {
   const userId = req.query.user;
 
   try {
@@ -53,21 +54,28 @@ router.get('/', authMiddleware, async (req, res) => {
       .lean();
 
     if (!user) {
-      logger.warn(`User with _id ${userId} doesn't exist.`);
       res.status(404).json({
         message: ResponseMessages.USER_ID_DOESNT_EXIST,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
-      return;
+
+      return next(
+        new ApiError(
+          `A user has specified a user ID '${userId}' in the query parameter. A user object with the provided ID doesn't exist in the database.`,
+          `${req.method} /users`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     res.status(200).json(user);
   } catch (error) {
-    logger.error(`Couldn't fetch a user with id ${userId}. Error: ${error}.`);
     res.status(500).json({
       message: ResponseMessages.INTERNAL_SERVER_ERROR,
       code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
+
+    return next(error);
   }
 });
 

@@ -1,9 +1,10 @@
 import { Game, Group, IBet, IBetWithID, IGameWithID, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
+import { ApiError } from '../errors/customErrors';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
 import { alreadyBet } from '../utils/bets';
-import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import { getLatestSeason } from '../utils/groups';
 import getLogger from '../utils/logger';
 
@@ -38,7 +39,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  *
  * @param game ObjectId of the game to fetch
  */
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, async (req, res, next) => {
   logger.info('Data received in the request body: ' + JSON.stringify(req.body));
 
   const { game: gameId, homeTeamScore, awayTeamScore, scorer } = req.body;
@@ -46,47 +47,84 @@ router.post('/', authMiddleware, async (req, res) => {
   const userId = new Types.ObjectId(rawUser._id);
 
   if (gameId === undefined || homeTeamScore === undefined || awayTeamScore === undefined) {
-    logger.warn("The request doesn't contain required request body.");
-    return res.status(400).json({
+    res.status(400).json({
       message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
       code: ResponseErrorCodes.INVALID_REQUEST_BODY,
     });
+
+    return next(
+      new ApiError(
+        `A user has not specified all the required parameters. Provided parameters ${{
+          ...req.body,
+        }}`,
+        `${req.method} /groups/competition`,
+        ResponseStatusCodes.BAD_REQUEST
+      )
+    );
   }
 
   try {
     const user = await User.findById(userId);
     if (!user) {
-      logger.warn("The specified user doesn't exist.");
-      return res.status(404).json({
+      res.status(404).json({
         message: ResponseMessages.USER_ID_DOESNT_EXIST,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
+
+      return next(
+        new ApiError(
+          `A user has specified a user ID '${userId}' in the request body. A user object with the provided ID doesn't exist in the database.`,
+          `${req.method} /bets`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     if (alreadyBet(user, gameId)) {
-      logger.warn('The specified user has already placed a bet on this game.');
-      return res.status(400).json({
+      res.status(400).json({
         message: ResponseMessages.USER_ALREADY_PLACED_BET,
         code: ResponseErrorCodes.RESOURCE_ALREADY_EXISTS,
       });
+
+      return next(
+        new ApiError(
+          `A user has already placed a bet for the game ${gameId}.`,
+          `${req.method} /bets`,
+          ResponseStatusCodes.ALREADY_EXISTS
+        )
+      );
     }
 
     const game = await Game.findById(gameId);
     if (!game) {
-      logger.warn("The specified game doesn't exist.");
-      return res.status(404).json({
+      res.status(404).json({
         message: ResponseMessages.GAME_ID_DOESNT_EXIST,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
+
+      return next(
+        new ApiError(
+          `A user has specified a game ID '${gameId}' in the request body. A game object with the provided ID doesn't exist in the database.`,
+          `${req.method} /bets`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     // Don't submit the bet if the game already started.
     if (new Date().getTime() > game.date.getTime()) {
-      logger.warn('The specified game has already started.');
-      return res.status(400).json({
+      res.status(400).json({
         message: ResponseMessages.GAME_ALREADY_STARTED,
         code: ResponseErrorCodes.BAD_REQUEST,
       });
+
+      return next(
+        new ApiError(
+          `The specified game has already started.`,
+          `${req.method} /bets`,
+          ResponseStatusCodes.BAD_REQUEST
+        )
+      );
     }
 
     const bet: IBet = {
@@ -104,11 +142,12 @@ router.post('/', authMiddleware, async (req, res) => {
 
     res.status(200).json(user.bets);
   } catch (error) {
-    logger.error(`Couldn't create a bet. Error: ${error}.`);
     res.status(500).json({
       message: ResponseMessages.INTERNAL_SERVER_ERROR,
       code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
+
+    return next(error);
   }
 });
 
@@ -122,55 +161,92 @@ router.post('/', authMiddleware, async (req, res) => {
  * @param awayTeamScore
  * @param scorer
  */
-router.put('/', authMiddleware, async (req, res) => {
+router.put('/', authMiddleware, async (req, res, next) => {
   logger.info('Data received in the request body: ' + JSON.stringify(req.body));
 
   const { bet: betId, homeTeamScore, awayTeamScore, scorer } = req.body;
   const userId = (req.user as IUserWithID)._id;
 
   if (betId === undefined || homeTeamScore === undefined || awayTeamScore === undefined) {
-    logger.warn("The request doesn't contain required request body.");
-    return res.status(400).json({
+    res.status(400).json({
       message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
       code: ResponseErrorCodes.INVALID_REQUEST_BODY,
     });
+
+    return next(
+      new ApiError(
+        `A user has not specified all the required parameters. Provided parameters ${{
+          ...req.body,
+        }}`,
+        `${req.method} /bets`,
+        ResponseStatusCodes.BAD_REQUEST
+      )
+    );
   }
 
   try {
     const user = await User.findById(userId);
     if (!user) {
-      logger.error(`The user ${userId} doesn't exist in the database.`);
-      return res.status(400).json({
+      res.status(404).json({
         message: ResponseMessages.USER_ID_DOESNT_EXIST,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
+
+      return next(
+        new ApiError(
+          `A user has specified a user ID '${userId}' in the request body. A user object with the provided ID doesn't exist in the database.`,
+          `${req.method} /bets`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     const bet = user.bets.find((b) => (b as IBetWithID)._id.equals(betId));
     if (!bet) {
-      logger.error(`The bet ${betId} doesn't exist in the user object.`);
-      return res.status(400).json({
+      res.status(404).json({
         message: ResponseMessages.BET_ID_DOESNT_EXIST,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
+
+      return next(
+        new ApiError(
+          `A user has specified a bet ID '${betId}' in the request body. A bet object with the provided ID doesn't exist in the database.`,
+          `${req.method} /bets`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     const game = await Game.findById(bet.game);
     if (!game) {
-      logger.error(`The game ${bet.game} doesn't exist in the database.`);
-      return res.status(400).json({
+      res.status(404).json({
         message: ResponseMessages.GAME_ID_DOESNT_EXIST,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
+
+      return next(
+        new ApiError(
+          `A user has specified a game ID '${bet.game}' in the request body. A game object with the provided ID doesn't exist in the database.`,
+          `${req.method} /bets`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     // Don't update the bet if the game has already started.
     if (new Date().getTime() > game.date.getTime()) {
-      logger.error("The specified game has already started. The bet won't be updated.");
-      return res.status(400).json({
+      res.status(400).json({
         message: ResponseMessages.GAME_ALREADY_STARTED,
         code: ResponseErrorCodes.UNAUTHORIZED_REQUEST,
       });
+
+      return next(
+        new ApiError(
+          `The specified game has already started.`,
+          `${req.method} /bets`,
+          ResponseStatusCodes.BAD_REQUEST
+        )
+      );
     }
 
     bet.awayTeamScore = awayTeamScore;
@@ -182,11 +258,12 @@ router.put('/', authMiddleware, async (req, res) => {
 
     res.status(200).json(bet);
   } catch (error) {
-    logger.error(`Couldn't update the bet. Error: ${error}.`);
     res.status(500).json({
       message: ResponseMessages.INTERNAL_SERVER_ERROR,
       code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
+
+    return next(error);
   }
 });
 
@@ -201,7 +278,7 @@ router.put('/', authMiddleware, async (req, res) => {
  * @param round
  * @param limit
  */
-router.get('/top', authMiddleware, async (req, res) => {
+router.get('/top', authMiddleware, async (req, res, next) => {
   logger.info('Data received in the request query: ' + JSON.stringify(req.query));
 
   if (
@@ -213,11 +290,20 @@ router.get('/top', authMiddleware, async (req, res) => {
     typeof req.query.round !== 'string' ||
     (req.query.competition !== undefined && typeof req.query.competition !== 'string')
   ) {
-    logger.warn("The request doesn't contain required request query.");
-    return res.status(400).send({
+    res.status(400).send({
       message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
       code: ResponseErrorCodes.INVALID_REQUEST_BODY,
     });
+
+    return next(
+      new ApiError(
+        `No competition object for the provided parameters exists in the database. Provided query parameters ${{
+          ...req.query,
+        }}.`,
+        `${req.method} /bets/top`,
+        ResponseStatusCodes.NOT_FOUND
+      )
+    );
   }
 
   const userId = (req.user as IUserWithID)._id;
@@ -229,21 +315,42 @@ router.get('/top', authMiddleware, async (req, res) => {
   try {
     logger.info('Fetching the user by user ID.');
     const user = await User.findById(userId);
+
     if (!user) {
-      logger.error(`The user ${userId} doesn't exist in the database.`);
-      return res.status(400).json({
+      res.status(404).json({
         message: ResponseMessages.USER_ID_DOESNT_EXIST,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
+
+      return next(
+        new ApiError(
+          `A user has specified a user ID '${userId}' in the query parameter. A user object with the provided ID doesn't exist in the database.`,
+          `${req.method} /bets/top`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     // If no competition is specified in the request, pick the first competition
     // TODO: Should the competition object be mandatory?
     if (!competition) {
       logger.info('Fetching the group by group ID.');
-      const group = await Group.findById(user.groupId).orFail(
-        new Error(`Group with _id ${user.groupId} doesn't exist`)
-      );
+      const group = await Group.findById(user.groupId);
+
+      if (!group) {
+        res.status(404).json({
+          message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
+          code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+        });
+
+        return next(
+          new ApiError(
+            `A user has specified a group ID '${user.groupId}' in the query parameter. A group object with the provided ID doesn't exist in the database.`,
+            `${req.method} /bets/top`,
+            ResponseStatusCodes.NOT_FOUND
+          )
+        );
+      }
 
       logger.info('Getting the latest season object from the group.');
       const latestSeason = getLatestSeason(group.followedTeams[0]);
@@ -297,6 +404,8 @@ router.get('/top', authMiddleware, async (req, res) => {
       message: ResponseMessages.INTERNAL_SERVER_ERROR,
       code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
+
+    return next(error);
   }
 });
 

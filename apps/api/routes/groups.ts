@@ -1,8 +1,9 @@
 import { Group, ICompetition, IGameWithID, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
+import { ApiError } from '../errors/customErrors';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import { getLatestSeason } from '../utils/groups';
 import getLogger from '../utils/logger';
 
@@ -49,7 +50,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  *
  * @param group ObjectId of the group to fetch
  */
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res, next) => {
   const groupId = req.query.group;
 
   try {
@@ -58,20 +59,28 @@ router.get('/', authMiddleware, async (req, res) => {
       .select('-followedTeams.seasons.competitions');
 
     if (!group) {
-      logger.warn(`Group with _id ${groupId} doesn't exist.`);
-      return res.status(404).json({
+      res.status(404).json({
         message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
+
+      return next(
+        new ApiError(
+          `A user has specified a group ID '${groupId}' in the query parameter. A group object with the provided ID doesn't exist in the database.`,
+          `${req.method} /groups`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     res.status(200).json(group);
   } catch (error) {
-    logger.error(`Couldn't fetch a group ${groupId}. Error: ${error}`);
     res.status(500).json({
       message: ResponseMessages.INTERNAL_SERVER_ERROR,
       code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
+
+    return next(error);
   }
 });
 
@@ -83,7 +92,7 @@ router.get('/', authMiddleware, async (req, res) => {
  * @param group ObjectId of the group
  * @param season Filter for a season in which a users is enrolled
  */
-router.get('/users', authMiddleware, async (req, res) => {
+router.get('/users', authMiddleware, async (req, res, next) => {
   const groupId = req.query.group as string;
   const season = parseInt(req.query.season as string);
 
@@ -105,11 +114,12 @@ router.get('/users', authMiddleware, async (req, res) => {
 
     res.status(200).json(users);
   } catch (error) {
-    logger.error(`An error occured while fetching the group ${groupId}. Error: ${error}.`);
     res.status(500).send({
       message: ResponseMessages.INTERNAL_SERVER_ERROR,
       code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
+
+    return next(error);
   }
 });
 
@@ -123,16 +133,24 @@ router.get('/users', authMiddleware, async (req, res) => {
  * @param season season to filter on
  * @param competition competition API Id to filter on
  */
-router.get('/competition', authMiddleware, async (req, res) => {
+router.get('/competition', authMiddleware, async (req, res, next) => {
   const q = req.query;
 
   if (!q.group || !q.team || !q.season) {
-    logger.warn('Not all required query parameters were specified. ');
-    logger.warn(JSON.stringify({ ...q }));
-    return res.status(400).json({
+    res.status(400).json({
       message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
       code: ResponseErrorCodes.INVALID_REQUEST_BODY,
     });
+
+    return next(
+      new ApiError(
+        `A user has not specified all the required query parameters. Provided query parameters ${{
+          ...q,
+        }}`,
+        `${req.method} /groups/competition`,
+        ResponseStatusCodes.BAD_REQUEST
+      )
+    );
   }
 
   try {
@@ -141,20 +159,25 @@ router.get('/competition', authMiddleware, async (req, res) => {
     const season = parseInt(q.season.toString());
     let competitionApiId = q.competition ? parseInt(q.competition.toString()) : undefined;
 
-    if (!Types.ObjectId.isValid(groupId)) {
-      logger.info('Provided group id is of a wrong format. Provided value: ' + q.group);
-      return res.status(403).json({
-        message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
-        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
-      });
-    }
-
     // If no competition is specified in the request, pick the first competition
     // TODO: Should the competition object be mandatory?
     if (!competitionApiId) {
-      const group = await Group.findById(groupId).orFail(
-        new Error(`Group with _id ${groupId} doesn't exist`)
-      );
+      const group = await Group.findById(groupId);
+
+      if (!group) {
+        res.status(404).json({
+          message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
+          code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+        });
+
+        return next(
+          new ApiError(
+            `A user has specified a group ID '${groupId}' in the query parameter. A group object with the provided ID doesn't exist in the database.`,
+            `${req.method} /groups/competition`,
+            ResponseStatusCodes.NOT_FOUND
+          )
+        );
+      }
 
       const latestSeason = getLatestSeason(group.followedTeams[0]);
       competitionApiId = latestSeason.competitions[0].apiId;
@@ -173,21 +196,30 @@ router.get('/competition', authMiddleware, async (req, res) => {
       .replaceRoot('$followedTeams.seasons.competitions');
 
     if (!aggrResult[0]) {
-      logger.warn('No competition found for the specified parameters. ');
-      logger.warn(JSON.stringify({ ...q }));
-      return res.status(404).json({
+      res.status(404).json({
         message: ResponseMessages.INTERNAL_SERVER_ERROR,
         code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
       });
+
+      return next(
+        new ApiError(
+          `No competition object for the provided parameters exists in the database. Provided query parameters ${{
+            ...q,
+          }}.`,
+          `${req.method} /games/competition`,
+          ResponseStatusCodes.NOT_FOUND
+        )
+      );
     }
 
     res.status(200).json(aggrResult[0]);
   } catch (error) {
-    logger.error(`Couldn't fetch group ${req.params.groupId}. Error: ${error}.`);
     res.status(500).json({
       message: ResponseMessages.INTERNAL_SERVER_ERROR,
       code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
     });
+
+    return next(error);
   }
 });
 
