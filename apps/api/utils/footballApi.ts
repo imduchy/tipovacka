@@ -7,9 +7,7 @@ import {
 } from '@tipovacka/models';
 import axios, { AxiosResponse } from 'axios';
 import { FootballApiResponseError, NoResultsInApiResponseError } from './exceptions';
-import getLogger from './logger';
-
-const logger = getLogger();
+import logger from './logger';
 
 function logApiCall(endpoint: string, params: any) {
   logger.info(`[FootballApi] Get request to ${endpoint} endpoint with parameters %o`, params);

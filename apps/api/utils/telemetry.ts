@@ -1,6 +1,6 @@
 import * as appInsights from 'applicationinsights';
 
-export const initializeTelemetry = () => {
+export default () => {
   // Configure an Application Insights client
   appInsights
     .setup()
@@ -11,7 +11,7 @@ export const initializeTelemetry = () => {
     .setAutoCollectDependencies(true)
     .setAutoCollectConsole(true)
     .setSendLiveMetrics(false)
-    .setDistributedTracingMode(appInsights.DistributedTracingModes.AI);
+    .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C);
 
   const defaultClientContext = appInsights.defaultClient.context;
   // Configure the role name

@@ -1,8 +1,6 @@
 import { IUser, IUserWithID } from '@tipovacka/models';
 import { Request } from 'express';
-import getLogger from './logger';
-
-const logger = getLogger();
+import logger from './logger';
 
 export const isLoggedIn = (req: Request): boolean => {
   return req.user !== undefined;

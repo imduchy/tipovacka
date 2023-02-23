@@ -1,8 +1,6 @@
 import app from './app';
 import http from 'http';
-import getLogger from './utils/logger';
-
-const logger = getLogger();
+import logger from './utils/logger';
 
 const port = process.env.PORT || 3003;
 app.set('port', port);

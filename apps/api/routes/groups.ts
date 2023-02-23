@@ -5,9 +5,8 @@ import { ApiError } from '../errors/customErrors';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import { getLatestSeason } from '../utils/groups';
-import getLogger from '../utils/logger';
+import logger from '../utils/logger';
 
-const logger = getLogger();
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {

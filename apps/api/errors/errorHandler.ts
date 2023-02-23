@@ -1,7 +1,5 @@
 import { BaseError } from './customErrors';
-import getLogger from '../utils/logger';
-
-const logger = getLogger();
+import logger from '../utils/logger';
 
 export class ErrorHandler {
   public async handleError(error: Error): Promise<void> {

@@ -6,9 +6,8 @@ import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../uti
 import { alreadyBet } from '../utils/bets';
 import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import { getLatestSeason } from '../utils/groups';
-import getLogger from '../utils/logger';
+import logger from '../utils/logger';
 
-const logger = getLogger();
 const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -369,7 +368,6 @@ router.get('/top', authMiddleware, async (req, res, next) => {
 
     const games = gamesAggregate.flat() as IGameWithID[];
     const game = round >= 0 ? games[round] : games[games.length + round];
-    logger.info('The game object: ' + game);
 
     if (!game) {
       logger.info('No games found. Returning an empty list back.');

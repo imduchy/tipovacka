@@ -1,3 +1,6 @@
+// Initialize telemetry before creating the logger
+import initializeTelemetry from './utils/telemetry';
+
 import { DefaultAzureCredential } from '@azure/identity';
 import { SecretClient } from '@azure/keyvault-secrets';
 import { exportModels } from '@tipovacka/models';
@@ -17,15 +20,11 @@ import bets from './routes/bets';
 import games from './routes/games';
 import groups from './routes/groups';
 import users from './routes/users';
+import logger from './utils/logger';
 import { validateEnvVars } from './utils/misc';
-
-// Initialize telemetry before creating a logger
-import { initializeTelemetry } from './utils/telemetry';
-import getLogger from './utils/logger';
 
 // Initialize Application Insights telemetry
 initializeTelemetry();
-const logger = getLogger();
 
 const requiredEnvVars = {
   KEY_VAULT_URL: process.env.KEY_VAULT_URL,

@@ -9,11 +9,10 @@ import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../ut
 import * as FootballApi from '../utils/footballApi';
 import { findUpcomingGame } from '../utils/games';
 import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
-import getLogger from '../utils/logger';
+import logger from '../utils/logger';
 import { emptyStatisticsObject } from '../utils/teams';
 
 const router = Router();
-const logger = getLogger();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const user = req.user as IUserWithID | undefined;
