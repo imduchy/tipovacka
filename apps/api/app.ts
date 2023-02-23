@@ -17,9 +17,11 @@ import bets from './routes/bets';
 import games from './routes/games';
 import groups from './routes/groups';
 import users from './routes/users';
-import getLogger from './utils/logger';
 import { validateEnvVars } from './utils/misc';
+
+// Initialize telemetry before creating a logger
 import { initializeTelemetry } from './utils/telemetry';
+import getLogger from './utils/logger';
 
 const logger = getLogger();
 
@@ -58,10 +60,8 @@ kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME as string).then((se
 
   mongoose.connect(secret.value).then(() => {
     logger.info('Successfully connected to the database.');
+    exportModels(mongoose);
   });
-
-  // Export mongoose models
-  exportModels(mongoose);
 });
 
 // Set the football API key

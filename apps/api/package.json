@@ -10,11 +10,12 @@
     "build": "webpack",
     "test": "jest --passWithNoTests",
     "start": "node index.js",
-    "dev": "tsnd --respawn -r dotenv/config index.ts",
+    "dev": "tsnd --respawn -r dotenv/config index.ts | bunyan -o short",
     "lint": "eslint"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/bunyan": "^1.8.8",
     "@types/cors": "^2.8.9",
     "@types/express-session": "^1.17.3",
     "@types/multer": "^1.4.7",
@@ -33,6 +34,7 @@
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "bunyan": "^1.8.15",
     "connect-mongo": "^3.2.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
@@ -43,8 +45,6 @@
     "node-xlsx": "^0.17.2",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
-    "pino": "^8.8.0",
-    "pino-pretty": "^9.1.1",
     "winston": "^3.8.2"
   }
 }

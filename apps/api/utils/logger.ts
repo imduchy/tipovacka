@@ -1,22 +1,13 @@
-import pino from 'pino';
+import bunyan from 'bunyan';
 
-let loggerInstance: pino.Logger;
+let loggerInstance: bunyan;
 
-const getLogger = (): pino.Logger => {
+const getLogger = (): bunyan => {
   if (!loggerInstance) {
-    if (process.env.NODE_ENV !== 'production') {
-      loggerInstance = pino({
-        transport: {
-          levels: 'debug',
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-          },
-        },
-      });
-    } else {
-      loggerInstance = pino();
-    }
+    loggerInstance = bunyan.createLogger({
+      name:
+        process.env.NODE_ENV === 'production' ? 'aca-tipovacka-api-prod' : 'aca-tipovacka-api-test',
+    });
   }
 
   return loggerInstance;
