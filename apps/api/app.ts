@@ -23,6 +23,8 @@ import { validateEnvVars } from './utils/misc';
 import { initializeTelemetry } from './utils/telemetry';
 import getLogger from './utils/logger';
 
+// Initialize Application Insights telemetry
+initializeTelemetry();
 const logger = getLogger();
 
 const requiredEnvVars = {
@@ -35,9 +37,6 @@ const requiredEnvVars = {
 
 const app = express();
 const credential = new DefaultAzureCredential();
-
-// Initialize Application Insights telemetry
-initializeTelemetry();
 
 // Don't start the server without all required env variables
 const undefinedRequiredEnv = validateEnvVars(requiredEnvVars);

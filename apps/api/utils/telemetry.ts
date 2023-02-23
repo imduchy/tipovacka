@@ -6,16 +6,17 @@ export const initializeTelemetry = () => {
     .setup()
     .setAutoDependencyCorrelation(true)
     .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true, true)
+    .setAutoCollectPerformance(true)
     .setAutoCollectExceptions(true)
     .setAutoCollectDependencies(true)
-    .setAutoCollectConsole(true, true)
+    .setAutoCollectConsole(true)
     .setSendLiveMetrics(false)
     .setDistributedTracingMode(appInsights.DistributedTracingModes.AI);
 
   const defaultClientContext = appInsights.defaultClient.context;
   // Configure the role name
-  defaultClientContext.tags[defaultClientContext.keys.cloudRole] = 'aca-tipovacka-api-prod';
+  defaultClientContext.tags[defaultClientContext.keys.cloudRole] =
+    process.env.NODE_ENV === 'production' ? 'aca-tipovacka-api-prod' : 'aca-tipovacka-api-test';
 
   // Start the collecting telemetry and send it to Application Insights
   appInsights.start();
