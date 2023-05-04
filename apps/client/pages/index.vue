@@ -30,14 +30,13 @@
             <v-col cols="12">
               <span class="white--text text-subtitle-1 font-weight-bold"> Posledné zápasy </span>
             </v-col>
-            <v-col v-if="bestBets[0]" cols="12">
-              <game-result-card :game="bestBets[0].bets[lastGamePage].game"></game-result-card>
+            <v-col v-if="lastGames[0]" cols="12">
+              <game-result-card :game="lastGames[lastGamePage - 1]"></game-result-card>
               <v-pagination
                 v-model="lastGamePage"
                 class="mt-2"
                 dark
-                disabled
-                :length="bestBets[0].bets.length"
+                :length="lastGames.length"
               ></v-pagination>
             </v-col>
           </v-row>
@@ -136,7 +135,8 @@ export default Vue.extend({
       competition: {} as ICompetition,
       bestBets: [] as IBet[],
       user: this.$auth.user,
-      lastGamePage: 0,
+      lastGames: [] as IGame[],
+      lastGamePage: 1,
     };
   },
   // @ts-ignore
@@ -156,6 +156,15 @@ export default Vue.extend({
         // If there's no upcomingGame, get the last game.
         // Othewrise, get the second last game
         round: this.upcomingGame ? -2 : -1,
+      },
+    });
+
+    this.lastGames = await this.$axios.$get('/groups/games', {
+      params: {
+        group: this.$store.state.group._id,
+        team: this.followedTeam.apiId,
+        season: this.latestSeason,
+        amount: 3,
       },
     });
   },
