@@ -1,4 +1,12 @@
-import { IBet, IGame, IUser, User, FixtureEventDetail, FixtureEventType } from '@tipovacka/models';
+import {
+  FixtureEventDetail,
+  FixtureEventType,
+  IBet,
+  IGame,
+  IUser,
+  IUserWithID,
+  User,
+} from '@tipovacka/models';
 import { HydratedDocument, Types } from 'mongoose';
 
 /**
@@ -30,7 +38,7 @@ export function placedBetOnGame(user: IUser, game: HydratedDocument<IGame>): boo
  * @returns an updated user object
  */
 export async function assignPoints(
-  user: HydratedDocument<IUser>,
+  user: IUserWithID,
   points: number,
   competitionApiId: number,
   season: number
@@ -58,16 +66,24 @@ export async function assignPoints(
 }
 
 /**
- * TODO
+ * Evaluates a bet on a game based on the game result and the bet as follows:
+ * - If the bet contains the exact score, it returns 3 points
+ * - If the bet contains the correct winner, it returns 1 point
+ * - Otherwise, it returns 0 points.
+ * - If the bet contains the correct scorer, it adds an extra 1 point
+ * - If the game was a derby, the points are doubled
+ *
+ * The final number of points is returned.
  *
  * @param bet A bet record to evaluate
  * @param game A game record against which the bet will be evaluated
  * @param isDerby A flag indicating if a game was played against a rival team
+ * @returns number of points
  */
 export function evaluatePoints(bet: IBet, game: IGame, isDerby: boolean): number {
   let points = 0;
 
-  // In the future, a config file can be used to control what
+  // TODO: In the future, a config file can be used to control what
   // bets should be evaluated. E.g., some groups might want
   // to only evaluate bets on results, while others might want
   // to evaluate all bets
@@ -85,19 +101,23 @@ export function evaluatePoints(bet: IBet, game: IGame, isDerby: boolean): number
 }
 
 /**
- * TODO
+ * Checks if the bet was correct, based on the game result and the bet as follows:
+ * - If the bet contains the exact score, it returns 3 points
+ * - If the bet contains the correct winner, it returns 1 point
+ * - Otherwise, it returns 0 points.
  *
- * @param bet
- * @param game
- * @returns
+ * @param bet A bet record to evaluate
+ * @param game A game record against which the bet will be evaluated
+ * @returns number of points
  */
 function evaluateResultBet(bet: IBet, game: IGame): number {
   /**
-   * TODO
+   * Evalutes the result of a game based on the home team score and away team score,
+   * and returns 1 if home team won, 2 if away team won, 0 if it was a draw.
    *
-   * @param homeTeamScore
-   * @param awayTeamScore
-   * @returns
+   * @param homeTeamScore Home team score
+   * @param awayTeamScore Away team score
+   * @returns 1 if home team won, 2 if away team won, 0 if it was a draw
    */
   function __evaluate1X2(homeTeamScore: number, awayTeamScore: number) {
     if (homeTeamScore > awayTeamScore) return 1;
@@ -119,6 +139,15 @@ function evaluateResultBet(bet: IBet, game: IGame): number {
   return points;
 }
 
+/**
+ * Checks if the scorer specified in the bet has scored a goal in the game.
+ * If so, it returns 1, otherwise it returns 0.
+ *
+ * @param bet A bet record to evaluate
+ * @param game A game record against which the bet will be evaluated
+ * @returns 1 if the scorer has scored a goal, 0 otherwise
+ *
+ */
 function evaluateScorerBet(bet: IBet, game: IGame): number {
   const scorer = bet.scorer;
   const hasScored = game.events.some(

@@ -1,11 +1,19 @@
 ﻿import { AzureFunction, Context } from '@azure/functions';
 import { DefaultAzureCredential } from '@azure/identity';
 import { SecretClient } from '@azure/keyvault-secrets';
-import { BetStatus, Game, Group, IBetWithID, IGameWithID, IUser, User } from '@tipovacka/models';
+import {
+  BetStatus,
+  Game,
+  Group,
+  IBetWithID,
+  IGameWithID,
+  IUserWithID,
+  User,
+} from '@tipovacka/models';
+import { Types } from 'mongoose';
 import { getDatabase } from '../utils/database';
 import { ReturnCodes, ReturnObject } from '../utils/returnCodes';
 import { assignPoints, evaluatePoints, placedBetOnGame } from './utils';
-import { HydratedDocument, Types } from 'mongoose';
 
 const activityFunction: AzureFunction = async function (
   context: Context,
@@ -29,8 +37,8 @@ const activityFunction: AzureFunction = async function (
   const game = Game.hydrate(params[1]);
 
   context.log('Retrieving the group object from the database.');
-  const group = await Group.findById(groupId).populate('users');
-  const users = group.users as Array<HydratedDocument<IUser>>;
+  const group = await Group.findById(groupId).populate<{ users: Array<IUserWithID> }>('users');
+  const users = group.users;
 
   context.log('Checking if the game is a derby.');
   const rivals = group.followedTeams[0].rivals;
