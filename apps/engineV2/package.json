@@ -8,16 +8,18 @@
     "prestart": "npm run build",
     "start": "func start",
     "azurite": "azurite start -l ./.azurite",
-    "test": "echo \"No tests yet...\""
+    "test": "jest"
   },
   "dependencies": {
-    "durable-functions": "^2.1.0",
+    "@azure/identity": "^3.1.2",
     "@azure/keyvault-secrets": "^4.6.0",
-    "@azure/identity": "^3.1.2"
+    "durable-functions": "^2.1.0"
   },
   "devDependencies": {
     "@azure/functions": "^3.0.0",
     "@types/node": "16.x",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
     "typescript": "^4.0.0"
   }
 }
