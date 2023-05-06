@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
 import { exportModels, IBetWithID, IGameWithID, IUserWithID, User } from '@tipovacka/models';
+import 'jest';
 import mongoose from 'mongoose';
 import { createMockBet, createMockGame, createMockUser } from '../../utils/testUtils';
 import { assignPoints, evaluatePoints, placedBetOnGame } from '../utils';

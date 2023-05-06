@@ -1,27 +1,14 @@
-import { describe, expect, test, beforeEach } from '@jest/globals';
 import { Context } from '@azure/functions';
-import { Types, HydratedDocument } from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import activityFunction from '../index';
 import { SecretClient } from '@azure/keyvault-secrets';
-import { FootballApi } from '../../utils/footballApi';
+import { beforeEach, describe, expect, test } from '@jest/globals';
+import { exportModels, Game, Group } from '@tipovacka/models';
+import 'jest';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Types } from 'mongoose';
 import { getDatabase } from '../../utils/database';
-import {
-  exportModels,
-  FixtureEventDetail,
-  FixtureEventType,
-  Game,
-  GameStatus,
-  Group,
-  IGroup,
-} from '@tipovacka/models';
-import {
-  createMockFixtureEventResponse,
-  createMockFixtureResponse,
-  createMockGame,
-  createMockGameEvent,
-  createMockGroup,
-} from '../../utils/testUtils';
+import { FootballApi } from '../../utils/footballApi';
+import { createMockFixtureResponse, createMockGame, createMockGroup } from '../../utils/testUtils';
+import activityFunction from '../index';
 
 describe('updateGame', () => {
   let context: Context;
