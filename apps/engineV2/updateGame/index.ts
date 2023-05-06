@@ -1,5 +1,5 @@
 ﻿import { AzureFunction, Context } from '@azure/functions';
-import { Game, GameStatus, Group, IGame } from '@tipovacka/models';
+import { Game, GameStatus, Group, IGame, IGameWithID } from '@tipovacka/models';
 import { getDatabase } from '../utils/database';
 import { HydratedDocument } from 'mongoose';
 import { FootballApi } from '../utils/footballApi';
@@ -31,11 +31,13 @@ const activityFunction: AzureFunction = async function (
   await getDatabase(connectionStringSecret.value);
 
   context.log('Retrieving the group object from the database.');
-  const group = await Group.findById(groupId).populate('upcomingGame');
+  const group = await Group.findById(groupId).populate<{
+    upcomingGame: HydratedDocument<IGame>;
+  }>('upcomingGame');
 
   context.log(`Updating the group ${group.name}`);
 
-  const upcomingGame = group.upcomingGame as HydratedDocument<IGame>;
+  const upcomingGame = group.upcomingGame;
 
   if (!upcomingGame) {
     context.log("The group doesn't have an upcoming game specified.");

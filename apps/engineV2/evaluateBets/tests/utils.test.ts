@@ -1,14 +1,7 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
-import {
-  BetStatus,
-  exportModels,
-  GameStatus,
-  IBetWithID,
-  IGameWithID,
-  IUserWithID,
-  User,
-} from '@tipovacka/models';
+import { exportModels, IBetWithID, IGameWithID, IUserWithID, User } from '@tipovacka/models';
 import mongoose from 'mongoose';
+import { createMockBet, createMockGame, createMockUser } from '../../utils/testUtils';
 import { assignPoints, evaluatePoints, placedBetOnGame } from '../utils';
 
 describe('assignPoints', () => {
@@ -124,61 +117,3 @@ describe('evaluatePoints', () => {
     expect(points).toBe(3);
   });
 });
-
-function createMockUser(group?: mongoose.Types.ObjectId): IUserWithID {
-  return {
-    _id: new mongoose.Types.ObjectId(),
-    groupId: group ? group : new mongoose.Types.ObjectId(),
-    email: 'mockuser@email.com',
-    username: 'mockuser',
-    password: 'monkey123',
-    competitionScore: [
-      {
-        competitionApiId: 1,
-        season: 2020,
-        score: 0,
-      },
-    ],
-    bets: [],
-    scope: ['user'],
-  };
-}
-
-function createMockBet(user?: mongoose.Types.ObjectId, game?: mongoose.Types.ObjectId): IBetWithID {
-  return {
-    _id: new mongoose.Types.ObjectId(),
-    game: game ? game : new mongoose.Types.ObjectId(),
-    user: user ? user : new mongoose.Types.ObjectId(),
-    homeTeamScore: 0,
-    awayTeamScore: 0,
-    points: 0,
-    scorer: 1,
-    status: BetStatus.PENDING,
-  };
-}
-
-function createMockGame() {
-  return {
-    _id: new mongoose.Types.ObjectId(),
-    season: 2020,
-    homeTeam: {
-      teamId: 1,
-      name: 'Arsenal',
-      logo: 'https://media.api-sports.io/football/teams/1.png',
-    },
-    awayTeam: {
-      teamId: 2,
-      name: 'Chelsea',
-      logo: 'https://media.api-sports.io/football/teams/2.png',
-    },
-    homeTeamScore: 2,
-    awayTeamScore: 1,
-    competitionId: 1,
-    competitionName: 'Premier League',
-    gameId: 1,
-    venue: 'Emirates Stadium',
-    date: new Date(),
-    status: GameStatus.FT,
-    events: [],
-  };
-}
