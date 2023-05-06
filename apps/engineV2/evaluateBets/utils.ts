@@ -3,6 +3,7 @@ import {
   FixtureEventType,
   IBet,
   IGame,
+  IGameWithID,
   IUser,
   IUserWithID,
   User,
@@ -16,7 +17,7 @@ import { HydratedDocument, Types } from 'mongoose';
  * @param game A game to which a bet was placed on
  * @returns true if the user has placed a bet on the game
  */
-export function placedBetOnGame(user: IUser, game: HydratedDocument<IGame>): boolean {
+export function placedBetOnGame(user: IUser, game: IGameWithID): boolean {
   if (user.bets) {
     return user.bets.some((bet) => (bet.game as Types.ObjectId).equals(game._id));
   }
