@@ -16,7 +16,7 @@
     "test": "npm run test --workspaces --if-present"
   },
   "lint-staged": {
-    "apps/**/*.{js, ts, vue}": [
+    "apps/**/*.{ts, vue}": [
       "eslint --fix"
     ],
     "packages/**/*.ts": [
