@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@azure/functions": "^3.0.0",
+    "@types/jest": "^29.5.1",
     "@types/node": "16.x",
     "jest": "^29.5.0",
     "mongodb-memory-server": "^8.12.2",
