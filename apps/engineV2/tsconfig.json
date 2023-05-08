@@ -9,5 +9,5 @@
     "esModuleInterop": true,
     "types": ["@types/jest"]
   },
-  "exclude": ["node_modules", "dist", "/**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
