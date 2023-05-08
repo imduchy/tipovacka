@@ -26,6 +26,9 @@
     <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
     <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
 
+    <!-- reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet" />
 
@@ -518,7 +521,12 @@
             </div> -->
 
             <div class="col-lg-12 mt-5 mt-lg-0">
-              <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+              <form
+                action="https://formspree.io/f/xwkjyzgg"
+                method="post"
+                role="form"
+                class="contact-email-form"
+              >
                 <div class="row gy-2 gx-md-3">
                   <div class="col-md-6 form-group">
                     <input
@@ -559,10 +567,21 @@
                       required
                     ></textarea>
                   </div>
+                  <div class="form-group col-12 text-center">
+                    <div
+                      class="g-recaptcha d-inline-block"
+                      data-sitekey="6LdfXe8lAAAAADZCee1t1fm8lDSsS2HFRFw-IX24"
+                    ></div>
+                  </div>
                   <div class="my-3 col-12">
                     <div class="loading">Loading</div>
-                    <div class="error-message"></div>
-                    <div class="sent-message">Your message has been sent. Thank you!</div>
+                    <div class="error-message">
+                      Váš e-mail sa nepodarilo odoslať. Skúste to prosím neskôr, alebo nás
+                      kontaktujte priamo na email info@onlinetipovacka.sk
+                    </div>
+                    <div class="sent-message">
+                      Vaša e-mail bol odoslaný. Budeme sa Vám snažiť odpovedať čo najskôr.
+                    </div>
                   </div>
                   <div class="text-center col-12"><button type="submit">Odoslať email</button></div>
                 </div>
@@ -606,9 +625,9 @@
     <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
     <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
     <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="assets/vendor/php-email-form/validate.js"></script>
 
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
+    <script src="assets/js/form-validate.js"></script>
   </body>
 </html>
