@@ -22,7 +22,8 @@ const activityFunction: AzureFunction = async function (
 
   context.log('Fetching secrets from the Key Vault.');
   const footballApiKey = await secretClient.getSecret('FOOTBALL-API-KEY');
-  const connectionStringSecret = await secretClient.getSecret('DB-CONNECTION-STRING');
+  const connectionStringSecretName = process.env.CONNECTION_STRING_SECRET_NAME;
+  const connectionStringSecret = await secretClient.getSecret(connectionStringSecretName);
 
   context.log('Getting the FootballApi client.');
   const footballApi = new FootballApi(context, secretClient, apiHost, footballApiKey.value);

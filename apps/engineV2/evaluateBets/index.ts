@@ -28,7 +28,8 @@ const activityFunction: AzureFunction = async function (
   const secretClient = new SecretClient(keyVaultUrl, credentials);
 
   context.log('Fetching secrets from the Key Vault.');
-  const connectionStringSecret = await secretClient.getSecret('DB-CONNECTION-STRING');
+  const connectionStringSecretName = process.env.CONNECTION_STRING_SECRET_NAME;
+  const connectionStringSecret = await secretClient.getSecret(connectionStringSecretName);
 
   context.log('Getting the database object.');
   await getDatabase(connectionStringSecret.value);

@@ -44,8 +44,9 @@ resource "azurerm_linux_function_app" "example" {
   }
 
   app_settings = {
-    API_FOOTBALL_HOST = "v3.football.api-sports.io"
-    KEY_VAULT_URL     = azurerm_key_vault.this.vault_uri
+    API_FOOTBALL_HOST             = "v3.football.api-sports.io"
+    KEY_VAULT_URL                 = azurerm_key_vault.this.vault_uri
+    CONNECTION_STRING_SECRET_NAME = "DB-CONNECTION-STRING"
   }
 
   lifecycle {

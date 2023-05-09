@@ -1,37 +1,51 @@
-﻿import * as df from 'durable-functions';
+﻿import { IGroup } from '@tipovacka/models';
+import { HydratedDocument } from 'mongoose';
+import * as df from 'durable-functions';
 import { ReturnCodes, ReturnObject } from '../utils/returnCodes';
 
 const orchestrator = df.orchestrator(function* (context) {
-  const groupId = '610e588d781739002fc69fb8';
+  context.log('The orchestrator has started.');
 
-  context.log('Executing the update game activity function.');
-  const updateGameResponse: ReturnObject = yield context.df.callActivity('updateGame', groupId);
+  context.log('Executing the get groups activity function.');
+  const groupsResponse: ReturnObject = yield context.df.callActivity('getGroups', null);
+  const groups: Array<HydratedDocument<IGroup>> = groupsResponse.data;
+  context.log(`The get groups activity returned ${groups.length} groups.`);
 
-  context.log(`The update game activity returned with ${JSON.stringify(updateGameResponse)}`);
+  for (const group of groups) {
+    context.log(`Starting to process group ${group.name} with id ${group._id}.`);
+    const groupId = group._id;
 
-  if (updateGameResponse.code === ReturnCodes.GAME_FINISHED) {
-    context.log('Executing the evaluate bets activity function.');
-    const evaluateBetsResponse = yield context.df.callActivity('evaluateBets', [
-      groupId,
-      updateGameResponse.data,
-    ]);
+    context.log('Executing the update game activity function.');
+    const updateGameResponse: ReturnObject = yield context.df.callActivity('updateGame', groupId);
 
-    context.log(`The evaluate bets activity returned with ${JSON.stringify(evaluateBetsResponse)}`);
+    context.log(`The update game activity returned with ${JSON.stringify(updateGameResponse)}`);
+
+    if (updateGameResponse.code === ReturnCodes.GAME_FINISHED) {
+      context.log('Executing the evaluate bets activity function.');
+      const evaluateBetsResponse = yield context.df.callActivity('evaluateBets', [
+        groupId,
+        updateGameResponse.data,
+      ]);
+
+      context.log(
+        `The evaluate bets activity returned with ${JSON.stringify(evaluateBetsResponse)}`
+      );
+    }
+
+    if (updateGameResponse.code !== ReturnCodes.GAME_NOT_FINISHED) {
+      context.log('Executing the get upcoming game activity function.');
+      const upcomingGameResponse = yield context.df.callActivity('getUpcomingGame', groupId);
+
+      context.log(`The update game activity returned with ${JSON.stringify(upcomingGameResponse)}`);
+    }
+
+    context.log('Executing the update competition activity function.');
+    const updateCompetitionResponse = yield context.df.callActivity('updateCompetition', groupId);
+
+    context.log(
+      `The update competition activity returned with ${JSON.stringify(updateCompetitionResponse)}`
+    );
   }
-
-  if (updateGameResponse.code !== ReturnCodes.GAME_NOT_FINISHED) {
-    context.log('Executing the get upcoming game activity function.');
-    const upcomingGameResponse = yield context.df.callActivity('getUpcomingGame', groupId);
-
-    context.log(`The update game activity returned with ${JSON.stringify(upcomingGameResponse)}`);
-  }
-
-  context.log('Executing the update competition activity function.');
-  const updateCompetitionResponse = yield context.df.callActivity('updateCompetition', groupId);
-
-  context.log(
-    `The update competition activity returned with ${JSON.stringify(updateCompetitionResponse)}`
-  );
 
   context.log('The orchestrator has finished successfully.');
   return;

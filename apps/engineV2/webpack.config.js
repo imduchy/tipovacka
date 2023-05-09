@@ -8,7 +8,8 @@ module.exports = {
     updateGame: './updateGame/index.ts',
     updateCompetition: './updateCompetition/index.ts',
     getUpcomingGame: './getUpcomingGame/index.ts',
-    evaluateBets: './evaluateBets/index.ts'
+    evaluateBets: './evaluateBets/index.ts',
+    getGroups: './getGroups/index.ts',
   },
   mode: "production",
   target: 'node',
