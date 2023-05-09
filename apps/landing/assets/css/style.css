@@ -396,14 +396,14 @@ h6 {
   width: 100%;
   height: 100vh;
   position: relative;
-  background: url('../img/hero-bg.jpg') top center;
+  background: url('../img/hero-bg-dark.png') top center;
   background-size: cover;
   position: relative;
 }
 
 #hero:before {
   content: '';
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.4);
   position: absolute;
   bottom: 0;
   top: 0;
@@ -420,12 +420,12 @@ h6 {
   font-size: 56px;
   font-weight: 700;
   line-height: 72px;
-  color: #124265;
+  color: #f8fbfe;
   font-family: 'Poppins', sans-serif;
 }
 
 #hero h2 {
-  color: #5e5e5e;
+  color: #faf9f6;
   margin: 10px 0 0 0;
   font-size: 22px;
 }
