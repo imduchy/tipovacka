@@ -17,7 +17,7 @@
     ]
   },
   "peerDependencies": {
-    "mongoose": "6.2.2"
+    "mongoose": "^6.11.2"
   },
   "repository": {
     "type": "git",

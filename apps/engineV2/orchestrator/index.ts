@@ -12,6 +12,11 @@ const orchestrator = df.orchestrator(function* (context) {
   context.log(`The get groups activity returned ${groups.length} groups.`);
 
   for (const group of groups) {
+    // To avoid throttling by the Football API, wait 1 minute between each group.
+    context.log('Waiting 1 minute before processing the next group.');
+    const oneMinuteDelay = new Date(context.df.currentUtcDateTime.valueOf() + 60000);
+    yield context.df.createTimer(oneMinuteDelay);
+
     context.log(`Starting to process group ${group.name} with id ${group._id}.`);
     const groupId = group._id;
 

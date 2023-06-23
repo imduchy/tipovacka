@@ -1,8 +1,10 @@
 import { Game } from '@tipovacka/models';
 import express, { NextFunction, Request, Response } from 'express';
 import { ApiError } from '../errors/customErrors';
+import { validate } from '../middleware/schemaValidationMiddleware';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
+import { getGameSchema } from './schema';
 
 const router = express.Router();
 
@@ -23,9 +25,9 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  *
  * Access: Protected (Logged-in)
  *
- * @param gameId An ObjectId of the game
+ * @param game An ObjectId of the game
  */
-router.get('/', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', validate({ query: getGameSchema }), authMiddleware, async (req, res, next) => {
   const gameId = req.query.game;
 
   try {

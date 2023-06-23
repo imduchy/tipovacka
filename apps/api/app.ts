@@ -16,12 +16,13 @@ import initializeAuthenticator from './middleware/passportAuthenticator';
 import sessionMiddleware from './middleware/sessionMiddleware';
 import admin from './routes/admin';
 import auth from './routes/auth';
-import bets from './routes/bets';
-import games from './routes/games';
-import groups from './routes/groups';
+import bets from './bets/api';
+import games from './games/api';
+import groups from './groups/api';
 import users from './routes/users';
 import logger from './utils/logger';
 import { validateEnvVars } from './utils/misc';
+import { schemaValidationMiddleware } from './middleware/schemaValidationMiddleware';
 
 // Initialize Application Insights telemetry
 initializeTelemetry();
@@ -47,10 +48,12 @@ if (undefinedRequiredEnv.length > 0) {
   process.exit();
 }
 
-const vaultURL = process.env.KEY_VAULT_URL as string;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const vaultURL = process.env.KEY_VAULT_URL!;
 const kvClient = new SecretClient(vaultURL, credential);
 
-kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME as string).then((secret) => {
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME!).then((secret) => {
   if (!secret.value) {
     logger.error('Database connection string is undefined.');
     process.exit();
@@ -63,7 +66,8 @@ kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME as string).then((se
 });
 
 // Set the football API key
-kvClient.getSecret(process.env.FOOTBALL_API_KEY_SECRET_NAME as string).then((secret) => {
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+kvClient.getSecret(process.env.FOOTBALL_API_KEY_SECRET_NAME!).then((secret) => {
   if (!secret.value) {
     logger.error('Football API key string is undefined.');
     process.exit();
@@ -121,6 +125,7 @@ app.use('/api/games', games);
 app.use('/api/bets', bets);
 
 // Centralised error handling
+app.use(schemaValidationMiddleware);
 app.use(errorMiddleware);
 
 process.on('unhandledRejection', (error: Error) => {

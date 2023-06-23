@@ -1,14 +1,15 @@
 import {
+  ICompetitionStandingRecord,
+  IFollowedTeam,
   IPlayer,
+  ISeason,
   ITeamStatistics,
   PlayersResponse,
   StandingsResponse,
   TeamStatisticsResponse,
-  ICompetitionStandingRecord,
-  IFollowedTeam,
 } from '@tipovacka/models';
 
-export function getLatestSeason(followedTeam: IFollowedTeam) {
+export function getLatestSeason(followedTeam: IFollowedTeam): ISeason | undefined {
   const sortedSeasons = [...followedTeam.seasons].sort((a, b) => b.season - a.season);
   return sortedSeasons[0];
 }

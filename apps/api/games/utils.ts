@@ -1,6 +1,6 @@
 import { FixtureResponse, GameStatus, IGame } from '@tipovacka/models';
-import { getFixture } from './footballApi';
-import logger from './logger';
+import { getFixture } from '../utils/footballApi';
+import logger from '../utils/logger';
 
 /**
  * Fetches an upcoming game for each of specified leagues from an API
@@ -8,38 +8,37 @@ import logger from './logger';
  *
  * @param teamId teamId (id returned from API) of a team
  * @param leagueIds list of leagueIds (ids returned from API)
- * @param amountOfGames number of upcoming games to fetch from the API
  * @returns an upcoming game for a specified team
  */
 export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
-  const upcomingGames: IGame[] = [];
+  let upcomingGames: IGame[] = [];
 
   try {
+    const apiCalls = [];
+
     for (const league of leagueIds) {
-      const response = await getUpcomingGame(teamId, league);
-
-      if (!response) {
-        // getUpcomingGame logs a warn message
-        break;
-      }
-
-      upcomingGames.push(response);
+      apiCalls.push(getUpcomingGame(teamId, league));
     }
+
+    const responses = await Promise.all(apiCalls);
+    upcomingGames = responses.filter((r) => r !== undefined) as IGame[];
   } catch (error) {
-    logger.error(`Error while getting upcoming games for team ${teamId} & leagues ${leagueIds}`);
+    logger.error(`Error while finding upcoming games for team ${teamId} & leagues ${leagueIds}`);
     throw error;
   }
 
-  if (upcomingGames.length === 0) {
-    return undefined;
-  }
+  if (upcomingGames.length === 0) return undefined;
 
   upcomingGames.sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
-  logger.info(`Sorted upcoming games in the selected leagues for team ${teamId}.`);
-  logger.info(`The upcoming game is ${upcomingGames[0].gameId}.`);
+  logger.info(`Sorted ${upcomingGames.length} upcoming games by the date field.`);
+  logger.info(
+    `The upcoming game is the game ${upcomingGames[0].gameId} between ` +
+      `${upcomingGames[0].homeTeam} and ${upcomingGames[0].awayTeam} ` +
+      `on the ${upcomingGames[0].date}.`
+  );
 
   return upcomingGames[0];
 };
@@ -54,18 +53,13 @@ export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
  */
 const getUpcomingGame = async (teamId: number, leagueId: number) => {
   try {
-    const { data } = await getFixture({
-      team: teamId,
-      league: leagueId,
-      next: 1,
-    });
+    const params = { team: teamId, league: leagueId, next: 1 };
+
+    const { data } = await getFixture(params);
 
     if (data.results === 0) {
-      logger.warn(
-        `There are no results for upcoming games of a team ${teamId} in league ${leagueId}.` +
-          ` Make sure you specified the right IDs.`
-      );
-      return;
+      logger.warn(`No upcoming games for the team ${teamId} in the league ${leagueId} found.`);
+      return undefined;
     }
 
     return responseMapping(data.response[0]);

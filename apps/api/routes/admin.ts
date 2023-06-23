@@ -4,11 +4,11 @@ import { NextFunction, Request, Response, Router } from 'express';
 import multer from 'multer';
 import xlsx from 'node-xlsx';
 import { ApiError } from '../errors/customErrors';
+import { findUpcomingGame } from '../games/utils';
+import { mapPlayers, mapStandings, mapTeamStatistics } from '../groups/utils';
 import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import * as FootballApi from '../utils/footballApi';
-import { findUpcomingGame } from '../utils/games';
-import { mapPlayers, mapStandings, mapTeamStatistics } from '../utils/groups';
 import logger from '../utils/logger';
 import { emptyStatisticsObject } from '../utils/teams';
 

@@ -2,11 +2,13 @@ import { Game, Group, IBet, IBetWithID, IGameWithID, IUserWithID, User } from '@
 import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
 import { ApiError } from '../errors/customErrors';
-import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
-import { alreadyBet } from '../utils/bets';
-import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import { getLatestSeason } from '../groups/utils';
+import { validate } from '../middleware/schemaValidationMiddleware';
+import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import logger from '../utils/logger';
+import { getTopBetsSchema, postBetSchema, putBetSchema } from './schema';
+import { hasPlacedBet } from './utils';
 
 const router = Router();
 
@@ -38,29 +40,10 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
  *
  * @param game ObjectId of the game to fetch
  */
-router.post('/', authMiddleware, async (req, res, next) => {
-  logger.info('Data received in the request body: ' + JSON.stringify(req.body));
-
+router.post('/', validate({ body: postBetSchema }), authMiddleware, async (req, res, next) => {
   const { game: gameId, homeTeamScore, awayTeamScore, scorer } = req.body;
   const rawUser = req.user as IUserWithID;
   const userId = new Types.ObjectId(rawUser._id);
-
-  if (gameId === undefined || homeTeamScore === undefined || awayTeamScore === undefined) {
-    res.status(400).json({
-      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
-      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
-    });
-
-    return next(
-      new ApiError(
-        `A user has not specified all the required parameters. Provided parameters ${{
-          ...req.body,
-        }}`,
-        `${req.method} /groups/competition`,
-        ResponseStatusCodes.BAD_REQUEST
-      )
-    );
-  }
 
   try {
     const user = await User.findById(userId);
@@ -79,7 +62,7 @@ router.post('/', authMiddleware, async (req, res, next) => {
       );
     }
 
-    if (alreadyBet(user, gameId)) {
+    if (hasPlacedBet(user, gameId)) {
       res.status(400).json({
         message: ResponseMessages.USER_ALREADY_PLACED_BET,
         code: ResponseErrorCodes.RESOURCE_ALREADY_EXISTS,
@@ -160,28 +143,9 @@ router.post('/', authMiddleware, async (req, res, next) => {
  * @param awayTeamScore
  * @param scorer
  */
-router.put('/', authMiddleware, async (req, res, next) => {
-  logger.info('Data received in the request body: ' + JSON.stringify(req.body));
-
+router.put('/', validate({ body: putBetSchema }), authMiddleware, async (req, res, next) => {
   const { bet: betId, homeTeamScore, awayTeamScore, scorer } = req.body;
   const userId = (req.user as IUserWithID)._id;
-
-  if (betId === undefined || homeTeamScore === undefined || awayTeamScore === undefined) {
-    res.status(400).json({
-      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
-      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
-    });
-
-    return next(
-      new ApiError(
-        `A user has not specified all the required parameters. Provided parameters ${{
-          ...req.body,
-        }}`,
-        `${req.method} /bets`,
-        ResponseStatusCodes.BAD_REQUEST
-      )
-    );
-  }
 
   try {
     const user = await User.findById(userId);
@@ -277,146 +241,126 @@ router.put('/', authMiddleware, async (req, res, next) => {
  * @param round
  * @param limit
  */
-router.get('/top', authMiddleware, async (req, res, next) => {
-  logger.info('Data received in the request query: ' + JSON.stringify(req.query));
+router.get(
+  '/top',
+  validate({ query: getTopBetsSchema }),
+  authMiddleware,
+  async (req, res, next) => {
+    logger.info('Data received in the request query: ' + JSON.stringify(req.query));
 
-  if (
-    req.query.team === undefined ||
-    typeof req.query.team !== 'string' ||
-    req.query.season === undefined ||
-    typeof req.query.season !== 'string' ||
-    req.query.round === undefined ||
-    typeof req.query.round !== 'string' ||
-    (req.query.competition !== undefined && typeof req.query.competition !== 'string')
-  ) {
-    res.status(400).send({
-      message: ResponseMessages.REQUIRED_ATTRIBUTES_MISSING,
-      code: ResponseErrorCodes.INVALID_REQUEST_BODY,
-    });
+    const userId = (req.user as IUserWithID)._id;
+    const team = parseInt(req.query.team as string);
+    const season = parseInt(req.query.season as string);
+    const round = parseInt(req.query.round as string);
+    let competition = req.query.competition ? parseInt(req.query.competition as string) : undefined;
 
-    return next(
-      new ApiError(
-        `No competition object for the provided parameters exists in the database. Provided query parameters ${{
-          ...req.query,
-        }}.`,
-        `${req.method} /bets/top`,
-        ResponseStatusCodes.NOT_FOUND
-      )
-    );
-  }
+    try {
+      logger.info('Fetching the user by user ID.');
+      const user = await User.findById(userId);
 
-  const userId = (req.user as IUserWithID)._id;
-  const team = parseInt(req.query.team);
-  const season = parseInt(req.query.season);
-  const round = parseInt(req.query.round);
-  let competition = req.query.competition ? parseInt(req.query.competition) : undefined;
-
-  try {
-    logger.info('Fetching the user by user ID.');
-    const user = await User.findById(userId);
-
-    if (!user) {
-      res.status(404).json({
-        message: ResponseMessages.USER_ID_DOESNT_EXIST,
-        code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
-      });
-
-      return next(
-        new ApiError(
-          `A user has specified a user ID '${userId}' in the query parameter. A user object with the provided ID doesn't exist in the database.`,
-          `${req.method} /bets/top`,
-          ResponseStatusCodes.NOT_FOUND
-        )
-      );
-    }
-
-    // If no competition is specified in the request, pick the first competition
-    // TODO: Should the competition object be mandatory?
-    if (!competition) {
-      logger.info('Fetching the group by group ID.');
-      const group = await Group.findById(user.groupId);
-
-      if (!group) {
+      if (!user) {
         res.status(404).json({
-          message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
+          message: ResponseMessages.USER_ID_DOESNT_EXIST,
           code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
         });
 
         return next(
           new ApiError(
-            `A user has specified a group ID '${user.groupId}' in the query parameter. A group object with the provided ID doesn't exist in the database.`,
+            `A user has specified a user ID '${userId}' in the query parameter. A user object with the provided ID doesn't exist in the database.`,
             `${req.method} /bets/top`,
             ResponseStatusCodes.NOT_FOUND
           )
         );
       }
 
-      logger.info('Getting the latest season object from the group.');
-      const latestSeason = getLatestSeason(group.followedTeams[0]);
-      if (!latestSeason) {
-        return next(
-          new ApiError(
-            `The group object of the user doesn't contain any seasons objects.`,
-            `${req.method} /groups/competition`,
-            ResponseStatusCodes.NOT_FOUND
-          )
-        );
+      // If no competition is specified in the request, pick the first competition
+      // TODO: Should the competition object be mandatory?
+      if (!competition) {
+        logger.info('Fetching the group by group ID.');
+        const group = await Group.findById(user.groupId);
+
+        if (!group) {
+          res.status(404).json({
+            message: ResponseMessages.GROUP_ID_DOESNT_EXIST,
+            code: ResponseErrorCodes.RESOURCE_NOT_FOUND,
+          });
+
+          return next(
+            new ApiError(
+              `A user has specified a group ID '${user.groupId}' in the query parameter. A group object with the provided ID doesn't exist in the database.`,
+              `${req.method} /bets/top`,
+              ResponseStatusCodes.NOT_FOUND
+            )
+          );
+        }
+
+        logger.info('Getting the latest season object from the group.');
+        const latestSeason = getLatestSeason(group.followedTeams[0]);
+        if (!latestSeason) {
+          return next(
+            new ApiError(
+              `The group object of the user doesn't contain any seasons objects.`,
+              `${req.method} /groups/competition`,
+              ResponseStatusCodes.NOT_FOUND
+            )
+          );
+        }
+
+        competition = latestSeason.competitions[0].apiId;
       }
 
-      competition = latestSeason.competitions[0].apiId;
-    }
-
-    const gamesAggregate = await Game.aggregate([
-      {
-        $match: {
-          season: season,
-          competitionId: competition,
-          $or: [{ 'homeTeam.teamId': team }, { 'awayTeam.teamId': team }],
+      const gamesAggregate = await Game.aggregate([
+        {
+          $match: {
+            season: season,
+            competitionId: competition,
+            $or: [{ 'homeTeam.teamId': team }, { 'awayTeam.teamId': team }],
+          },
         },
-      },
-    ]);
+      ]);
 
-    const games = gamesAggregate.flat() as IGameWithID[];
-    const game = round >= 0 ? games[round] : games[games.length + round];
+      const games = gamesAggregate.flat() as IGameWithID[];
+      const game = round >= 0 ? games[round] : games[games.length + round];
 
-    if (!game) {
-      logger.info('No games found. Returning an empty list back.');
-      return res.status(200).json([]);
-    }
+      if (!game) {
+        logger.info('No games found. Returning an empty list back.');
+        return res.status(200).json([]);
+      }
 
-    const users = await User.aggregate([
-      { $match: { groupId: user.groupId, 'bets.game': game._id } },
-      { $unwind: '$bets' },
-      { $match: { groupId: user.groupId, 'bets.game': game._id, 'bets.points': { $gt: 0 } } },
-      {
-        $lookup: {
-          from: 'games',
-          localField: 'bets.game',
-          foreignField: '_id',
-          as: 'bets.game',
+      const users = await User.aggregate([
+        { $match: { groupId: user.groupId, 'bets.game': game._id } },
+        { $unwind: '$bets' },
+        { $match: { groupId: user.groupId, 'bets.game': game._id, 'bets.points': { $gt: 0 } } },
+        {
+          $lookup: {
+            from: 'games',
+            localField: 'bets.game',
+            foreignField: '_id',
+            as: 'bets.game',
+          },
         },
-      },
-      { $sort: { 'bets.points': -1 } },
-    ]);
+        { $sort: { 'bets.points': -1 } },
+      ]);
 
-    // TODO: This should be idealy moved to the aggregation pipeline
-    users.forEach((user) => (user.bets = [user.bets]));
-    users.forEach((user) => (user.bets[0].game = user.bets[0].game[0]));
+      // TODO: This should be idealy moved to the aggregation pipeline
+      users.forEach((user) => (user.bets = [user.bets]));
+      users.forEach((user) => (user.bets[0].game = user.bets[0].game[0]));
 
-    console.log(users);
+      console.log(users);
 
-    // Returns
-    // [{ username, ..., bets: [{}] }, { username, ..., bets: [{}] }, { username, ..., bets: [{}] }]
-    res.status(200).json(users);
-  } catch (error) {
-    logger.error(`Couldn't find bets. Error: ${error}.`);
-    res.status(500).json({
-      message: ResponseMessages.INTERNAL_SERVER_ERROR,
-      code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
-    });
+      // Returns
+      // [{ username, ..., bets: [{}] }, { username, ..., bets: [{}] }, { username, ..., bets: [{}] }]
+      res.status(200).json(users);
+    } catch (error) {
+      logger.error(`Couldn't find bets. Error: ${error}.`);
+      res.status(500).json({
+        message: ResponseMessages.INTERNAL_SERVER_ERROR,
+        code: ResponseErrorCodes.INTERNAL_SERVER_ERROR,
+      });
 
-    return next(error);
+      return next(error);
+    }
   }
-});
+);
 
 export default router;
