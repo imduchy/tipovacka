@@ -10,7 +10,7 @@ import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
 import * as FootballApi from '../utils/footballApi';
 import logger from '../utils/logger';
-import { emptyStatisticsObject } from '../utils/teams';
+import { createEmptyStatisticsObject } from './utils';
 
 const router = Router();
 
@@ -87,7 +87,7 @@ router.post('/groups/competition', authMiddleware, async (req, res, next) => {
           name: league.name,
           logo: league.logo,
           standings: [],
-          teamStatistics: emptyStatisticsObject(),
+          teamStatistics: createEmptyStatisticsObject(),
           players: mapPlayers(playersResponse.data.response),
         },
       ],

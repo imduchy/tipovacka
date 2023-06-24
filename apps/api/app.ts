@@ -10,19 +10,19 @@ import express, { json, urlencoded } from 'express';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import passport from 'passport';
-import { errorHandler, errorMiddleware } from './middleware/errorMiddleware';
-import { securityHeadersMiddleware } from './middleware/headersMiddleware';
-import initializeAuthenticator from './middleware/passportAuthenticator';
-import sessionMiddleware from './middleware/sessionMiddleware';
-import admin from './routes/admin';
-import auth from './routes/auth';
+import admin from './admin/api';
+import auth from './auth/api';
 import bets from './bets/api';
 import games from './games/api';
 import groups from './groups/api';
-import users from './routes/users';
+import { errorHandler, errorMiddleware } from './middleware/errorMiddleware';
+import { securityHeadersMiddleware } from './middleware/headersMiddleware';
+import initializeAuthenticator from './middleware/passportAuthenticator';
+import { schemaValidationMiddleware } from './middleware/schemaValidationMiddleware';
+import sessionMiddleware from './middleware/sessionMiddleware';
+import users from './users/api';
 import logger from './utils/logger';
 import { validateEnvVars } from './utils/misc';
-import { schemaValidationMiddleware } from './middleware/schemaValidationMiddleware';
 
 // Initialize Application Insights telemetry
 initializeTelemetry();

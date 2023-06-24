@@ -1,6 +1,6 @@
 import { ITeamStatistics } from '@tipovacka/models';
 
-export const emptyStatisticsObject = (): ITeamStatistics => ({
+export const createEmptyStatisticsObject = (): ITeamStatistics => ({
   played: {
     away: 0,
     home: 0,

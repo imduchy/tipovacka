@@ -3,7 +3,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import { ApiError } from '../errors/customErrors';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
-import logger from '../utils/logger';
 
 const router = express.Router();
 

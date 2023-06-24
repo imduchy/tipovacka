@@ -1,13 +1,13 @@
 import { IUser, IUserWithID, User } from '@tipovacka/models';
 import bcrypt from 'bcryptjs';
-import express, { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import { infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
 import logger from '../utils/logger';
 
-const router = express.Router();
+const router = Router();
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   infoAuditLog(req);
