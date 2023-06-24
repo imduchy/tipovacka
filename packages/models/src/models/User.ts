@@ -153,7 +153,7 @@ UserSchema.post(
       next(
         new UserSchemaPostHookError(
           'An exception occurred while executing a post deleteOne hook of the UserSchema ' +
-            `for the document with _id ${this._id}. The error is: ${error}.`
+            `for the document with _id ${doc._id}. The error is: ${error}.`
         )
       );
     }
