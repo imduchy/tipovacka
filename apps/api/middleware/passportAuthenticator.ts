@@ -42,12 +42,13 @@ export default (passport: PassportStatic) => {
   });
 
   passport.deserializeUser((id, done) => {
-    User.findById(id, {}, {}, (err, user) => {
-      done(err, user);
-    }).populate({
-      path: 'bets',
-      model: 'bet',
-      populate: { path: 'game', model: 'game' },
-    });
+    User.findById(id)
+      .populate({
+        path: 'bets',
+        model: 'bet',
+        populate: { path: 'game', model: 'game' },
+      })
+      .then((user) => done(null, user))
+      .catch((err) => done(err, null));
   });
 };
