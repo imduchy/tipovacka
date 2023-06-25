@@ -14,7 +14,7 @@ export interface IUser {
   _version?: number;
   username: string;
   email: string;
-  password: string;
+  password?: string;
   // TODO: Create an input interface where bets and competitionScore
   // won't be needed
   competitionScore: Array<ICompetitionScore>;
@@ -43,7 +43,7 @@ export const UserSchema = new Schema<IUser>(
     _version: { type: Number, required: true, default: 1 },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: false },
     competitionScore: [
       {
         type: new Schema(CompetitionScoreSchema),
