@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@nuxtjs/auth-next": "^5.0.0-1640716105.da0587d",
-    "@nuxtjs/composition-api": "0.32.0",
+    "@nuxtjs/composition-api": "0.33.1",
     "@nuxtjs/vuetify": "^1.12.3",
     "axios": "^0.26.0",
     "nuxt": "^2.15.8"
