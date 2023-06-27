@@ -62,6 +62,7 @@ kvClient.getSecret(process.env.CONNECTION_STRING_SECRET_NAME!).then((secret) => 
 
   mongoose.connect(secret.value).then(() => {
     mongoose.set('sanitizeFilter', true);
+
     logger.info('Successfully connected to the database.');
     exportModels(mongoose);
   });
