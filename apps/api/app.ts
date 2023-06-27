@@ -23,6 +23,7 @@ import sessionMiddleware from './middleware/sessionMiddleware';
 import users from './users/api';
 import logger from './utils/logger';
 import { validateEnvVars } from './utils/misc';
+import rateLimit from 'express-rate-limit';
 
 // Initialize Application Insights telemetry
 initializeTelemetry();
@@ -93,6 +94,15 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   sessionStore = new session.MemoryStore();
 }
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60, // Limit each IP to 60 requests per a minute
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
 
 app.use(sessionMiddleware(sessionStore));
 
