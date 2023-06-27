@@ -139,7 +139,7 @@ router.post('/password', authMiddleware, async (req, res) => {
       return res.status(404).send("User doesn't exist");
     }
 
-    const passwordsMatch = await bcrypt.compare(oldPassword, user.password);
+    const passwordsMatch = await bcrypt.compare(oldPassword, user.password!);
     if (!passwordsMatch) {
       res.status(401).json({
         message: ResponseMessages.UNAUTHORIZED_REQUEST,

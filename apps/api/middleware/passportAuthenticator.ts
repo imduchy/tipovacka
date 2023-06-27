@@ -17,7 +17,7 @@ export default (passport: PassportStatic) => {
               });
             }
 
-            bcrypt.compare(password, user.password, (err, isMatch) => {
+            bcrypt.compare(password, user.password!, (err, isMatch) => {
               if (err) throw err;
 
               if (isMatch) {
