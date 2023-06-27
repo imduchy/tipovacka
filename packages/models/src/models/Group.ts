@@ -23,7 +23,7 @@ export const GroupSchema = new Schema<IGroup>(
     website: { type: String, required: false },
     followedTeams: [
       {
-        type: new Schema(FollowedTeamSchema),
+        type: FollowedTeamSchema,
         required: true,
       },
     ],

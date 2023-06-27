@@ -63,7 +63,7 @@ export const PlayerSchema = new Schema<IPlayer>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   photo: { type: String, required: true },
-  statistics: { type: new Schema(PlayerStatisticsSchema), required: true },
+  statistics: { type: PlayerStatisticsSchema, required: true },
   injured: { type: Boolean, required: true, default: false },
   age: { type: Number, required: true },
 });

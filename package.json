@@ -45,5 +45,8 @@
   "bugs": {
     "url": "https://github.com/Duchynko/betting-game/issues"
   },
-  "homepage": "https://github.com/Duchynko/betting-game#readme"
+  "homepage": "https://github.com/Duchynko/betting-game#readme",
+  "dependencies": {
+    "mongoose": "^6.2.2"
+  }
 }

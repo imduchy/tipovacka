@@ -46,12 +46,12 @@ export const UserSchema = new Schema<IUser>(
     password: { type: String, required: false },
     competitionScore: [
       {
-        type: new Schema(CompetitionScoreSchema),
+        type: CompetitionScoreSchema,
         required: true,
         default: [],
       },
     ],
-    bets: [{ type: new Schema(BetSchema), default: [], required: true }],
+    bets: [{ type: BetSchema, default: [], required: true }],
     groupId: { type: Schema.Types.ObjectId, ref: 'group' },
     scope: [{ type: String, required: false, default: 'user' }],
   },
