@@ -1,9 +1,11 @@
-const path = require('node:path')
+const path = require('node:path');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   entry: ['./index.ts'],
   mode: 'production',
   target: 'node',
+  // externals: [nodeExternals()],
   module: {
     rules: [
       {
@@ -11,6 +13,11 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      // {
+      //   test: /\.js$/,
+      //   use: 'babel-loader',
+      //   exclude: /node_modules/
+      // }
     ],
   },
   resolve: {
