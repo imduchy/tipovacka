@@ -4,7 +4,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import { infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages } from '../utils/constants';
+import { ResponseErrorCodes, ResponseMessages } from '../utils/httpResponses';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -74,44 +74,6 @@ router.post('/login', passport.authenticate('local'), function (req, res) {
   // `req.user` contains the authenticated user.
   res.status(200).send('Login successfull.');
 });
-
-// router.post('/register', async (req, res) => {
-//   const { username, email, password, groupId } = req.body;
-
-//   try {
-//     validateInput(req.body);
-
-//     const user = await User.findOne({ email });
-//     if (user) {
-//       res.status(400).send('User with this email already exists');
-//       return;
-//     }
-
-//     const salt = await bcrypt.genSalt();
-//     const encryptedPassword = await bcrypt.hash(password, salt);
-
-//     const newUser = await User.create({
-//       email,
-//       username,
-//       groupId,
-//       password: encryptedPassword,
-//     });
-//     logger.info(
-//       `A new user ${newUser.email} (${newUser._id}) has been created in group ${newUser.groupId}`
-//     );
-
-//     res.status(200).send(newUser);
-//   } catch (error) {
-//     if (error instanceof (ValidationError || PropertyRequiredError)) {
-//       // Logging handled in validateInput
-//       res.status(400).send(error.message);
-//     } else {
-//       logger.error(`Error while registering a user.`);
-//       logger.error(`Error: ${error}.`);
-//       res.status(500).send('Internal error');
-//     }
-//   }
-// });
 
 router.post('/password', authMiddleware, async (req, res) => {
   const { oldPassword, newPassword, confirmedPassword } = req.body;

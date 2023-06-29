@@ -1,3 +1,4 @@
+import { MappingUtils, TeamUtils } from '@tipovacka/common-utils';
 import { Game, Group, ISeason, IUser, IUserWithID, User } from '@tipovacka/models';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
@@ -5,12 +6,10 @@ import multer from 'multer';
 import xlsx from 'node-xlsx';
 import { ApiError } from '../errors/customErrors';
 import { findUpcomingGame } from '../games/utils';
-import { mapPlayers, mapStandings, mapTeamStatistics } from '../groups/utils';
 import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/httpResponses';
 import * as FootballApi from '../utils/footballApi';
 import logger from '../utils/logger';
-import { createEmptyStatisticsObject } from './utils';
 
 const router = Router();
 
@@ -87,8 +86,8 @@ router.post('/groups/competition', authMiddleware, async (req, res, next) => {
           name: league.name,
           logo: league.logo,
           standings: [],
-          teamStatistics: createEmptyStatisticsObject(),
-          players: mapPlayers(playersResponse.data.response),
+          teamStatistics: TeamUtils.createEmptyTeamStatisticsObject(),
+          players: MappingUtils.mapPlayersFromApiResponse(playersResponse.data.response),
         },
       ],
     };
@@ -577,9 +576,9 @@ router.post('/groups', authMiddleware, async ({ body }, res) => {
                   logo: competition.league.logo,
                   name: competition.league.name,
                   games: [],
-                  players: mapPlayers(players),
-                  standings: mapStandings(competition),
-                  teamStatistics: mapTeamStatistics(teamStatistics),
+                  players: MappingUtils.mapPlayersFromApiResponse(players),
+                  standings: MappingUtils.mapStandingsFromApiResponse(competition),
+                  teamStatistics: MappingUtils.mapTeamStatisticsFromApiResponse(teamStatistics),
                 },
               ],
             },

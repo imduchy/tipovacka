@@ -5,7 +5,7 @@ import { ApiError } from '../errors/customErrors';
 import { getLatestSeason } from '../groups/utils';
 import { validate } from '../middleware/schemaValidationMiddleware';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/httpResponses';
 import logger from '../utils/logger';
 import { getTopBetsSchema, postBetSchema, putBetSchema } from './schema';
 import { hasPlacedBet } from './utils';

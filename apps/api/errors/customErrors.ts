@@ -1,4 +1,4 @@
-import { ResponseStatusCodes } from '../utils/constants';
+import { ResponseStatusCodes } from '../utils/httpResponses';
 
 export class BaseError extends Error {
   public readonly message: string;

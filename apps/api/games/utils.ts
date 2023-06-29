@@ -1,4 +1,5 @@
-import { FixtureResponse, GameStatus, IGame } from '@tipovacka/models';
+import { MappingUtils } from '@tipovacka/common-utils';
+import { IGame } from '@tipovacka/models';
 import { getFixture } from '../utils/footballApi';
 import logger from '../utils/logger';
 
@@ -62,41 +63,9 @@ const getUpcomingGame = async (teamId: number, leagueId: number) => {
       return undefined;
     }
 
-    return responseMapping(data.response[0]);
+    return MappingUtils.mapFixtureFromApiResponse(data.response[0]);
   } catch (error) {
     logger.error(`Error while getting upcoming games for team ${teamId} & leagues ${leagueId}`);
     throw error;
   }
-};
-
-/**
- * Maps response from the API's fixture endpoint
- * to an IGame object.
- *
- * @param response fixture response from the API
- */
-const responseMapping = (response: FixtureResponse.Response): IGame => {
-  const { fixture, teams, league, score } = response;
-
-  return {
-    date: new Date(fixture.date),
-    gameId: fixture.id,
-    competitionId: league.id,
-    competitionName: league.name,
-    awayTeam: {
-      teamId: teams.away.id,
-      name: teams.away.name,
-      logo: teams.away.logo,
-    },
-    homeTeam: {
-      teamId: teams.home.id,
-      name: teams.home.name,
-      logo: teams.home.logo,
-    },
-    season: league.season,
-    status: GameStatus[fixture.status.short],
-    venue: fixture.venue.name,
-    awayTeamScore: score.fulltime.away ? score.fulltime.away : 0,
-    homeTeamScore: score.fulltime.home ? score.fulltime.away : 0,
-  };
 };

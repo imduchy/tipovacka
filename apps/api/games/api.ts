@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { ApiError } from '../errors/customErrors';
 import { validate } from '../middleware/schemaValidationMiddleware';
 import { containsAdminKey, isLoggedIn } from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/httpResponses';
 import { getGameSchema } from './schema';
 
 const router = express.Router();

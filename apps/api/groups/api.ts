@@ -3,7 +3,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
 import { ApiError } from '../errors/customErrors';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/httpResponses';
 import logger from '../utils/logger';
 import { getLatestSeason } from './utils';
 import {

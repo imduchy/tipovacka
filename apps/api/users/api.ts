@@ -2,7 +2,7 @@ import { IUserWithID, User } from '@tipovacka/models';
 import express, { NextFunction, Request, Response } from 'express';
 import { ApiError } from '../errors/customErrors';
 import { containsAdminKey, infoAuditLog, isLoggedIn, warnAuditLog } from '../utils/authMiddleware';
-import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/constants';
+import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/httpResponses';
 
 const router = express.Router();
 

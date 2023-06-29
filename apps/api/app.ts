@@ -7,6 +7,7 @@ import { exportModels } from '@tipovacka/models';
 import connectMongo from 'connect-mongo';
 import cors from 'cors';
 import express, { json, urlencoded } from 'express';
+import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import passport from 'passport';
@@ -22,8 +23,7 @@ import { schemaValidationMiddleware } from './middleware/schemaValidationMiddlew
 import sessionMiddleware from './middleware/sessionMiddleware';
 import users from './users/api';
 import logger from './utils/logger';
-import { validateEnvVars } from './utils/misc';
-import rateLimit from 'express-rate-limit';
+import { validateEnvVars } from './utils/validation';
 
 // Initialize Application Insights telemetry
 initializeTelemetry();
