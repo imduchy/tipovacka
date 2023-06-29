@@ -1,0 +1,23 @@
+{
+  "name": "@tipovacka/common-utils",
+  "version": "1.0.0",
+  "author": "Jakub Duchon",
+  "license": "ISC",
+  "private": true,
+  "description": "Common utils for Tipovacka project",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint ./src"
+  },
+  "lint-staged": {
+    "src/*": [
+      "npm run lint"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Duchynko/betting-game.git"
+  }
+}

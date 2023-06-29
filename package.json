@@ -7,10 +7,10 @@
   "description": "Root package for Tipovacka project",
   "workspaces": [
     "apps/*",
-    "packages/models"
+    "packages/*"
   ],
   "scripts": {
-    "build-common": "npm run build --workspace=packages/",
+    "build-pkgs": "npm run build --workspace=packages/",
     "dev": "npm run dev --workspace=apps/",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"
