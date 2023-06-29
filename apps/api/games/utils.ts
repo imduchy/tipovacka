@@ -1,6 +1,5 @@
-import { MappingUtils } from '@tipovacka/common-utils';
+import { FootballApi, MappingUtils } from '@tipovacka/common-utils';
 import { IGame } from '@tipovacka/models';
-import { getFixture } from '../utils/footballApi';
 import logger from '../utils/logger';
 
 /**
@@ -54,9 +53,9 @@ export const findUpcomingGame = async (teamId: number, leagueIds: number[]) => {
  */
 const getUpcomingGame = async (teamId: number, leagueId: number) => {
   try {
-    const params = { team: teamId, league: leagueId, next: 1 };
+    const params = { team: teamId.toString(), league: leagueId.toString(), next: 1 };
 
-    const { data } = await getFixture(params);
+    const { data } = await FootballApi.getFixture(params);
 
     if (data.results === 0) {
       logger.warn(`No upcoming games for the team ${teamId} in the league ${leagueId} found.`);
@@ -65,7 +64,7 @@ const getUpcomingGame = async (teamId: number, leagueId: number) => {
 
     return MappingUtils.mapFixtureFromApiResponse(data.response[0]);
   } catch (error) {
-    logger.error(`Error while getting upcoming games for team ${teamId} & leagues ${leagueId}`);
+    logger.error('Error while fetching upcoming games from the Football API.');
     throw error;
   }
 };

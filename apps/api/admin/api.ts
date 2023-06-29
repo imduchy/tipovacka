@@ -1,4 +1,4 @@
-import { MappingUtils, TeamUtils } from '@tipovacka/common-utils';
+import { MappingUtils, TeamUtils, FootballApi } from '@tipovacka/common-utils';
 import { Game, Group, ISeason, IUser, IUserWithID, User } from '@tipovacka/models';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response, Router } from 'express';
@@ -8,7 +8,6 @@ import { ApiError } from '../errors/customErrors';
 import { findUpcomingGame } from '../games/utils';
 import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/httpResponses';
-import * as FootballApi from '../utils/footballApi';
 import logger from '../utils/logger';
 
 const router = Router();

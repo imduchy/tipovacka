@@ -3,9 +3,18 @@ import {
   mapStandingsFromApiResponse,
   mapTeamStatisticsFromApiResponse,
   mapFixtureFromApiResponse,
-} from './src/mappings';
+} from './mappings';
 
-import { createEmptyTeamStatisticsObject } from './src/teams';
+import {
+  getFixture,
+  getLeagues,
+  getPlayers,
+  getStandings,
+  getTeam,
+  getTeamStatistics,
+} from './football_api';
+
+import { createEmptyTeamStatisticsObject } from './teams';
 
 export const MappingUtils = {
   mapPlayersFromApiResponse,
@@ -16,4 +25,13 @@ export const MappingUtils = {
 
 export const TeamUtils = {
   createEmptyTeamStatisticsObject,
+};
+
+export const FootballApi = {
+  getFixture,
+  getLeagues,
+  getPlayers,
+  getStandings,
+  getTeam,
+  getTeamStatistics,
 };

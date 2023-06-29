@@ -1,10 +1,22 @@
+import { FootballApi } from '@tipovacka/common-utils';
 import { FixtureResponse } from '@tipovacka/models';
 import { AxiosResponse } from 'axios';
-import { getFixture } from '../../utils/footballApi';
 import { findUpcomingGame } from '../utils';
 
-jest.mock('../../utils/footballApi');
-const getFixtureMock = jest.mocked(getFixture);
+jest.mock('@tipovacka/common-utils', () => {
+  const originalModule = jest.requireActual('@tipovacka/common-utils');
+
+  // Only the getFixture method in the exported FootballApi object needs to be
+  // mocked, and everything else should keep the original implementation.
+  return {
+    __esModule: true,
+    ...originalModule,
+    FootballApi: {
+      getFixture: jest.fn(),
+    },
+  };
+});
+const getFixtureMock = jest.mocked(FootballApi.getFixture);
 
 type FixtureResponseType = AxiosResponse<FixtureResponse.RootObject>;
 

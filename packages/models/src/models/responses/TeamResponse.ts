@@ -1,7 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export declare namespace TeamResponse {
   export interface Parameters {
-    id: string;
+    id?: string;
+    league?: string;
+    season?: string;
   }
 
   export interface Paging {

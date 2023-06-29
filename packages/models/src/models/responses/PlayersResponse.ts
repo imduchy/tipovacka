@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export declare namespace PlayersResponse {
   export interface Parameters {
-    id?: number;
-    season?: number;
-    league?: number;
-    team?: number;
+    id?: string;
+    season?: string;
+    league?: string;
+    team?: string;
     search?: string;
     page?: number;
   }

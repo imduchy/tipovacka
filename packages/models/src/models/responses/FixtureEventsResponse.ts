@@ -4,6 +4,9 @@ import { FixtureEventDetail, FixtureEventType } from '../Enums';
 export declare namespace FixtureEventsResponse {
   export interface Parameters {
     fixture: string;
+    team?: string;
+    player?: string;
+    type?: string;
   }
 
   export interface Paging {

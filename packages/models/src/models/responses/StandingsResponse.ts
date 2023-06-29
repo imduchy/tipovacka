@@ -1,7 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export declare namespace StandingsResponse {
   export interface Parameters {
-    league: string;
+    league?: string;
+    team?: string;
     season: string;
   }
 

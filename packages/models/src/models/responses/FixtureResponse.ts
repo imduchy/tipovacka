@@ -3,10 +3,10 @@ import { GameStatus } from '../Enums';
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export declare namespace FixtureResponse {
   export interface Parameters {
-    team: string;
-    next: string;
-    season: string;
-    league: string;
+    team?: string;
+    next?: number;
+    season?: string;
+    league?: string;
   }
 
   export interface Paging {
