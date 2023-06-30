@@ -5,7 +5,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import multer from 'multer';
 import xlsx from 'node-xlsx';
 import { ApiError } from '../errors/customErrors';
-import { findUpcomingGame } from '../games/utils';
+import { findUpcomingGame } from './utils';
 import { containsAdminKey, hasAdminRole } from '../utils/authMiddleware';
 import { ResponseErrorCodes, ResponseMessages, ResponseStatusCodes } from '../utils/httpResponses';
 import logger from '../utils/logger';

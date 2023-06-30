@@ -1,5 +1,12 @@
 import { AllowedSchema } from 'express-json-validator-middleware';
 
+export interface PostBetParams {
+  game: string;
+  homeTeamScore: number;
+  awayTeamScore: number;
+  scorer?: number;
+}
+
 export const postBetSchema: AllowedSchema = {
   type: 'object',
   required: ['game, homeTeamScore, awayTeamScore'],
@@ -25,6 +32,13 @@ export const postBetSchema: AllowedSchema = {
     },
   },
 };
+
+export interface PutBetParams {
+  bet: string;
+  homeTeamScore: number;
+  awayTeamScore: number;
+  scorer: number;
+}
 
 export const putBetSchema: AllowedSchema = {
   type: 'object',
