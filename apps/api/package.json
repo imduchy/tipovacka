@@ -4,7 +4,7 @@
   "author": "Jakub Duchon",
   "license": "ISC",
   "private": true,
-  "description": "Express API for Tipovacka project",
+  "description": "Express API for the project",
   "main": "index.js",
   "scripts": {
     "build": "webpack",

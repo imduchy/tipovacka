@@ -1,11 +1,9 @@
 const path = require('node:path');
-const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   entry: ['./index.ts'],
   mode: 'production',
   target: 'node',
-  // externals: [nodeExternals()],
   module: {
     rules: [
       {
@@ -13,11 +11,31 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
-      // {
-      //   test: /\.js$/,
-      //   use: 'babel-loader',
-      //   exclude: /node_modules/
-      // }
+      {
+        test: /\.js$/,
+        exclude: /node_modules\/(?!@aws-sdk\/).*/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              [
+                '@babel/preset-env',
+                {
+                  targets: {
+                    node: '16',
+                  },
+                },
+              ],
+            ],
+            plugins: [
+              '@babel/plugin-transform-optional-chaining',
+              '@babel/plugin-transform-spread',
+              '@babel/plugin-transform-nullish-coalescing-operator',
+              '@babel/plugin-transform-classes',
+            ],
+          },
+        },
+      },
     ],
   },
   resolve: {
