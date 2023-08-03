@@ -23,7 +23,7 @@ jobs:
       - name: Install root dependencies
         run: |
           npm install -g npm@latest
-          npm install
+          npm ci
           npm run build-pkgs
 
       - name: Build And Deploy
