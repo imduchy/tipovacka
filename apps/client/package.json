@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.16.5",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@nuxt/types": "^2.15.8",
     "@nuxt/typescript-build": "^2.1.0",
     "@nuxtjs/axios": "^5.12.5",

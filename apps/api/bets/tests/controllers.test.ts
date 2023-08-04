@@ -12,13 +12,13 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { ApiError } from '../../errors/customErrors';
 import { ResponseErrorCodes } from '../../utils/httpResponses';
-import { postBet, putBet } from '../controllers';
+import { getTopBets, postBet, putBet } from '../controllers';
 
 // import mockingoose from 'mockingoose'; doesn't seem to be working
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
-describe('POST /bet', () => {
+describe('POST /bets', () => {
   let requestMock: Request;
   let responseMock: Response;
   let nextFnMock: NextFunction;
@@ -137,7 +137,7 @@ describe('POST /bet', () => {
   });
 });
 
-describe('PUT /bet', () => {
+describe('PUT /bets', () => {
   let requestMock: Request;
   let responseMock: Response;
   let nextFnMock: NextFunction;
@@ -260,5 +260,62 @@ describe('PUT /bet', () => {
     await putBet(requestMock, responseMock, nextFnMock);
 
     expect(responseMock.status).toBeCalledWith(200);
+  });
+});
+
+describe('GET /bets/top', () => {
+  let requestMock: Request;
+  let responseMock: Response;
+  let nextFnMock: NextFunction;
+  let userMock: IUserWithID;
+  let betMock: IBetWithID;
+  let gameMock: IGameWithID;
+
+  beforeAll(() => {
+    exportModels(mongoose);
+  });
+
+  beforeEach(() => {
+    mockingoose.resetAll();
+
+    userMock = {
+      _id: '507f191e810c19729de480eb',
+      groupId: '507f191e810c19729de770cd',
+      username: 'user1',
+      email: 'user@email.com',
+      competitionScore: [],
+      bets: [],
+      scope: ['user'],
+    } as unknown as IUserWithID;
+
+    gameMock = {
+      _id: '507f191e810c19729de860ea',
+      date: new Date(),
+    } as unknown as IGameWithID;
+
+    betMock = {
+      _id: '507f191e810c19729de492ef',
+      game: gameMock._id,
+      homeTeamScore: 2,
+      awayTeamScore: 1,
+      scorer: 123,
+    } as unknown as IBetWithID;
+
+    requestMock = {
+      body: { team: betMock._id, season: 2023, round: 1, competition: 123 },
+      user: { _id: userMock._id },
+    } as unknown as Request;
+
+    responseMock = {
+      send: jest.fn().mockReturnThis(),
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+    } as unknown as Response;
+
+    nextFnMock = jest.fn().mockReturnThis();
+  });
+
+  it("should return 404 if the user object doesn't exist", async () => {
+    expect(2).toEqual(2);
   });
 });

@@ -164,6 +164,8 @@ UserSchema.path('groupId').validate(function (value: Types.ObjectId) {
   const GroupModel = model<IGroup>('group');
 
   return new Promise(function (resolve) {
-    GroupModel.findById(value, (_: unknown, group: IGroup) => resolve(!!group));
+    const group = GroupModel.findById(value);
+
+    resolve(!!group);
   });
 }, 'A group with _id `{VALUE}` was not found');

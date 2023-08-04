@@ -297,7 +297,8 @@ router.get(
       }
 
       const games = await Game.find({
-        competitionId: { $in: competitionsFilter },
+        // { $in: competitionsFilter } doesn't seem to work as expected - it passes the object into the query
+        competitionId: competitionsFilter[0],
         season: season,
         $or: [{ 'homeTeam.teamId': { $eq: teamApiId } }, { 'awayTeam.teamId': { $eq: teamApiId } }],
       });

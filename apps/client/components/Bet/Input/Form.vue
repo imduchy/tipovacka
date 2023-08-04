@@ -261,12 +261,14 @@ export default Vue.extend({
       this.sendingRequest = true;
 
       try {
+        const scorer = this.scorer ? this.scorer.apiId : 0;
+
         this.$axios
           .post('/bets', {
             game: this.upcomingGame._id,
             homeTeamScore: this.homeTeamScore,
             awayTeamScore: this.awayTeamScore,
-            scorer: this.scorer ? this.scorer.apiId : 0,
+            scorer,
           })
           .then(async (response) => {
             if (response.status === 200) {

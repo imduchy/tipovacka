@@ -151,7 +151,7 @@ export default Vue.extend({
 
     this.bestBets = await this.$axios.$get('/bets/top', {
       params: {
-        team: this.followedTeam.apiId,
+        team: parseInt(this.followedTeam.apiId),
         season: this.latestSeason,
         // If there's no upcomingGame, get the last game.
         // Othewrise, get the second last game
