@@ -33,7 +33,7 @@ jobs:
 
       - name: 'Build the application'
         run: |
-          npm run build-common
+          npm run build-pkgs
           npm run build --workspace=@tipovacka/enginev2
 
       - name: 'Run tests'
