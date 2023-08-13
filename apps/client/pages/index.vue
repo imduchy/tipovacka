@@ -155,7 +155,7 @@ export default Vue.extend({
         season: this.latestSeason,
         // If there's no upcomingGame, get the last game.
         // Othewrise, get the second last game
-        round: this.upcomingGame ? -2 : -1,
+        round: this.upcomingGame ? -1 : 0,
       },
     });
 

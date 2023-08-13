@@ -1,4 +1,4 @@
-import { Game, Group, IBet, IBetWithID, IUserWithID, User } from '@tipovacka/models';
+import { Game, GameStatus, Group, IBet, IBetWithID, IUserWithID, User } from '@tipovacka/models';
 import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { ApiError } from '../errors/customErrors';
@@ -261,6 +261,7 @@ export const getTopBets = async (req: Request, res: Response, next: NextFunction
       season: season,
       competitionId: competition,
       $eq: { $or: [{ 'homeTeam.teamId': team }, { 'awayTeam.teamId': team }] },
+      status: GameStatus.FT,
     });
 
     // const games = gamesAggregate.flat() as IGameWithID[];
