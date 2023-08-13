@@ -189,8 +189,9 @@ export const putBet = async (req: Request, res: Response, next: NextFunction): P
 
 export const getTopBets = async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req.user as IUserWithID)._id;
-  const { team, season, round }: GetTopBetsParams = req.body;
-  let competition: number | undefined = req.body.competition;
+  const { team, season, round } = req.query;
+  let competition = undefined;
+  // let competition: number | undefined = req.params.competition;
 
   try {
     logger.info('Fetching the user by user ID.');
@@ -257,6 +258,9 @@ export const getTopBets = async (req: Request, res: Response, next: NextFunction
     //   },
     // ]);
 
+    console.log('Season: ', season);
+    console.log('Competition: ', competition);
+
     const games = await Game.find({
       season: season,
       competitionId: competition,
@@ -264,8 +268,11 @@ export const getTopBets = async (req: Request, res: Response, next: NextFunction
       status: GameStatus.FT,
     });
 
+    console.log('Games: ', games.length);
+
     // const games = gamesAggregate.flat() as IGameWithID[];
-    const game = round >= 0 ? games[round] : games[games.length + round];
+    // const game = round >= 0 ? games[round] : games[games.length + round];
+    const game = games[games.length + parseInt(round as string)];
 
     if (!game) {
       logger.info('No games found. Returning an empty list back.');
