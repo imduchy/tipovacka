@@ -37,7 +37,7 @@ export default Vue.extend({
   // @ts-ignore
   async fetch() {
     this.rawUsers = await this.$axios.$get('/groups/users', {
-      params: { group: this.$store.state.group._id, season: 2022 },
+      params: { group: this.$store.state.group._id, season: 2023 },
     });
   },
   computed: {
